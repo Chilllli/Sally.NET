@@ -5,6 +5,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Chan.commands;
 using Discord_Chan.config;
+using Discord_Chan.db;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -29,6 +30,7 @@ namespace Discord_Chan
         {
 
             botConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
+            DataAccess.Initialize(botConfiguration);
 
             client = new DiscordSocketClient();
             commands = new CommandService();
@@ -59,14 +61,33 @@ namespace Discord_Chan
         {
             client.MessageReceived += CommandHandler;
             client.Ready += Client_Ready;
+            client.GuildMemberUpdated += Client_GuildMemberUpdated;
             await commands.AddModulesAsync(Assembly.GetEntryAssembly());
         }//Assembly.GetEntryAssembly()
+
+        private async Task Client_GuildMemberUpdated(SocketGuildUser userOld, SocketGuildUser userNew)
+        {
+            if(userOld == null && userNew != null)
+            {
+                if (DataAccess.Instance.users.Find(u => u.Id == userNew.Id) == null)
+                {
+                    DataAccess.Instance.InsertUser(new User() { Id = userNew.Id, Xp = 10 });
+                }
+            }            
+        }
 
         private async Task Client_Ready()
         {
             MusicCommands.Initialize(client);
-          // IAudioClient voiceChannel = await client.Guilds.Where(g => g.Name == "Its better together!").First().VoiceChannels.Where(c => c.Name == "Türschwelle").First().ConnectAsync();
-          //  MusicCommands.audioClient = voiceChannel;
+            // IAudioClient voiceChannel = await client.Guilds.Where(g => g.Name == "Its better together!").First().VoiceChannels.Where(c => c.Name == "Türschwelle").First().ConnectAsync();
+            //  MusicCommands.audioClient = voiceChannel;
+            foreach (SocketGuildUser user in client.Guilds.Where(g => g.Id == 316621565305421825).First().Users)
+            {
+                if(DataAccess.Instance.users.Find(u => u.Id == user.Id) == null)
+                {
+                    DataAccess.Instance.InsertUser(new User() { Id=user.Id, Xp=10});
+                }
+            }
         }
 
         private async Task CommandHandler(SocketMessage arg)
