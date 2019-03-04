@@ -28,7 +28,7 @@ namespace Discord_Chan.db
             try
             {
                 connection.Open();
-                Console.WriteLine("Success");
+                Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} Success");
             }
             catch (MySqlException ex)
             {
@@ -43,29 +43,31 @@ namespace Discord_Chan.db
 
         public void InsertUser(User user)
         {
-            MySqlCommand command = new MySqlCommand("INSERT INTO users.infos(id,xp) VALUES (@id,@xp)", connection);
+            MySqlCommand command = new MySqlCommand("INSERT INTO users.infos(id,xp,isMuted) VALUES (@id,@xp,@mute)", connection);
             command.Parameters.AddWithValue("@id", user.Id);
             command.Parameters.AddWithValue("@xp", user.Xp);
+            command.Parameters.AddWithValue("@mute", user.HasMuted);
             command.Prepare();
             command.ExecuteNonQuery();
         }
 
         public void UpdateUser(User user)
         {
-            MySqlCommand command = new MySqlCommand("UPDATE users.infos SET xp = @xp WHERE id = @id", connection);
+            MySqlCommand command = new MySqlCommand("UPDATE users.infos SET xp = @xp, isMuted = @mute WHERE id = @id", connection);
             command.Parameters.AddWithValue("@id", user.Id);
             command.Parameters.AddWithValue("@xp", user.Xp);
+            command.Parameters.AddWithValue("@mute", user.HasMuted);
             command.Prepare();
             command.ExecuteNonQuery();
         }
         
         void loadUsers()
         {
-            MySqlCommand command = new MySqlCommand("SELECT id,xp FROM users.infos", connection);
+            MySqlCommand command = new MySqlCommand("SELECT id,xp,isMuted FROM users.infos", connection);
             MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                users.Add(new User() { Id = (ulong)reader["id"], Xp = (int)reader["xp"] });
+                users.Add(new User() { Id = (ulong)reader["id"], Xp = (int)reader["xp"], HasMuted = (int)reader["isMuted"] });
             }
             reader.Close();
         }

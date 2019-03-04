@@ -41,6 +41,6 @@ namespace Discord_Chan.db
         {
             return (int)Math.Floor(Math.Sqrt((xp - 200) / 300) + Math.Sqrt((xp - 200) / 500));
         }
-        public bool HasMuted;
+        public int HasMuted;
     }
 }
