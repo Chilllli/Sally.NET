@@ -8,8 +8,39 @@ namespace Discord_Chan.db
     class User
     {
         public ulong Id;
-        public int Xp;
-        public Timer xpTimer;
-        public DateTime lastXpTime;
+        private int xp;
+        public int Xp
+        {
+            get
+            {
+                return xp;
+            }
+            set
+            {
+                if(Level < getLevelFromXp(value))
+                {
+                    xp = value;
+                    OnLevelUp?.Invoke(this);
+                }
+                xp = value;
+            }
+        }
+        public Timer XpTimer;
+        public DateTime LastXpTime;
+
+        public int Level
+        {
+            get
+            {
+                return getLevelFromXp(Xp);
+            }
+        }
+        public delegate void LevelUp(User user);
+        public event LevelUp OnLevelUp;
+        private static int getLevelFromXp(int xp)
+        {
+            return (int)Math.Floor(Math.Sqrt((xp - 200) / 300) + Math.Sqrt((xp - 200) / 500));
+        }
+        public bool HasMuted;
     }
 }

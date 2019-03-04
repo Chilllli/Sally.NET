@@ -100,9 +100,9 @@ namespace Discord_Chan
 
         private void startTrackingVoiceChannel(User user)
         {
-            user.lastXpTime = DateTime.Now;
-            user.xpTimer = new Timer(xpTiming);
-            user.xpTimer.Elapsed += (s,e) => trackVoiceChannel(user);
+            user.LastXpTime = DateTime.Now;
+            user.XpTimer = new Timer(xpTiming);
+            user.XpTimer.Elapsed += (s,e) => trackVoiceChannel(user);
         }
 
         private void trackVoiceChannel(User user)
@@ -117,15 +117,15 @@ namespace Discord_Chan
                 return;
             }
             user.Xp += xp;
-            user.lastXpTime = DateTime.Now;
+            user.LastXpTime = DateTime.Now;
 
 
         }
 
         private void stopTrackingVoiceChannel(User user)
         {
-            user.xpTimer.Stop();
-            user.Xp += (int)Math.Round(((DateTime.Now - user.lastXpTime).TotalMilliseconds / xpTiming) * xp);
+            user.XpTimer.Stop();
+            user.Xp += (int)Math.Round(((DateTime.Now - user.LastXpTime).TotalMilliseconds / xpTiming) * xp);
         }
 
         private async Task userJoined(SocketGuildUser userOld, SocketGuildUser userNew)
@@ -136,8 +136,28 @@ namespace Discord_Chan
             }
             if (DataAccess.Instance.users.Find(u => u.Id == userNew.Id) == null)
             {
-                DataAccess.Instance.InsertUser(new User() { Id = userNew.Id, Xp = 10 });
+                User user = new User() { Id = userNew.Id, Xp = 10 };
+                user.OnLevelUp += User_OnLevelUp;
+                DataAccess.Instance.InsertUser(user);
             }
+        }
+
+        private async void User_OnLevelUp(User user)
+        {
+            SocketRole levelRole = myGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level}");
+            if (levelRole == null)
+            {
+                await myGuild.CreateRoleAsync($"Level {user.Level}");
+                levelRole = myGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level}");
+            }
+            SocketGuildUser gUser = myGuild.Users.ToList().Find(u => u.Id == user.Id);
+            SocketRole oldLevelRole = myGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level - 1}");
+            if(gUser.Roles.ToList().Find(r => r.Id == oldLevelRole.Id) == null)
+            {
+                await gUser.AddRoleAsync(levelRole);
+            }
+            await gUser.RemoveRoleAsync(oldLevelRole);
+            await gUser.AddRoleAsync(levelRole);
         }
 
         private async Task Client_Ready()
