@@ -43,7 +43,7 @@ namespace Discord_Chan.db
 
         public void InsertUser(User user)
         {
-            MySqlCommand command = new MySqlCommand("INSERT INTO users.infos(id,xp,isMuted) VALUES (@id,@xp,@mute)", connection);
+            MySqlCommand command = new MySqlCommand("INSERT INTO infos(id,xp,isMuted) VALUES (@id,@xp,@mute)", connection);
             command.Parameters.AddWithValue("@id", user.Id);
             command.Parameters.AddWithValue("@xp", user.Xp);
             command.Parameters.AddWithValue("@mute", user.HasMuted ? 1 : 0);
@@ -53,7 +53,7 @@ namespace Discord_Chan.db
 
         public void UpdateUser(User user)
         {
-            MySqlCommand command = new MySqlCommand("UPDATE users.infos SET xp = @xp, isMuted = @mute WHERE id = @id", connection);
+            MySqlCommand command = new MySqlCommand("UPDATE infos SET xp = @xp, isMuted = @mute WHERE id = @id", connection);
             command.Parameters.AddWithValue("@id", user.Id);
             command.Parameters.AddWithValue("@xp", user.Xp);
             command.Parameters.AddWithValue("@mute", user.HasMuted ? 1 : 0);
@@ -63,7 +63,7 @@ namespace Discord_Chan.db
         
         void loadUsers()
         {
-            MySqlCommand command = new MySqlCommand("SELECT id,xp,isMuted FROM users.infos", connection);
+            MySqlCommand command = new MySqlCommand("SELECT id,xp,isMuted FROM infos", connection);
             MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
