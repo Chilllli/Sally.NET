@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -26,6 +27,8 @@ namespace Discord_Chan
         private SocketGuild myGuild;
         private int xp = 20;
         private int xpTiming = 5 * 1000 * 60;
+        private SocketUser me;
+        private ulong meId = 249680382499225600;
 
         public static void Main(string[] args)
         {
@@ -41,28 +44,27 @@ namespace Discord_Chan
 
         public async Task MainAsync()
         {
-            
-                botConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
+
+            botConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
             DataAccess.Initialize(botConfiguration);
-            using (DataAccess access = DataAccess.Instance)
-            {
-                client = new DiscordSocketClient();
-                commands = new CommandService();
-                services = new ServiceCollection()
-                  .AddSingleton(client)
-                  .AddSingleton<InteractiveService>()
-                  .BuildServiceProvider();
 
-                await InitializeCommands();
+            client = new DiscordSocketClient();
+            commands = new CommandService();
+            services = new ServiceCollection()
+              .AddSingleton(client)
+              .AddSingleton<InteractiveService>()
+              .BuildServiceProvider();
 
-                client.Log += Log;
+            await InitializeCommands();
 
-                await client.LoginAsync(TokenType.Bot, botConfiguration.token);
-                await client.StartAsync();
+            client.Log += Log;
 
-                // Block this task until the program is closed.
-                await Task.Delay(-1);
-            }
+            await client.LoginAsync(TokenType.Bot, botConfiguration.token);
+            await client.StartAsync();
+
+            // Block this task until the program is closed.
+            await Task.Delay(-1);
+
         }
 
         private Task Log(LogMessage msg)
@@ -100,12 +102,12 @@ namespace Discord_Chan
         private async Task voiceChannelJoined(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
         {
             //if guild joined
-            if(voiceStateOld.VoiceChannel?.Id == voiceStateNew.VoiceChannel?.Id || voiceStateNew.VoiceChannel == null)
+            if (voiceStateOld.VoiceChannel?.Id == voiceStateNew.VoiceChannel?.Id || voiceStateNew.VoiceChannel == null)
             {
                 return;
             }
             User currentUser = DataAccess.Instance.users.Find(u => u.Id == disUser.Id);
-            if(!currentUser.HasMuted)
+            if (!currentUser.HasMuted)
             {
                 //send private message
                 //await disUser.SendMessageAsync("testing");
@@ -117,17 +119,17 @@ namespace Discord_Chan
         {
             user.LastXpTime = DateTime.Now;
             user.XpTimer = new Timer(xpTiming);
-            user.XpTimer.Elapsed += (s,e) => trackVoiceChannel(user);
+            user.XpTimer.Elapsed += (s, e) => trackVoiceChannel(user);
         }
 
         private void trackVoiceChannel(User user)
         {
             SocketGuildUser trackedUser = myGuild.Users.ToList().Find(u => u.Id == user.Id);
-            if(trackedUser == null)
+            if (trackedUser == null)
             {
                 return;
             }
-            if(trackedUser.VoiceChannel == null)
+            if (trackedUser.VoiceChannel == null)
             {
                 return;
             }
@@ -143,7 +145,7 @@ namespace Discord_Chan
 
         private async Task userJoined(SocketGuildUser userOld, SocketGuildUser userNew)
         {
-            if(userOld != null || userNew == null)
+            if (userOld != null || userNew == null)
             {
                 return;
             }
@@ -165,7 +167,7 @@ namespace Discord_Chan
             }
             SocketGuildUser gUser = myGuild.Users.ToList().Find(u => u.Id == user.Id);
             SocketRole oldLevelRole = myGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level - 1}");
-            if(gUser.Roles.ToList().Find(r => r.Id == oldLevelRole.Id) != null)
+            if (gUser.Roles.ToList().Find(r => r.Id == oldLevelRole.Id) != null)
             {
                 await gUser.RemoveRoleAsync(oldLevelRole);
             }
@@ -180,12 +182,36 @@ namespace Discord_Chan
             //  MusicCommands.audioClient = voiceChannel;
             foreach (SocketGuildUser user in myGuild.Users)
             {
-                if(DataAccess.Instance.users.Find(u => u.Id == user.Id) == null)
+                if (DataAccess.Instance.users.Find(u => u.Id == user.Id) == null)
                 {
                     DataAccess.Instance.InsertUser(new User(user.Id, 10, false));
                 }
             }
-
+            //finding myself
+            foreach(SocketUser user in myGuild.Users)
+            {
+                if(user.Id == meId)
+                {
+                    me = user;
+                    break;
+                }
+            }
+#pragma warning disable CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    using (NamedPipeServerStream npss = new NamedPipeServerStream("StatusNotifier", PipeDirection.In))
+                    {
+                        npss.WaitForConnection();
+                        using (StreamReader reader = new StreamReader(npss))
+                        {
+                            me.SendMessageAsync(reader.ReadLine());
+                        }
+                    }
+                }
+            });
+#pragma warning restore CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
         }
 
         private async Task CommandHandler(SocketMessage arg)
