@@ -152,7 +152,7 @@ namespace Discord_Chan.commands
 
             //alle nachrichten löschen
             ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.botConfiguration.radioControlChannel) as SocketTextChannel;
-            List<IMessage> userMessages = (await textChannel.GetMessagesAsync().Flatten()).ToList();
+            List<IMessage> userMessages = await( textChannel.GetMessagesAsync().Flatten()).ToList();
             foreach (IMessage message in userMessages)
             {
                 await message.DeleteAsync();
@@ -184,10 +184,10 @@ namespace Discord_Chan.commands
                 SocketTextChannel textChannel = client.Guilds.First(g => g.GetChannel(Program.botConfiguration.radioControlChannel) != null).GetChannel(Program.botConfiguration.radioControlChannel) as SocketTextChannel;
                 RestUserMessage oneMessage = await textChannel.GetMessageAsync(Id) as RestUserMessage;
                 if (oneMessage == null) continue;
-                int currentPause = (await oneMessage.GetReactionUsersAsync("\u23EF")).Count;
-                int currentPrevious = (await oneMessage.GetReactionUsersAsync("\u23EE")).Count;
-                int currentSkip = (await oneMessage.GetReactionUsersAsync("\u23ED")).Count;
-                int currentRepeat = (await oneMessage.GetReactionUsersAsync("\U0001F502")).Count;
+                int currentPause = await ( oneMessage.GetReactionUsersAsync(new Emoji("\u23EF"), 10000)).Count();
+                int currentPrevious = await ( oneMessage.GetReactionUsersAsync(new Emoji("\u23EE"), 10000)).Count();
+                int currentSkip = await ( oneMessage.GetReactionUsersAsync(new Emoji("\u23ED"), 10000)).Count();
+                int currentRepeat = await ( oneMessage.GetReactionUsersAsync(new Emoji("\U0001F502"), 10000)).Count();
 
                 if (currentPause + currentPrevious + currentRepeat + currentSkip == 0)
                 {

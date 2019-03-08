@@ -7,6 +7,12 @@ namespace Discord_Chan.db
 {
     class User
     {
+        public User(ulong id, int xp, bool mute){
+            Id = id;
+            this.xp = xp;
+            hasMuted = mute;
+        }
+
         public ulong Id;
         private int xp;
         public int Xp
@@ -23,6 +29,7 @@ namespace Discord_Chan.db
                     OnLevelUp?.Invoke(this);
                 }
                 xp = value;
+                DataAccess.Instance.UpdateUser(this);
             }
         }
         public Timer XpTimer;
@@ -41,6 +48,18 @@ namespace Discord_Chan.db
         {
             return (int)Math.Floor(Math.Sqrt((xp - 200) / 300) + Math.Sqrt((xp - 200) / 500));
         }
-        public int HasMuted;
+        private bool hasMuted;
+        public bool HasMuted
+        {
+            set
+            {
+                hasMuted = value;
+                DataAccess.Instance.UpdateUser(this);
+            }
+            get
+            {
+                return hasMuted;
+            }
+        }
     }
 }

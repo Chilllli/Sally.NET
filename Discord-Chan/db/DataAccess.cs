@@ -28,7 +28,7 @@ namespace Discord_Chan.db
             try
             {
                 connection.Open();
-                Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} Success");
+                Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    Success");
             }
             catch (MySqlException ex)
             {
@@ -46,7 +46,7 @@ namespace Discord_Chan.db
             MySqlCommand command = new MySqlCommand("INSERT INTO users.infos(id,xp,isMuted) VALUES (@id,@xp,@mute)", connection);
             command.Parameters.AddWithValue("@id", user.Id);
             command.Parameters.AddWithValue("@xp", user.Xp);
-            command.Parameters.AddWithValue("@mute", user.HasMuted);
+            command.Parameters.AddWithValue("@mute", user.HasMuted ? 1 : 0);
             command.Prepare();
             command.ExecuteNonQuery();
         }
@@ -56,7 +56,7 @@ namespace Discord_Chan.db
             MySqlCommand command = new MySqlCommand("UPDATE users.infos SET xp = @xp, isMuted = @mute WHERE id = @id", connection);
             command.Parameters.AddWithValue("@id", user.Id);
             command.Parameters.AddWithValue("@xp", user.Xp);
-            command.Parameters.AddWithValue("@mute", user.HasMuted);
+            command.Parameters.AddWithValue("@mute", user.HasMuted ? 1 : 0);
             command.Prepare();
             command.ExecuteNonQuery();
         }
@@ -67,9 +67,10 @@ namespace Discord_Chan.db
             MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                users.Add(new User() { Id = (ulong)reader["id"], Xp = (int)reader["xp"], HasMuted = (int)reader["isMuted"] });
+                users.Add(new User((ulong)reader["id"], (int)reader["xp"], (int)reader["isMuted"] == 1));
             }
             reader.Close();
+            Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    All Users loaded");
         }
 
         public void Dispose()

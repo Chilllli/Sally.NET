@@ -28,31 +28,41 @@ namespace Discord_Chan
         private int xpTiming = 5 * 1000 * 60;
 
         public static void Main(string[] args)
-            => new Program().MainAsync().GetAwaiter().GetResult();
+        {
+            Console.CancelKeyPress += Console_CancelKeyPress;
+            new Program().MainAsync().GetAwaiter().GetResult();
+        }
+
+        private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            DataAccess.Instance.Dispose();
+            Environment.Exit(0);
+        }
 
         public async Task MainAsync()
         {
-
-            botConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
+            
+                botConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
             DataAccess.Initialize(botConfiguration);
+            using (DataAccess access = DataAccess.Instance)
+            {
+                client = new DiscordSocketClient();
+                commands = new CommandService();
+                services = new ServiceCollection()
+                  .AddSingleton(client)
+                  .AddSingleton<InteractiveService>()
+                  .BuildServiceProvider();
 
-            client = new DiscordSocketClient();
-            commands = new CommandService();
-            services = new ServiceCollection()
-              .AddSingleton(client)
-              .AddSingleton<InteractiveService>()
-              .BuildServiceProvider();
+                await InitializeCommands();
 
-            await InitializeCommands();
+                client.Log += Log;
 
-            client.Log += Log;
+                await client.LoginAsync(TokenType.Bot, botConfiguration.token);
+                await client.StartAsync();
 
-            await client.LoginAsync(TokenType.Bot, botConfiguration.token);
-            await client.StartAsync();
-
-            // Block this task until the program is closed.
-            await Task.Delay(-1);
-
+                // Block this task until the program is closed.
+                await Task.Delay(-1);
+            }
         }
 
         private Task Log(LogMessage msg)
@@ -66,36 +76,41 @@ namespace Discord_Chan
             client.MessageReceived += CommandHandler;
             client.Ready += Client_Ready;
             client.GuildMemberUpdated += userJoined;
-            client.GuildMemberUpdated += voiceChannelJoined;
-            client.GuildMemberUpdated += voiceChannelLeft;
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly());
-        }//Assembly.GetEntryAssembly()
-
-        private async Task voiceChannelLeft(SocketGuildUser userOld, SocketGuildUser userNew)
-        {
-            if (userOld == null || userNew == null)
-            {
-                return;
-            }
-            if (userNew.VoiceChannel != null && userOld.VoiceChannel?.Id == userNew.VoiceChannel?.Id)
-            {
-                return;
-            }
-            stopTrackingVoiceChannel(DataAccess.Instance.users.Find(u => u.Id == userNew.Id));
+            client.UserVoiceStateUpdated += voiceChannelJoined;
+            client.UserVoiceStateUpdated += voiceChannelLeft;
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
 
-        private async Task voiceChannelJoined(SocketGuildUser userOld, SocketGuildUser userNew)
+
+        private async Task voiceChannelLeft(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
         {
-            //if guild joined
-            if(userOld == null || userNew == null)
-            {
-                return;
-            } 
-            if(userOld.VoiceChannel?.Id == userNew.VoiceChannel?.Id || userNew.VoiceChannel == null)
+            if (voiceStateNew.VoiceChannel != null || voiceStateOld.VoiceChannel?.Id == voiceStateNew.VoiceChannel?.Id)
             {
                 return;
             }
-            startTrackingVoiceChannel(DataAccess.Instance.users.Find(u => u.Id == userNew.Id));
+            User currentUser = DataAccess.Instance.users.Find(u => u.Id == disUser.Id);
+            if (!currentUser.HasMuted)
+            {
+                //send private message
+                //await disUser.SendMessageAsync("testing");
+            }
+            stopTrackingVoiceChannel(DataAccess.Instance.users.Find(u => u.Id == disUser.Id));
+        }
+
+        private async Task voiceChannelJoined(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
+        {
+            //if guild joined
+            if(voiceStateOld.VoiceChannel?.Id == voiceStateNew.VoiceChannel?.Id || voiceStateNew.VoiceChannel == null)
+            {
+                return;
+            }
+            User currentUser = DataAccess.Instance.users.Find(u => u.Id == disUser.Id);
+            if(!currentUser.HasMuted)
+            {
+                //send private message
+                //await disUser.SendMessageAsync("testing");
+            }
+            startTrackingVoiceChannel(currentUser);
         }
 
         private void startTrackingVoiceChannel(User user)
@@ -118,8 +133,6 @@ namespace Discord_Chan
             }
             user.Xp += xp;
             user.LastXpTime = DateTime.Now;
-
-
         }
 
         private void stopTrackingVoiceChannel(User user)
@@ -136,7 +149,7 @@ namespace Discord_Chan
             }
             if (DataAccess.Instance.users.Find(u => u.Id == userNew.Id) == null)
             {
-                User user = new User() { Id = userNew.Id, Xp = 10 };
+                User user = new User(userNew.Id, 10, false);
                 user.OnLevelUp += User_OnLevelUp;
                 DataAccess.Instance.InsertUser(user);
             }
@@ -152,11 +165,10 @@ namespace Discord_Chan
             }
             SocketGuildUser gUser = myGuild.Users.ToList().Find(u => u.Id == user.Id);
             SocketRole oldLevelRole = myGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level - 1}");
-            if(gUser.Roles.ToList().Find(r => r.Id == oldLevelRole.Id) == null)
+            if(gUser.Roles.ToList().Find(r => r.Id == oldLevelRole.Id) != null)
             {
-                await gUser.AddRoleAsync(levelRole);
+                await gUser.RemoveRoleAsync(oldLevelRole);
             }
-            await gUser.RemoveRoleAsync(oldLevelRole);
             await gUser.AddRoleAsync(levelRole);
         }
 
@@ -170,7 +182,7 @@ namespace Discord_Chan
             {
                 if(DataAccess.Instance.users.Find(u => u.Id == user.Id) == null)
                 {
-                    DataAccess.Instance.InsertUser(new User() { Id=user.Id, Xp=10});
+                    DataAccess.Instance.InsertUser(new User(user.Id, 10, false));
                 }
             }
 
