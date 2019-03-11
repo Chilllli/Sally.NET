@@ -286,8 +286,16 @@ namespace Discord_Chan.commands
             string taskPath = Path.Combine(Path.GetTempPath(), $"{id}.pcm");
             if (!File.Exists(path))
             {
-                await tubeClient.DownloadMediaStreamAsync(streamInfo, path);
-
+                using (MemoryStream outputStream = new MemoryStream())
+                {
+                    await tubeClient.DownloadMediaStreamAsync(streamInfo, outputStream);
+                    outputStream.Seek(0, SeekOrigin.Begin);
+                    using (FileStream fileStream = new FileStream(path, FileMode.Open))
+                    {
+                        await outputStream.CopyToAsync(fileStream);
+                    }
+                }
+                    
                 Process.Start(new ProcessStartInfo()
                 {
                     FileName = "ffmpeg",

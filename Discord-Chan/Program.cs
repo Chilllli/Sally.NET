@@ -177,7 +177,7 @@ namespace Discord_Chan
         private async Task Client_Ready()
         {
             myGuild = client.Guilds.Where(g => g.Id == 316621565305421825).First();
-            //MusicCommands.Initialize(client);
+            MusicCommands.Initialize(client);
             // IAudioClient voiceChannel = await client.Guilds.Where(g => g.Name == "Its better together!").First().VoiceChannels.Where(c => c.Name == "Türschwelle").First().ConnectAsync();
             //  MusicCommands.audioClient = voiceChannel;
             foreach (SocketGuildUser user in myGuild.Users)
