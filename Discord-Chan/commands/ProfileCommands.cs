@@ -24,8 +24,6 @@ namespace Discord_Chan.commands
                 Console.WriteLine(avatar);
                 Console.WriteLine(password);
             }
-
-
         }
 
         [Command("mute")]

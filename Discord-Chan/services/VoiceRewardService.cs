@@ -2,16 +2,15 @@
 using Discord_Chan.db;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Discord_Chan.services
 {
     static class VoiceRewardService
     {
-        private static int xp = 250;
-        private static int xpTiming = 10 * 1000 * 60;
-
         public static async Task InitializeHandler(DiscordSocketClient client)
         {
             client.UserVoiceStateUpdated += voiceChannelJoined;
@@ -52,13 +51,13 @@ namespace Discord_Chan.services
         private static void startTrackingVoiceChannel(User user)
         {
             user.LastXpTime = DateTime.Now;
-            user.XpTimer = new Timer(xpTiming);
+            user.XpTimer = new Timer(Program.BotConfiguration.xpTimerInMin * 1000 * 60);
             user.XpTimer.Elapsed += (s, e) => trackVoiceChannel(user);
         }
 
         private static void trackVoiceChannel(User user)
         {
-            SocketGuildUser trackedUser = myGuild.Users.ToList().Find(u => u.Id == user.Id);
+            SocketGuildUser trackedUser = Program.MyGuild.Users.ToList().Find(u => u.Id == user.Id);
             if (trackedUser == null)
             {
                 return;
@@ -67,14 +66,14 @@ namespace Discord_Chan.services
             {
                 return;
             }
-            user.Xp += xp;
+            user.Xp += Program.BotConfiguration.gainedXp;
             user.LastXpTime = DateTime.Now;
         }
 
         private static void stopTrackingVoiceChannel(User user)
         {
             user.XpTimer.Stop();
-            user.Xp += (int)Math.Round(((DateTime.Now - user.LastXpTime).TotalMilliseconds / xpTiming) * xp);
+            user.Xp += (int)Math.Round(((DateTime.Now - user.LastXpTime).TotalMilliseconds / Program.BotConfiguration.xpTimerInMin * 1000 * 60) * Program.BotConfiguration.gainedXp);
         }
     }
 }

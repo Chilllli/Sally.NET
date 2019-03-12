@@ -21,7 +21,11 @@ namespace Discord_Chan
 {
     class Program
     {
-        public static BotConfiguration botConfiguration;
+        public static BotConfiguration BotConfiguration
+        {
+            get;
+            private set;
+        }
 
         public static DiscordSocketClient Client
         {
@@ -34,6 +38,7 @@ namespace Discord_Chan
             get;
             private set;
         }
+       
 
         public static void Main(string[] args)
         {
@@ -50,8 +55,9 @@ namespace Discord_Chan
         public async Task MainAsync()
         {
 
-            botConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
-            DataAccess.Initialize(botConfiguration);
+            BotConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
+            DataAccess.Initialize(BotConfiguration);
+        
 
             Client = new DiscordSocketClient();
 
@@ -63,7 +69,7 @@ namespace Discord_Chan
 
             Client.Log += Log;
 
-            await Client.LoginAsync(TokenType.Bot, botConfiguration.token);
+            await Client.LoginAsync(TokenType.Bot, BotConfiguration.token);
             await Client.StartAsync();
 
             // Block this task until the program is closed.
@@ -79,7 +85,7 @@ namespace Discord_Chan
 
         private async Task Client_Ready()
         {
-            MyGuild = Client.Guilds.Where(g => g.Id == 316621565305421825).First();
+            MyGuild = Client.Guilds.Where(g => g.Id == BotConfiguration.guildId).First();
             foreach (SocketGuildUser user in MyGuild.Users)
             {
                 if (DataAccess.Instance.users.Find(u => u.Id == user.Id) == null)
@@ -87,7 +93,7 @@ namespace Discord_Chan
                     DataAccess.Instance.InsertUser(new User(user.Id, 10, false));
                 }
             }
-            await StatusNotifierService.InitializeService();
+            await StatusNotifierService.InitializeService(BotConfiguration);
             MusicCommands.Initialize(Client);
         }
     }

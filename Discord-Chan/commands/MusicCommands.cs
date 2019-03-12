@@ -151,7 +151,7 @@ namespace Discord_Chan.commands
             audioClient.SpeakingUpdated += AudioClient_SpeakingUpdated;
 
             //alle nachrichten löschen
-            ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.botConfiguration.radioControlChannel) as SocketTextChannel;
+            ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.BotConfiguration.radioControlChannel) as SocketTextChannel;
             List<IMessage> userMessages = await( textChannel.GetMessagesAsync().Flatten()).ToList();
             foreach (IMessage message in userMessages)
             {
@@ -181,7 +181,7 @@ namespace Discord_Chan.commands
             {
                 await Task.Delay(1000);
                 if (Id == 0) continue;
-                SocketTextChannel textChannel = client.Guilds.First(g => g.GetChannel(Program.botConfiguration.radioControlChannel) != null).GetChannel(Program.botConfiguration.radioControlChannel) as SocketTextChannel;
+                SocketTextChannel textChannel = client.Guilds.First(g => g.GetChannel(Program.BotConfiguration.radioControlChannel) != null).GetChannel(Program.BotConfiguration.radioControlChannel) as SocketTextChannel;
                 RestUserMessage oneMessage = await textChannel.GetMessageAsync(Id) as RestUserMessage;
                 if (oneMessage == null) continue;
                 int currentPause = await ( oneMessage.GetReactionUsersAsync(new Emoji("\u23EF"), 10000)).Count();

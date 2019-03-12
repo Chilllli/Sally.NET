@@ -12,5 +12,9 @@ namespace Discord_Chan.config
         public string db_password;
         public string db_host;
         public ulong radioControlChannel;
+        public ulong guildId;
+        public ulong meId;
+        public int gainedXp;
+        public int xpTimerInMin;
     }
 }

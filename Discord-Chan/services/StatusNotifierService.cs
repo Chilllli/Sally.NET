@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Discord_Chan.config;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,14 +13,13 @@ namespace Discord_Chan.services
     class StatusNotifierService
     {
         private static SocketUser me;
-        private static readonly ulong meId = 249680382499225600;
 
-        public static async Task InitializeService()
+        public static async Task InitializeService(BotConfiguration botConfiguration)
         {
             //finding myself
             foreach (SocketUser user in Program.MyGuild.Users)
             {
-                if (user.Id == meId)
+                if (user.Id == botConfiguration.meId)
                 {
                     me = user;
                     break;
