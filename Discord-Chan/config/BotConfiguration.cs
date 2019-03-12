@@ -16,5 +16,6 @@ namespace Discord_Chan.config
         public ulong meId;
         public int gainedXp;
         public int xpTimerInMin;
+        public ulong TerrariaId;
     }
 }
