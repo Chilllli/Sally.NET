@@ -61,5 +61,7 @@ namespace Discord_Chan.db
                 return hasMuted;
             }
         }
+        public DateTime LastGreeting = new DateTime();
+        public DateTime LastFarewell = new DateTime();
     }
 }

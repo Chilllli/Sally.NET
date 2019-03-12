@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Discord_Chan.db;
 using System;
 using System.Collections.Generic;
@@ -24,10 +25,11 @@ namespace Discord_Chan.services
                 return;
             }
             User currentUser = DataAccess.Instance.users.Find(u => u.Id == disUser.Id);
-            if (!currentUser.HasMuted)
+            if (!currentUser.HasMuted && (DateTime.Now - currentUser.LastFarewell).TotalHours > 12)
             {
                 //send private message
-                //await disUser.SendMessageAsync("testing");
+                await disUser.SendMessageAsync("Bye");
+                currentUser.LastFarewell = DateTime.Now;
             }
             stopTrackingVoiceChannel(DataAccess.Instance.users.Find(u => u.Id == disUser.Id));
         }
@@ -40,10 +42,11 @@ namespace Discord_Chan.services
                 return;
             }
             User currentUser = DataAccess.Instance.users.Find(u => u.Id == disUser.Id);
-            if (!currentUser.HasMuted)
+            if (!currentUser.HasMuted && (DateTime.Now - currentUser.LastGreeting).TotalHours > 12)
             {
                 //send private message
-                //await disUser.SendMessageAsync("testing");
+                await disUser.SendMessageAsync("Hello");
+                currentUser.LastGreeting = DateTime.Now;
             }
             startTrackingVoiceChannel(currentUser);
         }
