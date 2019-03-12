@@ -41,7 +41,7 @@ namespace Discord_Chan.commands
             User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             user.HasMuted = false;
         }
-
+#if DEBUG
         [Command("getrich")]
         public async Task QuickExp()
         {
@@ -59,5 +59,6 @@ namespace Discord_Chan.commands
             User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             user.Xp += 1000;
         }
+#endif
     }
 }
