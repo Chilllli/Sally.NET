@@ -57,7 +57,6 @@ namespace Discord_Chan
 
             BotConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
             DataAccess.Initialize(BotConfiguration);
-        
 
             Client = new DiscordSocketClient();
 

@@ -26,11 +26,11 @@ namespace Discord_Chan.services
                 }
             }
 #pragma warning disable CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
-            Task.Run(observeNotifierPipe());
+            Task.Run(observeNotifierPipe);
 #pragma warning restore CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
         }
 
-        private static Action observeNotifierPipe()
+        private static async Task observeNotifierPipe()
         {
             while (true)
             {
@@ -39,7 +39,7 @@ namespace Discord_Chan.services
                     npss.WaitForConnection();
                     using (StreamReader reader = new StreamReader(npss))
                     {
-                        me.SendMessageAsync(reader.ReadLine());
+                        await me.SendMessageAsync(reader.ReadLine());
                     }
                 }
             }
