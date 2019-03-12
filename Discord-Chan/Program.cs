@@ -25,8 +25,8 @@ namespace Discord_Chan
         private DiscordSocketClient client;
         private IServiceProvider services;
         private SocketGuild myGuild;
-        private int xp = 20;
-        private int xpTiming = 5 * 1000 * 60;
+        private int xp = 250;
+        private int xpTiming = 10 * 1000 * 60;
         private SocketUser me;
         private ulong meId = 249680382499225600;
 
@@ -152,7 +152,6 @@ namespace Discord_Chan
             if (DataAccess.Instance.users.Find(u => u.Id == userNew.Id) == null)
             {
                 User user = new User(userNew.Id, 10, false);
-                user.OnLevelUp += User_OnLevelUp;
                 DataAccess.Instance.InsertUser(user);
             }
         }
@@ -167,9 +166,9 @@ namespace Discord_Chan
             }
             SocketGuildUser gUser = myGuild.Users.ToList().Find(u => u.Id == user.Id);
             SocketRole oldLevelRole = myGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level - 1}");
-            if (gUser.Roles.ToList().Find(r => r.Id == oldLevelRole.Id) != null)
+            if (oldLevelRole != null && gUser.Roles.ToList().Find(r => r.Id == oldLevelRole.Id) != null)
             {
-                await gUser.RemoveRoleAsync(oldLevelRole);
+                    await gUser.RemoveRoleAsync(oldLevelRole);   
             }
             await gUser.AddRoleAsync(levelRole);
         }
@@ -188,9 +187,9 @@ namespace Discord_Chan
                 }
             }
             //finding myself
-            foreach(SocketUser user in myGuild.Users)
+            foreach (SocketUser user in myGuild.Users)
             {
-                if(user.Id == meId)
+                if (user.Id == meId)
                 {
                     me = user;
                     break;
@@ -212,6 +211,7 @@ namespace Discord_Chan
                 }
             });
 #pragma warning restore CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
+            User.OnLevelUp += User_OnLevelUp;
         }
 
         private async Task CommandHandler(SocketMessage arg)
