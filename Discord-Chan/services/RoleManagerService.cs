@@ -20,11 +20,14 @@ namespace Discord_Chan.services
             if (levelRole == null)
             {
                 await Program.MyGuild.CreateRoleAsync($"Level {user.Level}");
-                levelRole = Program.MyGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level}");
+                while (levelRole == null)
+                {
+                    levelRole = Program.MyGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level}");
+                }
             }
             SocketGuildUser gUser = Program.MyGuild.Users.ToList().Find(u => u.Id == user.Id);
-            SocketRole oldLevelRole = Program.MyGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level - 1}");
-            if (oldLevelRole != null && gUser.Roles.ToList().Find(r => r.Id == oldLevelRole.Id) != null)
+            SocketRole oldLevelRole = gUser.Roles.ToList().Find(r => r.Name.Contains("Level "));
+            if (oldLevelRole != null)
             {
                 await gUser.RemoveRoleAsync(oldLevelRole);
             }

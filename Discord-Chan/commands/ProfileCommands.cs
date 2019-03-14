@@ -55,7 +55,7 @@ namespace Discord_Chan.commands
                 return;
             }
             User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
-            user.Xp += 1000;
+            user.Xp += 10000;
         }
 #endif
     }
