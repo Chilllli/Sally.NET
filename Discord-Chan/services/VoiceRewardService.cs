@@ -76,7 +76,7 @@ namespace Discord_Chan.services
         private static void stopTrackingVoiceChannel(User user)
         {
             user.XpTimer.Stop();
-            user.Xp += (int)Math.Round(((DateTime.Now - user.LastXpTime).TotalMilliseconds / Program.BotConfiguration.xpTimerInMin * 1000 * 60) * Program.BotConfiguration.gainedXp);
+            user.Xp += (int)Math.Round(((DateTime.Now - user.LastXpTime).TotalMilliseconds / (Program.BotConfiguration.xpTimerInMin * 1000 * 60)) * Program.BotConfiguration.gainedXp);
         }
     }
 }

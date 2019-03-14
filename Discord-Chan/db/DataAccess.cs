@@ -49,6 +49,7 @@ namespace Discord_Chan.db
             command.Parameters.AddWithValue("@mute", user.HasMuted ? 1 : 0);
             command.Prepare();
             command.ExecuteNonQuery();
+            users.Add(user);
         }
 
         public void UpdateUser(User user)
