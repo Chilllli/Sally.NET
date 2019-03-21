@@ -74,6 +74,17 @@ namespace Discord_Chan.db
             Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    All Users loaded");
         }
 
+        public void LoadSpecUser(User user)
+        {
+            MySqlCommand command = new MySqlCommand("SELECT id,xp,isMuted FROM infos", connection);
+            MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                users.Add(new User((ulong)reader["id"], (int)reader["xp"], (int)reader["isMuted"] == 1));
+            }
+            reader.Close();
+        }
+
         public void Dispose()
         {
             if (connection.State == System.Data.ConnectionState.Open)

@@ -73,7 +73,6 @@ namespace Discord_Chan
 
             // Block this task until the program is closed.
             await Task.Delay(-1);
-
         }
 
         private Task Log(LogMessage msg)

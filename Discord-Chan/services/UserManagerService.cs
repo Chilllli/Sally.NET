@@ -11,18 +11,22 @@ namespace Discord_Chan.services
     {
         public static async Task InitializeHandler(DiscordSocketClient client)
         {
-            client.GuildMemberUpdated += userJoined;
+            client.UserJoined += Client_UserJoined;
         }
-        private static async Task userJoined(SocketGuildUser userOld, SocketGuildUser userNew)
+
+        private static async Task Client_UserJoined(SocketGuildUser userNew)
         {
-            if (userOld != null || userNew == null)
-            {
-                return;
-            }
-            if (DataAccess.Instance.users.Find(u => u.Id == userNew.Id) == null)
+            //check if the user is complete new
+            User joinedUser = DataAccess.Instance.users.Find(u => u.Id == userNew.Id);
+            if (joinedUser == null)
             {
                 User user = new User(userNew.Id, 10, false);
                 DataAccess.Instance.InsertUser(user);
+            }
+            //user was on this server before
+            else
+            {
+                DataAccess.Instance.LoadSpecUser(joinedUser);
             }
         }
     }
