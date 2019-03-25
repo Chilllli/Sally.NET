@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Discord_Chan.db;
 using System;
 using System.Collections.Generic;
@@ -16,22 +17,29 @@ namespace Discord_Chan.services
         }
         private static async void User_OnLevelUp(User user)
         {
-            SocketRole levelRole = Program.MyGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level}");
-            if (levelRole == null)
+            CreateOrAddRole($"Level {user.Level}", user.Id, new[] { $"Level " });
+        }
+        public static async void CreateOrAddRole(string role, ulong id, string[] removeCriteria = null, Color? color = null)
+        {
+            SocketRole newRole = Program.MyGuild.Roles.ToList().Find(r => r.Name == role);
+            if (newRole == null)
             {
-                await Program.MyGuild.CreateRoleAsync($"Level {user.Level}");
-                while (levelRole == null)
+                await Program.MyGuild.CreateRoleAsync(role, color: color);
+                while (newRole == null)
                 {
-                    levelRole = Program.MyGuild.Roles.ToList().Find(r => r.Name == $"Level {user.Level}");
+                    newRole = Program.MyGuild.Roles.ToList().Find(r => r.Name == role);
                 }
             }
-            SocketGuildUser gUser = Program.MyGuild.Users.ToList().Find(u => u.Id == user.Id);
-            SocketRole oldLevelRole = gUser.Roles.ToList().Find(r => r.Name.Contains("Level "));
-            if (oldLevelRole != null)
+            SocketGuildUser gUser = Program.MyGuild.Users.ToList().Find(u => u.Id == id);
+            if (removeCriteria != null)
             {
-                await gUser.RemoveRoleAsync(oldLevelRole);
+                SocketRole oldRole = gUser.Roles.ToList().Find(r => removeCriteria.ToList().Find(c => r.Name.Contains(c)) != null);
+                if (oldRole != null)
+                {
+                    await gUser.RemoveRoleAsync(oldRole);
+                }
             }
-            await gUser.AddRoleAsync(levelRole);
+            await gUser.AddRoleAsync(newRole);
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Discord_Chan.services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,6 +51,57 @@ namespace Discord_Chan.commands
                 dynamicEmbed.AddField(mod, "\u2705", true);
             }
             return dynamicEmbed.Build();
+        }
+        [Group("rl")]
+        public class RocketLeagueCommands : ModuleBase
+        {
+            [Command("setRank")]
+            private async Task setPlayerRank(Rank rank, int level = 0)
+            {
+                if (level != 0 && rank == Rank.GrandChampion)
+                {
+                    await Context.Message.Channel.SendMessageAsync("invalid operation");
+                    return;
+                }
+                if (level > 3 || level < 1)
+                {
+                    await Context.Message.Channel.SendMessageAsync("invalid rank level");
+                    return;
+                }
+                Type enumType = typeof(Rank);
+                MemberInfo[] memInfo = enumType.GetMember(rank.ToString());
+                Object[] attributes = memInfo[0].GetCustomAttributes(typeof(RankAttribute), false);
+                Color color = ((RankAttribute)attributes[0]).color;
+
+                RoleManagerService.CreateOrAddRole(rank != Rank.GrandChampion ? $"{rank} {level}" : rank.ToString(), Context.Message.Author.Id, Enum.GetNames(typeof(Rank)), color);
+            }
+            public enum Rank
+            {
+                [RankAttribute(0x77391a)] Wood,
+                [RankAttribute(0xc95d1a)] Bronze,
+                [RankAttribute(0x5eedea)] Silver,
+                [RankAttribute(0xd2d60a)] Gold,
+                [RankAttribute(0x62c4ba)] Platinum,
+                [RankAttribute(0x1653e2)] Diamond,
+                [RankAttribute(0x801aed)] Champion,
+                [RankAttribute(0x801aed)] GrandChampion
+            }
+            public class RankAttribute : Attribute
+            {
+                public uint HexColor;
+                public Color color
+                {
+                    get
+                    {
+                        return new Color(HexColor);
+                    }
+                }
+                public RankAttribute(uint hexColor)
+                {
+                    HexColor = hexColor;
+                    Color color = new Color(hexColor);
+                }
+            }
         }
     }
 }
