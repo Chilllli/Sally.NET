@@ -45,7 +45,7 @@ namespace Discord_Chan.services
             IResult result = await commands.ExecuteAsync(context, argPos, services);
             //Error Handler
             if (!result.IsSuccess)
-                await context.Channel.SendMessageAsync(result.ErrorReason);
+                await context.Channel.SendMessageAsync(result.ErrorReason + " ¯\\_(ツ)_/¯");
         }
     }
 }

@@ -16,7 +16,6 @@ namespace Discord_Chan.services
     {
         private static DiscordSocketClient client;
         private static double dailyPoints;
-        private static string place;
         private static float pointsSum;
         private static List<DateTime> messageList = new List<DateTime>();
         private static bool onStart;
@@ -107,7 +106,7 @@ namespace Discord_Chan.services
         public static Mood getMood()
         {
             double currentMood = MoodPoints;
-            if(currentMood >= 0 && currentMood <= 0.25)
+            if (currentMood >= 0 && currentMood <= 0.25)
             {
                 return Mood.Sad;
             }
@@ -132,9 +131,12 @@ namespace Discord_Chan.services
 
         private static async Task setMood(Mood mood)
         {
-            if (client.Activity.Name == mood.ToString())
+            if (client.Activity?.Name == mood.ToString())
+            {
                 return;
+            }
             await client.SetActivityAsync(new Game(mood.ToString()));
+            await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
         }
     }
 }

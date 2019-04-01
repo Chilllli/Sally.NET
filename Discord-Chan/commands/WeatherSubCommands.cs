@@ -38,6 +38,7 @@ namespace Discord_Chan.commands
             User currentUser = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             currentUser.WeatherLocation = location;
             currentUser.NotifierTime = notiferTime;
+            await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author}, you successfully subbed to weather notifications.");
         }
         [Command("unsub2weather")]
         public async Task UnSubToService()
@@ -45,6 +46,7 @@ namespace Discord_Chan.commands
             User currentUser = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             currentUser.WeatherLocation = null;
             currentUser.NotifierTime = null;
+            await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author}, you successfully unsubbed to weather notifications.");
         }
     }
 }

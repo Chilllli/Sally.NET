@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Discord_Chan.config;
 using Discord_Chan.db;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace Discord_Chan.services
             if (!currentUser.HasMuted && (DateTime.Now - currentUser.LastFarewell).TotalHours > 12)
             {
                 //send private message
-                await disUser.SendMessageAsync("Bye");
+                await disUser.SendMessageAsync(MoodDictionary.getMoodMessage("Bye"));//Bye
                 currentUser.LastFarewell = DateTime.Now;
             }
             stopTrackingVoiceChannel(DataAccess.Instance.users.Find(u => u.Id == disUser.Id));
@@ -45,7 +46,7 @@ namespace Discord_Chan.services
             if (!currentUser.HasMuted && (DateTime.Now - currentUser.LastGreeting).TotalHours > 12)
             {
                 //send private message
-                await disUser.SendMessageAsync("Hello");
+                await disUser.SendMessageAsync(String.Format(MoodDictionary.getMoodMessage("Hello"), disUser.Username));//Hello
                 currentUser.LastGreeting = DateTime.Now;
             }
             startTrackingVoiceChannel(currentUser);
