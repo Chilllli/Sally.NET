@@ -56,6 +56,7 @@ namespace Discord_Chan
             VoiceRewardService.InitializeHandler(Client);
             UserManagerService.InitializeHandler(Client);
             MoodDictionary.InitializeMoodDictionary();
+            WeatherSubService.InitializeWeatherSub();
             await RoleManagerService.InitializeHandler();
             await CommandHandlerService.InitializeHandler(Client);
             Client.Ready += Client_Ready;

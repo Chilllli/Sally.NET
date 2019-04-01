@@ -77,10 +77,9 @@ namespace Discord_Chan.services
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("https://api.openweathermap.org");
-            Console.WriteLine(Program.BotConfiguration.WeatherPlace);
             HttpResponseMessage response = await client.GetAsync($"/data/2.5/weather?q={HttpUtility.UrlEncode(Program.BotConfiguration.WeatherPlace, Encoding.UTF8)}&appid={Program.BotConfiguration.WeatherApiKey}&units=metric");
 
-            // This line gives me error
+            // This line gives me error | not for me
             string stringResult = await response.Content.ReadAsStringAsync();
 
             dynamic temperature = JsonConvert.DeserializeObject<dynamic>(stringResult);
@@ -96,7 +95,6 @@ namespace Discord_Chan.services
             pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.rain != null ? (float)temperature.rain["1h"] : 0f);
             //snow.1h 0.1 10% 
             pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.snow != null ? (float)temperature.snow["1h"] : 0f);
-            Console.WriteLine($"Summay: {pointsSum}");
         }
         private static float calculateWeatherPoints(float width, float optimum, float weigth, float weatherValue)
             => MathF.Max(-(1 / MathF.Pow(width, 2)) * MathF.Pow((weatherValue - optimum), 2) + 1, -1) * weigth;

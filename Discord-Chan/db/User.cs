@@ -7,10 +7,12 @@ namespace Discord_Chan.db
 {
     class User
     {
-        public User(ulong id, int xp, bool mute){
+        public User(ulong id, int xp, bool mute, string weatherLocation = null, TimeSpan? notifierTime = null){
             Id = id;
             this.xp = xp;
             hasMuted = mute;
+            this.weatherLocation = weatherLocation;
+            this.notifierTime = notifierTime;
         }
 
         public ulong Id;
@@ -63,5 +65,33 @@ namespace Discord_Chan.db
         }
         public DateTime LastGreeting = new DateTime();
         public DateTime LastFarewell = new DateTime();
+        private string weatherLocation;
+        private TimeSpan? notifierTime;
+
+        public string WeatherLocation
+        {
+            get
+            {
+                return weatherLocation;
+            }
+            set
+            {
+                weatherLocation = value;
+                DataAccess.Instance.UpdateUser(this);
+            }
+        }
+
+        public TimeSpan? NotifierTime
+        {
+            get
+            {
+                return notifierTime;
+            }
+            set
+            {
+                notifierTime = value;
+                DataAccess.Instance.UpdateUser(this);
+            }
+        }
     }
 }

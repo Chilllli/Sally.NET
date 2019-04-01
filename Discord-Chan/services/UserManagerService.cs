@@ -23,11 +23,6 @@ namespace Discord_Chan.services
                 User user = new User(userNew.Id, 10, false);
                 DataAccess.Instance.InsertUser(user);
             }
-            //user was on this server before
-            else
-            {
-                DataAccess.Instance.LoadSpecUser(joinedUser);
-            }
             return Task.CompletedTask;
         }
     }
