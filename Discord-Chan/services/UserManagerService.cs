@@ -9,12 +9,12 @@ namespace Discord_Chan.services
 {
     static class UserManagerService
     {
-        public static async Task InitializeHandler(DiscordSocketClient client)
+        public static void InitializeHandler(DiscordSocketClient client)
         {
             client.UserJoined += Client_UserJoined;
         }
 
-        private static async Task Client_UserJoined(SocketGuildUser userNew)
+        private static Task Client_UserJoined(SocketGuildUser userNew)
         {
             //check if the user is complete new
             User joinedUser = DataAccess.Instance.users.Find(u => u.Id == userNew.Id);
@@ -28,6 +28,7 @@ namespace Discord_Chan.services
             {
                 DataAccess.Instance.LoadSpecUser(joinedUser);
             }
+            return Task.CompletedTask;
         }
     }
 }

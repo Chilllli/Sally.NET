@@ -1,21 +1,14 @@
 ﻿using Discord;
-using Discord.Addons.Interactive;
-using Discord.Audio;
-using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Chan.commands;
 using Discord_Chan.config;
 using Discord_Chan.db;
 using Discord_Chan.services;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace Discord_Chan
 {
@@ -60,8 +53,9 @@ namespace Discord_Chan
 
             Client = new DiscordSocketClient();
 
-            await VoiceRewardService.InitializeHandler(Client);
-            await UserManagerService.InitializeHandler(Client);
+            VoiceRewardService.InitializeHandler(Client);
+            UserManagerService.InitializeHandler(Client);
+            MoodDictionary.InitializeMoodDictionary();
             await RoleManagerService.InitializeHandler();
             await CommandHandlerService.InitializeHandler(Client);
             Client.Ready += Client_Ready;
@@ -91,8 +85,9 @@ namespace Discord_Chan
                     DataAccess.Instance.InsertUser(new User(user.Id, 10, false));
                 }
             }
-            await StatusNotifierService.InitializeService(BotConfiguration);
+            StatusNotifierService.InitializeService(BotConfiguration);
             MusicCommands.Initialize(Client);
+            await MoodHandleService.InitializeHandler(Client);
         }
     }
 }

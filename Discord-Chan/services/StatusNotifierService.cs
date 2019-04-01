@@ -14,7 +14,7 @@ namespace Discord_Chan.services
     {
         private static SocketUser me;
 
-        public static async Task InitializeService(BotConfiguration botConfiguration)
+        public static void InitializeService(BotConfiguration botConfiguration)
         {
             //finding myself
             foreach (SocketUser user in Program.MyGuild.Users)

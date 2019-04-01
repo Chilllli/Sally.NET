@@ -12,7 +12,7 @@ namespace Discord_Chan.services
 {
     static class VoiceRewardService
     {
-        public static async Task InitializeHandler(DiscordSocketClient client)
+        public static void InitializeHandler(DiscordSocketClient client)
         {
             client.UserVoiceStateUpdated += voiceChannelJoined;
             client.UserVoiceStateUpdated += voiceChannelLeft;
