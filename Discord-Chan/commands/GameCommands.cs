@@ -56,7 +56,7 @@ namespace Discord_Chan.commands
         public class RocketLeagueCommands : ModuleBase
         {
             [Command("setRank")]
-            private async Task setPlayerRank(Rank rank, int level = 0)
+            public async Task setPlayerRank(Rank rank, int level = 0)
             {
                 if (level != 0 && rank == Rank.GrandChampion)
                 {
