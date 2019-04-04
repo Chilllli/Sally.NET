@@ -15,7 +15,7 @@ namespace Discord_Chan.config
         {
             foreach (MoodHandleService.Mood mood in Enum.GetValues(typeof(MoodHandleService.Mood)))
             {
-                moodDictionary.Add(mood, JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"./mood/{mood}.json")));
+                //moodDictionary.Add(mood, JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"./mood/{mood}.json")));
             }
         }
 
