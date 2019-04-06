@@ -1,9 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Chan.Commands;
+using Discord_Chan.Command;
 using Discord_Chan.Config;
 using Discord_Chan.Db;
-using Discord_Chan.Services;
+using Discord_Chan.Service;
 using Newtonsoft.Json;
 using System;
 using System.IO;

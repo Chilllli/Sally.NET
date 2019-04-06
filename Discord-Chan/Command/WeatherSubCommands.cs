@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Discord_Chan.Commands
+namespace Discord_Chan.Command
 {
     public class WeatherSubCommands : ModuleBase
     {

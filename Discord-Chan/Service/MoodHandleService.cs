@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Web;
 
-namespace Discord_Chan.Services
+namespace Discord_Chan.Service
 {
     static class MoodHandleService
     {

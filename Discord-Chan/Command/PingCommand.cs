@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.Commands
+namespace Discord_Chan.Command
 {
     public class PingCommand : ModuleBase
     {

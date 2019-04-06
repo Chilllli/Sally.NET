@@ -20,7 +20,7 @@ using YoutubeExplode.Models;
 using YoutubeExplode.Models.MediaStreams;
 
 
-namespace Discord_Chan.Commands
+namespace Discord_Chan.Command
 {
     struct VideoInfo
     {

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Discord_Chan.Services
+namespace Discord_Chan.Service
 {
     static class VoiceRewardService
     {

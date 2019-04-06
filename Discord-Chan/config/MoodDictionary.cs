@@ -1,4 +1,4 @@
-﻿using Discord_Chan.Services;
+﻿using Discord_Chan.Service;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

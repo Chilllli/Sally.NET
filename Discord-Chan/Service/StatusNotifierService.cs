@@ -8,7 +8,7 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.Services
+namespace Discord_Chan.Service
 {
     class StatusNotifierService
     {
