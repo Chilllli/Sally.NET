@@ -1,13 +1,13 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
-using Discord_Chan.db;
+using Discord_Chan.Db;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.commands
+namespace Discord_Chan.Commands
 {
     
     public class ProfileCommands : ModuleBase

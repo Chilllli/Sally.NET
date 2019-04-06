@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Chan.config;
+using Discord_Chan.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.services
+namespace Discord_Chan.Services
 {
     class StatusNotifierService
     {

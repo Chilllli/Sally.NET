@@ -1,11 +1,11 @@
-﻿using Discord_Chan.services;
+﻿using Discord_Chan.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Discord_Chan.config
+namespace Discord_Chan.Config
 {
     static class MoodDictionary
     {

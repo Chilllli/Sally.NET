@@ -1,7 +1,7 @@
 ﻿using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord_Chan.commands;
+using Discord_Chan.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.services
+namespace Discord_Chan.Services
 {
     static class CommandHandlerService
     {
@@ -48,7 +48,7 @@ namespace Discord_Chan.services
             if (result.Error == CommandError.UnknownCommand)
             {
                 Dictionary<string, int> messageCompareValues = new Dictionary<string, int>();
-                List<Type> commandClasses = typeof(Discord_Chan.commands.PingCommand)
+                List<Type> commandClasses = typeof(Discord_Chan.Commands.PingCommand)
                     .Assembly.GetTypes()
                     .Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList();
                 foreach (Type commandClass in commandClasses)

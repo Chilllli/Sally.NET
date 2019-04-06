@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Chan.db;
+using Discord_Chan.Db;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Web;
 
-namespace Discord_Chan.services
+namespace Discord_Chan.Services
 {
     static class WeatherSubService
     {

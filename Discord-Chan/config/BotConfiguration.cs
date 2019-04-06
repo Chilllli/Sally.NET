@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Discord_Chan.config
+namespace Discord_Chan.Config
 {
     class BotConfiguration
     {

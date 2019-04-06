@@ -1,11 +1,11 @@
-﻿using Discord_Chan.config;
+﻿using Discord_Chan.Config;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Discord_Chan.db
+namespace Discord_Chan.Db
 {
     class DataAccess : IDisposable
     {

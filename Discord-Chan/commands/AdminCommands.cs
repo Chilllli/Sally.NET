@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.commands
+namespace Discord_Chan.Commands
 {
     public class AdminCommands : ModuleBase
     {

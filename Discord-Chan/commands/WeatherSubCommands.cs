@@ -1,6 +1,6 @@
 ﻿using Discord.Commands;
-using Discord_Chan.config;
-using Discord_Chan.db;
+using Discord_Chan.Config;
+using Discord_Chan.Db;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Discord_Chan.commands
+namespace Discord_Chan.Commands
 {
     public class WeatherSubCommands : ModuleBase
     {
