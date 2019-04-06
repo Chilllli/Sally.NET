@@ -135,8 +135,10 @@ namespace Discord_Chan.Service
             {
                 return;
             }
+#if RELEASE
             await client.SetActivityAsync(new Game(mood.ToString()));
             await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
+#endif
         }
     }
 }

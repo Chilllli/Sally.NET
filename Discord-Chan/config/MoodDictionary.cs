@@ -13,10 +13,12 @@ namespace Discord_Chan.Config
         
         public static void InitializeMoodDictionary()
         {
+#if RELEASE
             foreach (MoodHandleService.Mood mood in Enum.GetValues(typeof(MoodHandleService.Mood)))
             {
                 moodDictionary.Add(mood, JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"./mood/{mood}.json")));
             }
+#endif
         }
 
         public static string getMoodMessage(string message)
