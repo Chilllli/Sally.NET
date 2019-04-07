@@ -46,7 +46,7 @@ namespace Discord_Chan.Db
         }
         public delegate void LevelUp(User user);
         public static event LevelUp OnLevelUp;
-        private static int getLevelFromXp(int xp)
+        public static int getLevelFromXp(int xp)
         {
             return (int)Math.Floor(Math.Sqrt((xp - 200) / 300) + Math.Sqrt((xp - 200) / 500));
         }
