@@ -31,10 +31,20 @@ namespace Discord_Chan
             get;
             private set;
         }
+        public static SocketUser Me
+        {
+            get;
+            private set;
+        }
+        private static bool isRestarted;
        
 
         public static void Main(string[] args)
         {
+            if(args.Length > 0)
+            {
+                isRestarted = args[0] == "true";
+            }
             Console.CancelKeyPress += Console_CancelKeyPress;
             new Program().MainAsync().GetAwaiter().GetResult();
         }
@@ -85,10 +95,18 @@ namespace Discord_Chan
                 {
                     DataAccess.Instance.InsertUser(new User(user.Id, 10, false));
                 }
+                if(user.Id == BotConfiguration.meId)
+                {
+                    Me = user as SocketUser;
+                }
             }
-            StatusNotifierService.InitializeService(BotConfiguration);
+            StatusNotifierService.InitializeService();
             MusicCommands.Initialize(Client);
             await MoodHandleService.InitializeHandler(Client);
+            if (isRestarted)
+            {
+                await Me.SendMessageAsync("Bot successfully restarted");
+            }
         }
     }
 }
