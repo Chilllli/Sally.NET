@@ -16,6 +16,8 @@ Commands in this section need the prefix: **terraria**
 
 	*Example*: $terraria mods 
 
+
+### Rocket League-related:
 Commands in this section need the prefix: **rl**
 
 - **setRank**: set a role with a given rocket league matchmaking rank
