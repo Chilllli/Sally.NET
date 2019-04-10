@@ -17,16 +17,22 @@ namespace Discord_Chan.Command
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("https://en.wikipedia.org");
-            HttpResponseMessage response = await client.GetAsync($"/w/api.php?action=opensearch&format=json&search={searchTerm}&namespace=0&limit=10&utf8=1");
+            HttpResponseMessage response = await client.GetAsync($"/w/api.php?action=opensearch&format=json&search={searchTerm}&namespace=0&limit=5&utf8=1");
 
             string stringResult = await response.Content.ReadAsStringAsync();
 
             dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(stringResult);
+
             EmbedBuilder searchEmbed = new EmbedBuilder()
+                .WithTitle($"What is \"{searchTerm}\"?")
+                .WithDescription($"Results for {searchTerm}")
                 .WithFooter("Provided by your friendly bot Sally")
                 .WithTimestamp(DateTime.Now)
-                .WithColor(0xffffff)
-                .AddField($"What is \"{searchTerm}\"?", searchResult[2][0]);
+                .WithColor(0xffffff);
+                for (int i = 0; i < 5; i++)
+                {
+                    searchEmbed.AddField((searchResult[1][i]).ToString(), (searchResult[2][i]).ToString());
+                }
             await Context.Message.Channel.SendMessageAsync(null, embed: searchEmbed.Build()).ConfigureAwait(false);
         }
     }

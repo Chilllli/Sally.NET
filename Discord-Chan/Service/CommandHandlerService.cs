@@ -36,6 +36,8 @@ namespace Discord_Chan.Service
             SocketUserMessage message = arg as SocketUserMessage;
             if (message == null)
                 return;
+            if (Program.MyGuild.Users.ToList().Find(u => u.Id == message.Author.Id) == null)
+                return;
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
             //if (message.Author.Id == Program.Client.CurrentUser.Id)
