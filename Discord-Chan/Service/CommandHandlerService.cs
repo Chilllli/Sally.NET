@@ -1,4 +1,5 @@
-﻿using Discord.Addons.Interactive;
+﻿using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Chan.Command;
@@ -16,6 +17,7 @@ namespace Discord_Chan.Service
     {
         private static CommandService commands;
         private static IServiceProvider services;
+        private static char prefix = '$';
 
         public static async Task InitializeHandler(DiscordSocketClient client)
         {
@@ -36,8 +38,19 @@ namespace Discord_Chan.Service
                 return;
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
+            //if (message.Author.Id == Program.Client.CurrentUser.Id)
+            //    return;
+            //if((message.Channel as SocketDMChannel) != null)
+            //{
+            //    //dm channel
+            //    if(!message.HasCharPrefix(prefix, ref argPos))
+            //    {
+            //        //privat message
+            //        Program.RequestCounter++;
+            //    }
+            //}
             // Determine if the message is a command, based on if it starts with '!' or a mention prefix
-            if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(Program.Client.CurrentUser, ref argPos) || message.Content == PingCommand.PongMessage))
+            if (!(message.HasCharPrefix(prefix, ref argPos) || message.HasMentionPrefix(Program.Client.CurrentUser, ref argPos) || message.Content == PingCommand.PongMessage))
                 return;
             // Create a Command Context
             SocketCommandContext context = new SocketCommandContext(Program.Client, message);

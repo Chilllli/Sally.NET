@@ -68,6 +68,16 @@ namespace Discord_Chan.Command
                 await Program.Me.SendMessageAsync("Bot is shutting down now");
                 Environment.Exit(0);
             }
+
+            //[Command("apiRequests")]
+            //public async Task ShowCurrentApiRequests()
+            //{
+            //    if(Context.Message.Author.Id != Program.BotConfiguration.meId)
+            //    {
+            //        await Context.Message.Channel.SendMessageAsync("permission denied");
+            //    }
+            //    await Program.Me.SendMessageAsync($"There are currently {Program.RequestCounter} Requests.");
+            //}
         }
     }
 }
