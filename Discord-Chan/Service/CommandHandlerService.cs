@@ -4,9 +4,11 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Chan.Command;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,17 +42,26 @@ namespace Discord_Chan.Service
                 return;
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
-            //if (message.Author.Id == Program.Client.CurrentUser.Id)
-            //    return;
-            //if((message.Channel as SocketDMChannel) != null)
-            //{
-            //    //dm channel
-            //    if(!message.HasCharPrefix(prefix, ref argPos))
-            //    {
-            //        //privat message
-            //        Program.RequestCounter++;
-            //    }
-            //}
+            if (message.Author.Id == Program.Client.CurrentUser.Id)
+                return;
+            if ((message.Channel as SocketDMChannel) != null)
+            {
+                //dm channel
+                if (!message.HasCharPrefix(prefix, ref argPos))
+                {
+                    //privat message
+                    Program.RequestCounter++;
+                    HttpClient client = new HttpClient();
+                    client.BaseAddress = new Uri("https://www.cleverbot.com");
+                    HttpResponseMessage response = await client.GetAsync($"/getreply?key={Program.BotConfiguration.CleverApi}&input={message.Content}");
+
+                    string stringResult = await response.Content.ReadAsStringAsync();
+
+                    dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(stringResult);
+                    await message.Channel.SendMessageAsync(messageOutput["output"].ToString());
+                    return;
+                }
+            }
             // Determine if the message is a command, based on if it starts with '!' or a mention prefix
             if (!(message.HasCharPrefix(prefix, ref argPos) || message.HasMentionPrefix(Program.Client.CurrentUser, ref argPos) || message.Content == PingCommand.PongMessage))
                 return;

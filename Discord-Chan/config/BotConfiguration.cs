@@ -20,5 +20,6 @@ namespace Discord_Chan.Config
         public ulong AdminRole = 0;
         public string WeatherPlace = String.Empty;
         public string WeatherApiKey = String.Empty;
+        public string CleverApi = String.Empty;
     }
 }

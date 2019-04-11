@@ -37,20 +37,20 @@ namespace Discord_Chan
             private set;
         }
         private static bool isRestarted;
-        //private static int requestCounter;
-        //public static int RequestCounter
-        //{
-        //    get
-        //    {
-        //        return requestCounter;
-        //    }
-        //    set
-        //    {
-        //        requestCounter = value;
-        //        File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
-        //    }
-        //}
-       
+        private static int requestCounter;
+        public static int RequestCounter
+        {
+            get
+            {
+                return requestCounter;
+            }
+            set
+            {
+                requestCounter = value;
+                File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
+            }
+        }
+
 
         public static void Main(string[] args)
         {
@@ -74,7 +74,7 @@ namespace Discord_Chan
             BotConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
             DataAccess.Initialize(BotConfiguration);
 
-            //RequestCounter = Int32.Parse(File.ReadAllText("ApiRequests.txt"));
+            RequestCounter = Int32.Parse(File.ReadAllText("ApiRequests.txt"));
 
             Client = new DiscordSocketClient();
 

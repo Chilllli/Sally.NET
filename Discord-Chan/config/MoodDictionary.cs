@@ -23,7 +23,7 @@ namespace Discord_Chan.Config
 
         public static string getMoodMessage(string message)
         {
-            return moodDictionary[MoodHandleService.getMood()][message];
+            return moodDictionary[Program.Client.Activity != null ? Enum.Parse<MoodHandleService.Mood>(Program.Client.Activity?.Name) : MoodHandleService.getMood()][message];
         }
     }
 }

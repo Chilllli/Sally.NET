@@ -31,6 +31,8 @@ namespace Discord_Chan.Command
                 .WithColor(0xffffff);
                 for (int i = 0; i < 5; i++)
                 {
+                    if (searchResult[1][i] == null || searchResult[2][i] == null)
+                        break;
                     searchEmbed.AddField((searchResult[1][i]).ToString(), (searchResult[2][i]).ToString());
                 }
             await Context.Message.Channel.SendMessageAsync(null, embed: searchEmbed.Build()).ConfigureAwait(false);
