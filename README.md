@@ -1,11 +1,26 @@
 # Welcome to Sally .NET - everyone can get emotional
 
-Hey! Sally, your friendly Discord-Bot. She is another multipurpose bot with many request options.
+Hey! Sally, your friendly Discord-Bot. She is a multipurpose bot with many request options and just waiting for you. ^~^
 
 
 # Overview
 
+* **Feature**:
+	* command prediction
+	* subscription service
+	* leveling system
+	* command service
+
 The following list shows the available commands at the moment. If you want to use commands you need a "$" as prefix.
+
+* [Game Commands](#game-commands)  
+* [Random Commands](#random-commands) 
+* [User Commands](#user-commands) 
+* [Trivia Commands](#trivia-commands)
+* [Weather Commands](#weather-commands) 
+
+
+# Commands
 
 ## Game Commands
 
