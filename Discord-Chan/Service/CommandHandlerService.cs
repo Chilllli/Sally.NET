@@ -32,39 +32,49 @@ namespace Discord_Chan.Service
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
 
-        private static async Task CommandHandler(SocketMessage arg)
+        class Input
         {
-            // Don't process the command if it was a System Message
-            SocketUserMessage message = arg as SocketUserMessage;
-            if (message == null)
-                return;
-            if (Program.MyGuild.Users.ToList().Find(u => u.Id == message.Author.Id) == null)
-                return;
-            // Create a number to track where the prefix ends and the command begins
+            public string Type { get; set; }
+            public SocketUserMessage Message { get; set; }
+            public int ArgumentPosition { get; set; }
+        }
+
+
+        private static Input ClassifyAs(SocketUserMessage message)
+        {
             int argPos = 0;
-            if (message.Author.Id == Program.Client.CurrentUser.Id)
-                return;
-            if ((message.Channel as SocketDMChannel) != null)
+            if (message.HasCharPrefix(prefix, ref argPos))
             {
-                //dm channel
-                if (!message.HasCharPrefix(prefix, ref argPos))
-                {
-                    //privat message
-                    Program.RequestCounter++;
-                    HttpClient client = new HttpClient();
-                    client.BaseAddress = new Uri("https://www.cleverbot.com");
-                    HttpResponseMessage response = await client.GetAsync($"/getreply?key={Program.BotConfiguration.CleverApi}&input={message.Content}");
-
-                    string stringResult = await response.Content.ReadAsStringAsync();
-
-                    dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(stringResult);
-                    await message.Channel.SendMessageAsync(messageOutput["output"].ToString());
-                    return;
-                }
+                return new Input { Type = "Command", Message = message, ArgumentPosition = argPos };
             }
-            // Determine if the message is a command, based on if it starts with '!' or a mention prefix
-            if (!(message.HasCharPrefix(prefix, ref argPos) || message.HasMentionPrefix(Program.Client.CurrentUser, ref argPos) || message.Content == PingCommand.PongMessage))
+            if (message.HasMentionPrefix(Program.Client.CurrentUser, ref argPos))
+            {
+                return new Input { Type = "Mention", Message = message, ArgumentPosition = argPos };
+            }
+
+            return new Input { Type = "NaturalInput", Message = message, ArgumentPosition = 0 };
+        }
+
+        private static async Task HandleMessage(Input message)
+        {
+            if (message.Type == "Command" || message.Type == "Mention")
+            {
+                await HandleCommand(message);
                 return;
+            }
+
+            if (message.Type == "NaturalInput")
+            {
+                await HandleNaturalInput(message);
+                return;
+            }
+        }
+
+        private static async Task HandleCommand(Input input)
+        {
+            int argPos = input.ArgumentPosition;
+            SocketUserMessage message = input.Message;
+
             // Create a Command Context
             SocketCommandContext context = new SocketCommandContext(Program.Client, message);
             // Execute the command. (result does not indicate a return value, 
@@ -130,9 +140,47 @@ namespace Discord_Chan.Service
                 await context.Channel.SendMessageAsync($"{result.ErrorReason} ¯\\_(ツ)_/¯, but did you mean: {commandResult}");
                 return;
             }
+
             //Error Handler
             if (!result.IsSuccess)
                 await context.Channel.SendMessageAsync($"{result.ErrorReason} ¯\\_(ツ)_/¯");
+        }
+
+        private static async Task HandleNaturalInput(Input input)
+        {
+            SocketUserMessage message = input.Message;
+
+            if ((message.Channel as SocketDMChannel) != null)
+            {
+                //dm channel
+                    if (message.Author.Id == Program.Client.CurrentUser.Id)
+                        return;
+                    //privat message
+                    Program.RequestCounter++;
+                    HttpClient client = new HttpClient();
+                    client.BaseAddress = new Uri("https://www.cleverbot.com");
+                    HttpResponseMessage response = await client.GetAsync($"/getreply?key={Program.BotConfiguration.CleverApi}&input={message.Content}");
+
+                    string stringResult = await response.Content.ReadAsStringAsync();
+
+                    dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(stringResult);
+                    await message.Channel.SendMessageAsync(messageOutput["output"].ToString());
+                    return;
+            }
+        }
+
+        private static async Task CommandHandler(SocketMessage arg)
+        {
+            // Don't process the command if it was a System Message
+            SocketUserMessage message = arg as SocketUserMessage;
+
+            if (message == null)
+                return;
+            if (Program.MyGuild.Users.ToList().Find(u => u.Id == message.Author.Id) == null)
+                return;
+
+            Input input = ClassifyAs(message);
+            await HandleMessage(input);
         }
 
         private static int CalcLevenshteinDistance(string a, string b)

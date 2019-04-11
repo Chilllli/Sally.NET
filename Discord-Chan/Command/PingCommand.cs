@@ -15,19 +15,7 @@ namespace Discord_Chan.Command
         [Command("ping")]
         public async Task Ping()
         {
-            pingTracker.TryAdd((await Context.Channel.SendMessageAsync(PongMessage)).Id, DateTime.Now);
-        }
-
-        [Command("pong")]
-        public async Task Pong()
-        {
-            if (Context.Client.CurrentUser.Id != Context.User.Id) return;
-            await Context.Message.ModifyAsync((m) =>
-            {
-                DateTime date = new DateTime();
-                pingTracker.TryRemove(Context.Message.Id, out date);
-                m.Content = $"Pong! `{Math.Round((DateTime.Now - date).TotalMilliseconds)} ms`";
-            });
+            await Context.Message.Channel.SendMessageAsync($"Pong! `{Math.Round((DateTime.Now - Context.Message.CreatedAt).TotalMilliseconds)} ms`");
         }
     }
 }
