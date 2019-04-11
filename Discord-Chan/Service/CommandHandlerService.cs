@@ -3,6 +3,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Chan.Command;
+using Discord_Chan.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -32,47 +33,52 @@ namespace Discord_Chan.Service
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
 
-        class Input
-        {
-            public string Type { get; set; }
-            public SocketUserMessage Message { get; set; }
-            public int ArgumentPosition { get; set; }
-        }
-
-
+        /// <summary>
+        /// "Parses" the user input and classifies it using <see cref="InputType"/>
+        /// </summary>
+        /// <param name="message">Raw input</param>
+        /// <returns>Classified message including input</returns>
         private static Input ClassifyAs(SocketUserMessage message)
         {
             int argPos = 0;
+
             if (message.HasCharPrefix(prefix, ref argPos))
             {
-                return new Input { Type = "Command", Message = message, ArgumentPosition = argPos };
+                return new Input { Type = InputType.Command, Message = message, ArgumentPosition = argPos };
             }
             if (message.HasMentionPrefix(Program.Client.CurrentUser, ref argPos))
             {
-                return new Input { Type = "Mention", Message = message, ArgumentPosition = argPos };
+                return new Input { Type = InputType.Mention, Message = message, ArgumentPosition = argPos };
             }
 
-            return new Input { Type = "NaturalInput", Message = message, ArgumentPosition = 0 };
+            // Fallback for all other types of input
+            return new Input { Type = InputType.NaturalInput, Message = message };
         }
 
-        private static async Task HandleMessage(Input message)
+        /// <summary>
+        /// Handles classified input (like responding to commands, etc.)
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private static async Task HandleMessage(Input input)
         {
-            if (message.Type == "Command" || message.Type == "Mention")
+            if (input.Type == InputType.Command || input.Type == InputType.Mention)
             {
-                await HandleCommand(message);
+                await HandleCommand(input);
                 return;
             }
 
-            if (message.Type == "NaturalInput")
+            if (input.Type == InputType.NaturalInput)
             {
-                await HandleNaturalInput(message);
+                await HandleNaturalInput(input);
                 return;
             }
         }
 
         private static async Task HandleCommand(Input input)
         {
-            int argPos = input.ArgumentPosition;
+            int argPos = input.ArgumentPosition ?? 0;
+
             SocketUserMessage message = input.Message;
 
             // Create a Command Context
@@ -153,19 +159,19 @@ namespace Discord_Chan.Service
             if ((message.Channel as SocketDMChannel) != null)
             {
                 //dm channel
-                    if (message.Author.Id == Program.Client.CurrentUser.Id)
-                        return;
-                    //privat message
-                    Program.RequestCounter++;
-                    HttpClient client = new HttpClient();
-                    client.BaseAddress = new Uri("https://www.cleverbot.com");
-                    HttpResponseMessage response = await client.GetAsync($"/getreply?key={Program.BotConfiguration.CleverApi}&input={message.Content}");
-
-                    string stringResult = await response.Content.ReadAsStringAsync();
-
-                    dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(stringResult);
-                    await message.Channel.SendMessageAsync(messageOutput["output"].ToString());
+                if (message.Author.Id == Program.Client.CurrentUser.Id)
                     return;
+
+                //privat message
+                Program.RequestCounter++;
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri("https://www.cleverbot.com");
+                HttpResponseMessage response = await client.GetAsync($"/getreply?key={Program.BotConfiguration.CleverApi}&input={message.Content}");
+
+                string stringResult = await response.Content.ReadAsStringAsync();
+
+                dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(stringResult);
+                await message.Channel.SendMessageAsync(messageOutput["output"].ToString());
             }
         }
 
@@ -174,6 +180,7 @@ namespace Discord_Chan.Service
             // Don't process the command if it was a System Message
             SocketUserMessage message = arg as SocketUserMessage;
 
+            // Don't process the command if it is invalid
             if (message == null)
                 return;
             if (Program.MyGuild.Users.ToList().Find(u => u.Id == message.Author.Id) == null)
