@@ -7,11 +7,14 @@ Hey! Sally, your friendly Discord-Bot. She is a multipurpose bot with many reque
 
 The following list shows the available commands at the moment. If you want to use commands you need a "$" as prefix.
 
-* [Game Commands](##Game-Commands)  
-* [Random Commands](##Random-Commands) 
-* [User Commands](##User-Commands) 
-* [Trivia Commands](##Trivia-Commands)
-* [Weather Commands](##Weather-Commands) 
+* [Game Commands](#game-commands)  
+* [Random Commands](#random-commands) 
+* [User Commands](#user-commands) 
+* [Trivia Commands](#trivia-commands)
+* [Weather Commands](#weather-commands) 
+
+
+# Commands
 
 ## Game Commands
 
