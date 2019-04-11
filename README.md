@@ -10,6 +10,7 @@ Hey! Sally, your friendly Discord-Bot. She is a multipurpose bot with many reque
 	* subscription service
 	* leveling system
 	* command service
+	* live chat replies
 
 The following list shows the available commands at the moment. If you want to use commands you need a "$" as prefix.
 
