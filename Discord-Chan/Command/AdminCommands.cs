@@ -69,15 +69,15 @@ namespace Discord_Chan.Command
                 Environment.Exit(0);
             }
 
-            //[Command("apiRequests")]
-            //public async Task ShowCurrentApiRequests()
-            //{
-            //    if(Context.Message.Author.Id != Program.BotConfiguration.meId)
-            //    {
-            //        await Context.Message.Channel.SendMessageAsync("permission denied");
-            //    }
-            //    await Program.Me.SendMessageAsync($"There are currently {Program.RequestCounter} Requests.");
-            //}
+            [Command("apiRequests")]
+            public async Task ShowCurrentApiRequests()
+            {
+                if (Context.Message.Author.Id != Program.BotConfiguration.meId)
+                {
+                    await Context.Message.Channel.SendMessageAsync("permission denied");
+                }
+                await Program.Me.SendMessageAsync($"There are currently {Program.RequestCounter} Requests.");
+            }
         }
     }
 }

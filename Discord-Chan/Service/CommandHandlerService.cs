@@ -156,6 +156,8 @@ namespace Discord_Chan.Service
                     if (message.Author.Id == Program.Client.CurrentUser.Id)
                         return;
                     //privat message
+                    if (Program.RequestCounter > 9000)
+                        return;
                     Program.RequestCounter++;
                     HttpClient client = new HttpClient();
                     client.BaseAddress = new Uri("https://www.cleverbot.com");
