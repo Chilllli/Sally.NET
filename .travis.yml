@@ -1,2 +1,3 @@
 language: csharp
 solution: Discord-Chan.sln
+mono: none
