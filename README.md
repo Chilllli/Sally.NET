@@ -1,4 +1,4 @@
-# Welcome to Sally .NET - everyone can get emotional
+# Welcome to Sally .NET!
 
 Hey! Sally, your friendly Discord-Bot. She is a multipurpose bot with many request options and just waiting for you. ^~^
 
