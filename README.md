@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/Chilllli/Sally.NET.svg?token=e9oxuon9Djni1ERDenE9&branch=master)](https://travis-ci.com/Chilllli/Sally.NET)
 
-# Welcome to Sally .NET - everyone can get emotional
+# Welcome to Sally .NET
 
 Hey! Sally, your friendly Discord-Bot. She is a multipurpose bot with many request options and just waiting for you. ^~^
 
