@@ -2,4 +2,5 @@ language: csharp
 solution: Discord-Chan.sln
 mono: none
 dotnet: 2.1
-script: dotnet restore
+script: 
+	dotnet restore
