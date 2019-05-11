@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Discord_Chan.Db;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -135,6 +136,7 @@ namespace Discord_Chan.Service
             {
                 return;
             }
+            DataAccess.Instance.saveMood(mood);
 #if RELEASE
             await client.SetActivityAsync(new Game(mood.ToString()));
             await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));

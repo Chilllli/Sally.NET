@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static Discord_Chan.Service.MoodHandleService;
 
 namespace Discord_Chan.Db
 {
@@ -74,6 +75,15 @@ namespace Discord_Chan.Db
             }
             reader.Close();
             Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    All Users loaded");
+        }
+
+        public void saveMood(Mood mood)
+        {
+            MySqlCommand command = new MySqlCommand("INSERT INTO moodtable(time, mood) VALUES (@time, @mood)");
+            command.Parameters.AddWithValue("@time", DateTime.Now);
+            command.Parameters.AddWithValue("@mood", mood);
+            command.Prepare();
+            command.ExecuteNonQuery();
         }
 
         public void Dispose()
