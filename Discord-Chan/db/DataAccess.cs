@@ -79,8 +79,7 @@ namespace Discord_Chan.Db
 
         public void saveMood(Mood mood)
         {
-            MySqlCommand command = new MySqlCommand("INSERT INTO moodtable(time, mood) VALUES (@time, @mood)");
-            command.Parameters.AddWithValue("@time", DateTime.Now);
+            MySqlCommand command = new MySqlCommand("INSERT INTO moodtable(mood) VALUES (@mood)", connection);
             command.Parameters.AddWithValue("@mood", mood);
             command.Prepare();
             command.ExecuteNonQuery();
