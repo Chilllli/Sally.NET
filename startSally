@@ -1,0 +1,17 @@
+#!/bin/bash
+isRestarting=false;
+git pull origin master
+dotnet build Discord-Chan.sln -c Release
+cd Discord-Chan/bin/Release/netcoreapp2.1/
+while true 
+do
+ dotnet Discord-Chan.dll $isRestarting > sallyOutput 2>&1
+ if [ $? -eq 1 ] 
+ then
+  isRestarting=true;
+  continue
+ else
+  break
+ fi
+done
+
