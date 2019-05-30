@@ -11,13 +11,49 @@ namespace Discord_Chan.Service
 {
     static class RoleManagerService
     {
+        public static Dictionary<int, ulong> roleDictionary = new Dictionary<int, ulong>
+        {
+            { 0, 583765947211317249},
+            { 5, 583712540069199893},
+            { 10, 583712661347237888},
+            { 15, 583712739407691817},
+            { 20, 583712794101284894},
+            { 25, 583712865878409226},
+            { 30, 583712966327926785},
+            { 35, 583713031410679826},
+            { 40, 583713106623201281},
+            { 45, 583713192258306058},
+            { 50, 583713277792485389},
+            { 55, 583713406247239843},
+            { 60, 583713511176404992},
+            { 65, 583713745595793410},
+            { 70, 583714001687412746},
+            { 75, 583714264070619158},
+            { 80, 583714339018637314}
+
+        };
         public static async Task InitializeHandler()
         {
             User.OnLevelUp += User_OnLevelUp;
         }
         private static async void User_OnLevelUp(User user)
         {
-            CreateOrAddRole($"Level {user.Level}", user.Id, new[] { $"Level " });
+            //check if user level is a key
+            if (roleDictionary.ContainsKey(user.Level))
+            {
+                //get value of key-specific value
+                ulong roleId = roleDictionary.GetValueOrDefault(user.Level);
+                //get user from guild
+                SocketGuildUser guildUser = Program.MyGuild.Users.ToList().Find(u => u.Id == user.Id);
+                //remove any other level-specific roles
+                foreach (KeyValuePair<int, ulong> entry in roleDictionary)
+                {
+                    await guildUser.RemoveRoleAsync(Program.MyGuild.Roles.ToList().Find(r => r.Id == entry.Value));
+                }
+                //add new role to user
+                await guildUser.AddRoleAsync(Program.MyGuild.Roles.ToList().Find(r => r.Id == roleId));
+            }
+            //CreateOrAddRole($"Level {user.Level}", user.Id, new[] { $"Level " });
         }
         public static async void CreateOrAddRole(string role, ulong id, string[] removeCriteria = null, Color? color = null)
         {

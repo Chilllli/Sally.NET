@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Chan.Db;
+using Discord_Chan.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,6 +75,13 @@ namespace Discord_Chan.Command
                 .WithColor(0x5e099b)
                 .WithFooter("Provided by your friendly bot Sally");
             await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
+        }
+
+        [Command("start")]
+        public async Task WelcomeRoles()
+        {
+            SocketGuildUser newUser = Context.Message.Author as SocketGuildUser;
+            await newUser.AddRoleAsync(Program.MyGuild.Roles.ToList().Find(r => r.Id == RoleManagerService.roleDictionary.GetValueOrDefault(0)));
         }
     }
 }
