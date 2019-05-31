@@ -13,23 +13,22 @@ namespace Discord_Chan.Service
     {
         public static Dictionary<int, ulong> roleDictionary = new Dictionary<int, ulong>
         {
-            { 0, 583765947211317249},
-            { 5, 583712540069199893},
-            { 10, 583712661347237888},
-            { 15, 583712739407691817},
-            { 20, 583712794101284894},
-            { 25, 583712865878409226},
-            { 30, 583712966327926785},
-            { 35, 583713031410679826},
-            { 40, 583713106623201281},
-            { 45, 583713192258306058},
-            { 50, 583713277792485389},
-            { 55, 583713406247239843},
-            { 60, 583713511176404992},
-            { 65, 583713745595793410},
-            { 70, 583714001687412746},
-            { 75, 583714264070619158},
-            { 80, 583714339018637314}
+            { 0, 583712540069199893},
+            { 5, 583712661347237888},
+            { 10, 583712739407691817},
+            { 15, 583712794101284894},
+            { 20, 583712865878409226},
+            { 25, 583712966327926785},
+            { 30, 583713031410679826},
+            { 35, 583713106623201281},
+            { 40, 583713192258306058},
+            { 45, 583713277792485389},
+            { 50, 583713406247239843},
+            { 55, 583713511176404992},
+            { 60, 583713745595793410},
+            { 65, 583714001687412746},
+            { 70, 583714264070619158},
+            { 75, 583714339018637314}
 
         };
         public static async Task InitializeHandler()
@@ -48,7 +47,8 @@ namespace Discord_Chan.Service
                 //remove any other level-specific roles
                 foreach (KeyValuePair<int, ulong> entry in roleDictionary)
                 {
-                    await guildUser.RemoveRoleAsync(Program.MyGuild.Roles.ToList().Find(r => r.Id == entry.Value));
+                    if(guildUser.Roles.ToList().Find(r => r.Id == entry.Value) != null)
+                        await guildUser.RemoveRoleAsync(Program.MyGuild.Roles.ToList().Find(r => r.Id == entry.Value));
                 }
                 //add new role to user
                 await guildUser.AddRoleAsync(Program.MyGuild.Roles.ToList().Find(r => r.Id == roleId));
