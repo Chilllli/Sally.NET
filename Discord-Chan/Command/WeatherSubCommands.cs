@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord_Chan.Config;
 using Discord_Chan.Db;
+using Discord_Chan.Service;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -23,13 +24,7 @@ namespace Discord_Chan.Command
                 return;
             }
 
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("https://api.openweathermap.org");
-            HttpResponseMessage response = await client.GetAsync($"/data/2.5/weather?q={HttpUtility.UrlEncode(location, Encoding.UTF8)}&appid={Program.BotConfiguration.WeatherApiKey}&units=metric");
-
-            string stringResult = await response.Content.ReadAsStringAsync();
-
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(stringResult);
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi", location: location));
             if(temperature.cod != 200)
             {
                 await Context.Message.Channel.SendMessageAsync((string)temperature.message);
@@ -52,13 +47,7 @@ namespace Discord_Chan.Command
         [Command("currentWeather")]
         public async Task CheckCurrentWeather(string location)
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("https://api.openweathermap.org");
-            HttpResponseMessage response = await client.GetAsync($"/data/2.5/weather?q={HttpUtility.UrlEncode(location, Encoding.UTF8)}&appid={Program.BotConfiguration.WeatherApiKey}&units=metric");
-
-            string stringResult = await response.Content.ReadAsStringAsync();
-
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(stringResult);
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi", location: location));
             if (temperature.cod != 200)
             {
                 await Context.Message.Channel.SendMessageAsync((string)temperature.message);

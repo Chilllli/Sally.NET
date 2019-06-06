@@ -21,5 +21,6 @@ namespace Discord_Chan.Config
         public string WeatherPlace = String.Empty;
         public string WeatherApiKey = String.Empty;
         public string CleverApi = String.Empty;
+        //public ulong StarterChannel = 0;
     }
 }

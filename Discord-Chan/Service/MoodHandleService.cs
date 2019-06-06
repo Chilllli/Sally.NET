@@ -75,14 +75,7 @@ namespace Discord_Chan.Service
 
         private static async Task checkWeather()
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("https://api.openweathermap.org");
-            HttpResponseMessage response = await client.GetAsync($"/data/2.5/weather?q={HttpUtility.UrlEncode(Program.BotConfiguration.WeatherPlace, Encoding.UTF8)}&appid={Program.BotConfiguration.WeatherApiKey}&units=metric");
-
-            // This line gives me error | not for me
-            string stringResult = await response.Content.ReadAsStringAsync();
-
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(stringResult);
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi"));
             //main.temp 60%,
             pointsSum = calculateWeatherPoints(15f, 20f, 0.6f, (float)temperature.main.temp);
             //main.humidity 5%, 
@@ -130,7 +123,9 @@ namespace Discord_Chan.Service
             Extatic
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         private static async Task setMood(Mood mood)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             if (client.Activity?.Name == mood.ToString())
             {

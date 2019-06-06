@@ -163,13 +163,9 @@ namespace Discord_Chan.Service
                         return;
                     //privat message
                     Program.RequestCounter++;
-                    HttpClient client = new HttpClient();
-                    client.BaseAddress = new Uri("https://www.cleverbot.com");
-                    HttpResponseMessage response = await client.GetAsync($"/getreply?key={Program.BotConfiguration.CleverApi}&input={message.Content}");
+                    
 
-                string stringResult = await response.Content.ReadAsStringAsync();
-
-                dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(stringResult);
+                dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("cleverapi", message));
                 await message.Channel.SendMessageAsync(messageOutput["output"].ToString());
             }
         }
@@ -185,6 +181,7 @@ namespace Discord_Chan.Service
             if (Program.MyGuild.Users.ToList().Find(u => u.Id == message.Author.Id) == null)
                 return;
 
+            //await MessageHandlerService.DeleteStartMessages(message);
             Input input = ClassifyAs(message);
             await HandleMessage(input);
         }

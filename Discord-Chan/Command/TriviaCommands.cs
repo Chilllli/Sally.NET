@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord_Chan.Service;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,9 @@ namespace Discord_Chan.Command
         [Command("ask")]
         public async Task AskWikipedia(string searchTerm)
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("https://en.wikipedia.org");
-            HttpResponseMessage response = await client.GetAsync($"/w/api.php?action=opensearch&format=json&search={searchTerm}&namespace=0&limit=5&utf8=1");
+            
 
-            string stringResult = await response.Content.ReadAsStringAsync();
-
-            dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(stringResult);
+            dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("wikipedia", term: searchTerm));
 
             EmbedBuilder searchEmbed = new EmbedBuilder()
                 .WithTitle($"What is \"{searchTerm}\"?")
