@@ -15,7 +15,7 @@ namespace Discord_Chan.Command
         [Command("ping")]
         public async Task Ping()
         {
-            await Context.Message.Channel.SendMessageAsync($"Pong! `{Math.Round((DateTime.Now - Context.Message.CreatedAt).TotalMilliseconds)} ms`");
+            await Context.Message.Channel.SendMessageAsync($"Pong! `{Math.Abs(Math.Round((DateTimeOffset.UtcNow - Context.Message.CreatedAt).TotalMilliseconds))} ms`");
         }
 
         [Command("help")]
