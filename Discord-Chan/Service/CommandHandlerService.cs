@@ -90,7 +90,7 @@ namespace Discord_Chan.Service
             if (result.Error == CommandError.UnknownCommand)
             {
                 Dictionary<string, int> messageCompareValues = new Dictionary<string, int>();
-                List<Type> commandClasses = typeof(Discord_Chan.Command.PingCommand)
+                List<Type> commandClasses = typeof(Discord_Chan.Command.GeneralCommands)
                     .Assembly.GetTypes()
                     .Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList();
                 foreach (Type commandClass in commandClasses)
