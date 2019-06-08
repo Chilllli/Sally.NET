@@ -77,38 +77,38 @@ namespace Discord_Chan.Command
             await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
         }
 
-        [Command("start")]
-        public async Task WelcomeRoles()
-        {
-            bool hasHigherLvlRole = false;
-            ulong levelRoleId = 0;
-            SocketGuildUser newUser = Context.Message.Author as SocketGuildUser;
-            ulong newComerRoleId = RoleManagerService.roleDictionary.GetValueOrDefault(0);
-            foreach (KeyValuePair<int, ulong> entry in RoleManagerService.roleDictionary)
-            {
-                if (newUser.Roles.ToList().Find(r => r.Id == entry.Value) != null)
-                    levelRoleId = entry.Value;
-                hasHigherLvlRole = true;
-            }
-            //check if user has newcomer role
-            if (newUser.Roles.ToList().Find(r => r.Id == newComerRoleId) == null && !hasHigherLvlRole)
-            {
-                await newUser.AddRoleAsync(Program.MyGuild.Roles.ToList().Find(r => r.Id == newComerRoleId));
-                await Context.Message.Channel.SendMessageAsync("Welcome to the Server!");
-            }
-            else
-            {
-                if (hasHigherLvlRole)
-                {
-                    SocketRole levelRole = Program.MyGuild.Roles.ToList().Find(r => r.Id == levelRoleId);
-                    await Context.Message.Channel.SendMessageAsync($"You are already: {levelRole.Name}");
-                }
-                else
-                {
-                    await Context.Message.Channel.SendMessageAsync("You already have this role or a higher one!");
-                }
-            }
-        }
+        //[Command("start")]
+        //public async Task WelcomeRoles()
+        //{
+        //    bool hasHigherLvlRole = false;
+        //    ulong levelRoleId = 0;
+        //    SocketGuildUser newUser = Context.Message.Author as SocketGuildUser;
+        //    ulong newComerRoleId = RoleManagerService.roleDictionary.GetValueOrDefault(0);
+        //    foreach (KeyValuePair<int, ulong> entry in RoleManagerService.roleDictionary)
+        //    {
+        //        if (newUser.Roles.ToList().Find(r => r.Id == entry.Value) != null)
+        //            levelRoleId = entry.Value;
+        //        hasHigherLvlRole = true;
+        //    }
+        //    //check if user has newcomer role
+        //    if (newUser.Roles.ToList().Find(r => r.Id == newComerRoleId) == null && !hasHigherLvlRole)
+        //    {
+        //        await newUser.AddRoleAsync(Program.MyGuild.Roles.ToList().Find(r => r.Id == newComerRoleId));
+        //        await Context.Message.Channel.SendMessageAsync("Welcome to the Server!");
+        //    }
+        //    else
+        //    {
+        //        if (hasHigherLvlRole)
+        //        {
+        //            SocketRole levelRole = Program.MyGuild.Roles.ToList().Find(r => r.Id == levelRoleId);
+        //            await Context.Message.Channel.SendMessageAsync($"You are already: {levelRole.Name}");
+        //        }
+        //        else
+        //        {
+        //            await Context.Message.Channel.SendMessageAsync("You already have this role or a higher one!");
+        //        }
+        //    }
+        //}
 
         [Group("status")]
         public class StatusManagement : ModuleBase

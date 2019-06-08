@@ -16,8 +16,6 @@ namespace Discord_Chan.Command
         [Command("ask")]
         public async Task AskWikipedia(string searchTerm)
         {
-            
-
             dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("wikipedia", term: searchTerm));
 
             EmbedBuilder searchEmbed = new EmbedBuilder()
