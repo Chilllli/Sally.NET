@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Chan.Db;
+using Sally_NET.Db;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Web;
 
-namespace Discord_Chan.Service
+namespace Sally_NET.Service
 {
     static class MoodHandleService
     {

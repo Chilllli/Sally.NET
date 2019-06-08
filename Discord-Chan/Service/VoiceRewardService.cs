@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Chan.Config;
-using Discord_Chan.Db;
+using Sally_NET.Config;
+using Sally_NET.Db;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Discord_Chan.Service
+namespace Sally_NET.Service
 {
     static class VoiceRewardService
     {

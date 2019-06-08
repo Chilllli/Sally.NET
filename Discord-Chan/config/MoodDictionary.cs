@@ -1,11 +1,11 @@
-﻿using Discord_Chan.Service;
+﻿using Sally_NET.Service;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Discord_Chan.Config
+namespace Sally_NET.Config
 {
     static class MoodDictionary
     {

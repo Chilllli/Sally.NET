@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord_Chan.Service;
+using Sally_NET.Service;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.Command
+namespace Sally_NET.Command
 {
     public class GameCommands : ModuleBase
     {

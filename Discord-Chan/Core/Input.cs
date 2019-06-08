@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Discord_Chan.Core
+namespace Sally_NET.Core
 {
     class Input
     {

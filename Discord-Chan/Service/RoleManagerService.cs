@@ -1,13 +1,13 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Chan.Db;
+using Sally_NET.Db;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.Service
+namespace Sally_NET.Service
 {
     static class RoleManagerService
     {

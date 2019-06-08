@@ -2,8 +2,8 @@
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord_Chan.Command;
-using Discord_Chan.Core;
+using Sally_NET.Command;
+using Sally_NET.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -14,7 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.Service
+namespace Sally_NET.Service
 {
     static class CommandHandlerService
     {
@@ -90,7 +90,7 @@ namespace Discord_Chan.Service
             if (result.Error == CommandError.UnknownCommand)
             {
                 Dictionary<string, int> messageCompareValues = new Dictionary<string, int>();
-                List<Type> commandClasses = typeof(Discord_Chan.Command.GeneralCommands)
+                List<Type> commandClasses = typeof(Sally_NET.Command.GeneralCommands)
                     .Assembly.GetTypes()
                     .Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList();
                 foreach (Type commandClass in commandClasses)

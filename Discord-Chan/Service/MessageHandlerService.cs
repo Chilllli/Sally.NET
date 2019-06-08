@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.Service
+namespace Sally_NET.Service
 {
     class MessageHandlerService
     {

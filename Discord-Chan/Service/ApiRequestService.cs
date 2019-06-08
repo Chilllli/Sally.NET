@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Discord_Chan.Service
+namespace Sally_NET.Service
 {
     static class ApiRequestService
     {

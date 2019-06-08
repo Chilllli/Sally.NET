@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Timers;
 
-namespace Discord_Chan.Db
+namespace Sally_NET.Db
 {
     class User
     {

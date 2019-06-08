@@ -1,15 +1,15 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord_Chan.Db;
-using Discord_Chan.Service;
+using Sally_NET.Db;
+using Sally_NET.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord_Chan.Command
+namespace Sally_NET.Command
 {
 
     public class ProfileCommands : ModuleBase

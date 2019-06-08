@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Chan.Config;
-using Discord_Chan.Db;
-using Discord_Chan.Service;
+using Sally_NET.Config;
+using Sally_NET.Db;
+using Sally_NET.Service;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Discord_Chan.Command
+namespace Sally_NET.Command
 {
     public class WeatherCommands : ModuleBase
     {

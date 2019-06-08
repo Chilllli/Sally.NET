@@ -1,16 +1,16 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Chan.Command;
-using Discord_Chan.Config;
-using Discord_Chan.Db;
-using Discord_Chan.Service;
+using Sally_NET.Command;
+using Sally_NET.Config;
+using Sally_NET.Db;
+using Sally_NET.Service;
 using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Chan
+namespace Sally_NET
 {
     class Program
     {

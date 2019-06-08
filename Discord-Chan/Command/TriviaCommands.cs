@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Chan.Service;
+using Sally_NET.Service;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Discord_Chan.Command
+namespace Sally_NET.Command
 {
     public class TriviaCommands : ModuleBase
     {

@@ -1,12 +1,12 @@
-﻿using Discord_Chan.Config;
+﻿using Sally_NET.Config;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static Discord_Chan.Service.MoodHandleService;
+using static Sally_NET.Service.MoodHandleService;
 
-namespace Discord_Chan.Db
+namespace Sally_NET.Db
 {
     class DataAccess : IDisposable
     {

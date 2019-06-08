@@ -1,4 +1,4 @@
-﻿namespace Discord_Chan.Core
+﻿namespace Sally_NET.Core
 {
     enum InputType
     {
