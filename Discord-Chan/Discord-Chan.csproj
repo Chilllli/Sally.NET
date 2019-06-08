@@ -19,16 +19,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ffmpeg.exe">
+    <None Update="Libs\ffmpeg.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ffplay.exe">
+    <None Update="Libs\ffplay.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ffprobe.exe">
+    <None Update="Libs\ffprobe.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="libsodium.dll">
+    <None Update="Libs\libsodium.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="libs\ffmpeg.exe">
@@ -43,13 +43,8 @@
     <None Update="libs\opus.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="libs\youtube-dl.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="opus.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="youtube-dl.exe">
+    <None Update="libs\youtube-dl.exe" />
+    <None Update="Libs\opus.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

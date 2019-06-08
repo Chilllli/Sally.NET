@@ -13,7 +13,7 @@ using System.Web;
 
 namespace Discord_Chan.Command
 {
-    public class WeatherSubCommands : ModuleBase
+    public class WeatherCommands : ModuleBase
     {
         [Command("sub2weather")]
         public async Task SubToService(string location, TimeSpan notiferTime)
