@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Chan.Command
 {
-    
+
     public class ProfileCommands : ModuleBase
     {
         [Group("profile")]
@@ -48,11 +48,11 @@ namespace Discord_Chan.Command
             //check if user has the specific role
             SocketGuildUser myGuildUser = Context.Message.Author as SocketGuildUser;
             //check if private message
-            if(myGuildUser == null)
+            if (myGuildUser == null)
             {
                 return;
             }
-            if(myGuildUser.Roles.ToList().Find(r => r.Id == 483327985349558272) == null)
+            if (myGuildUser.Roles.ToList().Find(r => r.Id == 483327985349558272) == null)
             {
                 return;
             }
@@ -88,7 +88,7 @@ namespace Discord_Chan.Command
             {
                 if (newUser.Roles.ToList().Find(r => r.Id == entry.Value) != null)
                     levelRoleId = entry.Value;
-                    hasHigherLvlRole = true;
+                hasHigherLvlRole = true;
             }
             //check if user has newcomer role
             if (newUser.Roles.ToList().Find(r => r.Id == newComerRoleId) == null && !hasHigherLvlRole)
@@ -106,6 +106,24 @@ namespace Discord_Chan.Command
                 else
                 {
                     await Context.Message.Channel.SendMessageAsync("You already have this role or a higher one!");
+                }
+            }
+        }
+
+        [Group("status")]
+        public class StatusManagement : ModuleBase
+        {
+            [Command("isMuted")]
+            public async Task ShowMuteStatus()
+            {
+                User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+                if(user.HasMuted)
+                {
+                    await Context.Message.Channel.SendMessageAsync($"The bot is currently muted for you.");
+                }
+                else
+                {
+                    await Context.Message.Channel.SendMessageAsync($"The bot is currently not muted for you.");
                 }
             }
         }
