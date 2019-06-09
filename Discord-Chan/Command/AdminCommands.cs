@@ -75,6 +75,7 @@ namespace Sally_NET.Command
                 if (Context.Message.Author.Id != Program.BotConfiguration.meId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
+                    return;
                 }
                 await Program.Me.SendMessageAsync($"There are currently {Program.RequestCounter} Requests.");
             }

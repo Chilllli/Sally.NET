@@ -33,6 +33,7 @@ namespace Sally_NET.Command
         {
             User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             user.HasMuted = true;
+            await Context.Message.Channel.SendMessageAsync("The bot is muted now");
         }
 
         [Command("unmute")]
@@ -40,6 +41,7 @@ namespace Sally_NET.Command
         {
             User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             user.HasMuted = false;
+            await Context.Message.Channel.SendMessageAsync("The bot is unmuted now");
         }
 #if DEBUG
         [Command("getrich")]
