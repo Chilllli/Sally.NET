@@ -56,8 +56,7 @@ namespace Sally_NET.Service
 
         private static async void ChangeMoodTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            //await setMood(getMood());
-
+            await setMood(getMood());
         }
 
         private static Task Client_MessageReceived(SocketMessage message)
