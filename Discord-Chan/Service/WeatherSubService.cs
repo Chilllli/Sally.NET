@@ -34,13 +34,7 @@ namespace Sally_NET.Service
                 if (disUser == null)
                     continue;
 
-                HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri("https://api.openweathermap.org");
-                HttpResponseMessage response = await client.GetAsync($"/data/2.5/weather?q={HttpUtility.UrlEncode(user.WeatherLocation, Encoding.UTF8)}&appid={Program.BotConfiguration.WeatherApiKey}&units=metric");
-
-                string stringResult = await response.Content.ReadAsStringAsync();
-
-                dynamic temperature = JsonConvert.DeserializeObject<dynamic>(stringResult);
+                dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi", location: user.WeatherLocation));
 
                 EmbedBuilder weatherEmbed = new EmbedBuilder()
                     .WithTitle("Weather Info")

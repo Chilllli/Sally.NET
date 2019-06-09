@@ -22,5 +22,6 @@ namespace Sally_NET.Config
         public string WeatherApiKey = String.Empty;
         public string CleverApi = String.Empty;
         //public ulong StarterChannel = 0;
+        //public ulong ClientId = 0;
     }
 }

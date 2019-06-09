@@ -10,11 +10,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Web;
+using Sally_NET.Config;
+
 
 namespace Sally_NET.Service
 {
     static class MoodHandleService
     {
+        
         private static DiscordSocketClient client;
         private static double dailyPoints;
         private static float pointsSum;
@@ -53,7 +56,8 @@ namespace Sally_NET.Service
 
         private static async void ChangeMoodTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            await setMood(getMood());
+            //await setMood(getMood());
+
         }
 
         private static Task Client_MessageReceived(SocketMessage message)
@@ -137,5 +141,7 @@ namespace Sally_NET.Service
             await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
 #endif
         }
+
+
     }
 }

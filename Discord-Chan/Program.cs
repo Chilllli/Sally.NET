@@ -10,6 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+
+
 namespace Sally_NET
 {
     class Program
@@ -51,10 +53,9 @@ namespace Sally_NET
             }
         }
 
-
         public static void Main(string[] args)
         {
-            if(args.Length > 0)
+            if (args.Length > 0)
             {
                 isRestarted = args[0] == "true";
             }
@@ -71,8 +72,11 @@ namespace Sally_NET
         public async Task MainAsync()
         {
 
+
             BotConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
             DataAccess.Initialize(BotConfiguration);
+
+
 
             RequestCounter = Int32.Parse(File.ReadAllText("ApiRequests.txt"));
 
@@ -108,15 +112,15 @@ namespace Sally_NET
             {
                 if (DataAccess.Instance.users.Find(u => u.Id == user.Id) == null)
                 {
-                    DataAccess.Instance.InsertUser(new User(user.Id, 10, false));
+                    DataAccess.Instance.InsertUser(new Database.User(user.Id, 10, false));
                 }
                 //check if user is already in a voice channel
-                if(user.VoiceChannel != null)
+                if (user.VoiceChannel != null)
                 {
                     //start tracking if user detected
                     VoiceRewardService.StartTrackingVoiceChannel(DataAccess.Instance.users.Find(u => u.Id == user.Id));
                 }
-                if(user.Id == BotConfiguration.meId)
+                if (user.Id == BotConfiguration.meId)
                 {
                     Me = user as SocketUser;
                 }
