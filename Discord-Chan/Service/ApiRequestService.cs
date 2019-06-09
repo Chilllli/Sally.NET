@@ -20,52 +20,52 @@ namespace Sally_NET.Service
                     return request2cleverapiAsync(message).Result;
                 case "weatherapi":
                     return request2weatherAsync(location).Result;
+                case "memeapi":
+                    return request2memapi().Result;
                 default:
                     throw new Exception("no valid api endpoint");
             }
+        }
+
+        private static async Task<string> request2memapi()
+        {
+            string stringResult = await (CreateHttpRequest("https://api.memeload.us", "/v1/random").Result).Content.ReadAsStringAsync();
+            return stringResult;
         }
 
         private static async Task<string> request2weatherAsync(string location = null)
         {
             if (location == null)
             {
-                HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri("https://api.openweathermap.org");
-                HttpResponseMessage response = await client.GetAsync($"/data/2.5/weather?q={HttpUtility.UrlEncode(Program.BotConfiguration.WeatherPlace, Encoding.UTF8)}&appid={Program.BotConfiguration.WeatherApiKey}&units=metric");
-
                 // This line gives me error | not for me
-                string stringResult = await response.Content.ReadAsStringAsync();
+                string stringResult = await (CreateHttpRequest("https://api.openweathermap.org", $"/data/2.5/weather?q={HttpUtility.UrlEncode(Program.BotConfiguration.WeatherPlace, Encoding.UTF8)}&appid={Program.BotConfiguration.WeatherApiKey}&units=metric").Result).Content.ReadAsStringAsync();
                 return stringResult;
             }
             else
             {
-                HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri("https://api.openweathermap.org");
-                HttpResponseMessage response = await client.GetAsync($"/data/2.5/weather?q={HttpUtility.UrlEncode(location, Encoding.UTF8)}&appid={Program.BotConfiguration.WeatherApiKey}&units=metric");
-
-                string stringResult = await response.Content.ReadAsStringAsync();
+                string stringResult = await (CreateHttpRequest("https://api.openweathermap.org", $"/data/2.5/weather?q={HttpUtility.UrlEncode(location, Encoding.UTF8)}&appid={Program.BotConfiguration.WeatherApiKey}&units=metric").Result).Content.ReadAsStringAsync();
                 return stringResult;
             }
         }
 
         private static async Task<string> request2cleverapiAsync(SocketUserMessage message)
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("https://www.cleverbot.com");
-            HttpResponseMessage response = await client.GetAsync($"/getreply?key={Program.BotConfiguration.CleverApi}&input={message.Content}");
-
-            string stringResult = await response.Content.ReadAsStringAsync();
+            string stringResult = await (CreateHttpRequest("https://www.cleverbot.com", $"/getreply?key={Program.BotConfiguration.CleverApi}&input={message.Content}").Result).Content.ReadAsStringAsync();
             return stringResult;
         }
 
         private static async Task<string> request2wikiAsync(string term)
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("https://en.wikipedia.org");
-            HttpResponseMessage response = await client.GetAsync($"/w/api.php?action=opensearch&format=json&search={term}&namespace=0&limit=5&utf8=1");
-
-            string stringResult = await response.Content.ReadAsStringAsync();
+            string stringResult = await (CreateHttpRequest("https://en.wikipedia.org", $"/w/api.php?action=opensearch&format=json&search={term}&namespace=0&limit=5&utf8=1").Result).Content.ReadAsStringAsync();
             return stringResult;
+        }
+
+        private static async Task<HttpResponseMessage> CreateHttpRequest(string url, string urlExtension)
+        {
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri(url);
+            HttpResponseMessage responseMessage = await client.GetAsync(urlExtension);
+            return responseMessage;
         }
     }
 }

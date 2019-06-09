@@ -1,4 +1,6 @@
 ﻿using Discord.Commands;
+using Newtonsoft.Json;
+using Sally_NET.Service;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -28,6 +30,13 @@ namespace Sally_NET.Command
         public async Task GetCommandPage()
         {
             await Context.Message.Channel.SendMessageAsync("Here you can find the list of all available commands: https://its-sally.net/commands");
+        }
+
+        [Command("meme")]
+        public async Task SendRandomMeme()
+        {
+            dynamic jsonResponse = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("memeapi"));
+            await Context.Message.Channel.SendMessageAsync(jsonResponse.image);
         }
     }
 }
