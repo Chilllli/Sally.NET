@@ -1,5 +1,5 @@
 ﻿using Discord.WebSocket;
-using Sally_NET.Db;
+using Sally_NET.Database;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
-using Sally_NET.Db;
+using Sally_NET.Database;
 using Sally_NET.Service;
 using Newtonsoft.Json;
 using System;

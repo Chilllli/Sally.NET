@@ -1,12 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Sally_NET.Db;
-using Sally_NET.Service;
+using Sally_NET.Database;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sally_NET.Command

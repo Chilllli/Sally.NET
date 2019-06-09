@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using static Sally_NET.Service.MoodHandleService;
 
-namespace Sally_NET.Db
+namespace Sally_NET.Database
 {
     class DataAccess : IDisposable
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Timers;
 
-namespace Sally_NET.Db
+namespace Sally_NET.Database
 {
     class User
     {

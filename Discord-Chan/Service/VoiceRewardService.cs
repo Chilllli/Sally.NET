@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Sally_NET.Config;
-using Sally_NET.Db;
+using Sally_NET.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
