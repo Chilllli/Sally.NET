@@ -36,7 +36,7 @@ namespace Sally_NET.Command
         public async Task SendRandomMeme()
         {
             dynamic jsonResponse = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("memeapi"));
-            await Context.Message.Channel.SendMessageAsync(jsonResponse.image);
+            await Context.Message.Channel.SendMessageAsync((string)jsonResponse.image);
         }
     }
 }
