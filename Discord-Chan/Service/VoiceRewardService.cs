@@ -49,10 +49,10 @@ namespace Sally_NET.Service
                 await disUser.SendMessageAsync(String.Format(MoodDictionary.getMoodMessage("Hello"), disUser.Username));//Hello
                 currentUser.LastGreeting = DateTime.Now;
             }
-            startTrackingVoiceChannel(currentUser);
+            StartTrackingVoiceChannel(currentUser);
         }
 
-        private static void startTrackingVoiceChannel(User user)
+        public static void StartTrackingVoiceChannel(User user)
         {
             user.LastXpTime = DateTime.Now;
             user.XpTimer = new Timer(Program.BotConfiguration.xpTimerInMin * 1000 * 60);

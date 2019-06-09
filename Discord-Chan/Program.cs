@@ -110,6 +110,12 @@ namespace Sally_NET
                 {
                     DataAccess.Instance.InsertUser(new User(user.Id, 10, false));
                 }
+                //check if user is already in a voice channel
+                if(user.VoiceChannel != null)
+                {
+                    //start tracking if user detected
+                    VoiceRewardService.StartTrackingVoiceChannel(DataAccess.Instance.users.Find(u => u.Id == user.Id));
+                }
                 if(user.Id == BotConfiguration.meId)
                 {
                     Me = user as SocketUser;

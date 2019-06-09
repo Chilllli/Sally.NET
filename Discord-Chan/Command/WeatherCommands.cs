@@ -1,15 +1,10 @@
 ﻿using Discord;
 using Discord.Commands;
-using Sally_NET.Config;
 using Sally_NET.Db;
 using Sally_NET.Service;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Sally_NET.Command
 {
