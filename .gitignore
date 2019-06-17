@@ -331,3 +331,14 @@ ASALocalRun/
 
 #Custom
 Sprites/
+YoutubeExplode-master/DemoConsole/
+YoutubeExplode-master/DemoWPF/
+YoutubeExplode-master/.gitattributes
+YoutubeExplode-master/.gitignore
+YoutubeExplode-master/appveyor.yml
+YoutubeExplode-master/Changelog.md
+YoutubeExplode-master/favicon.ico
+YoutubeExplode-master/favicon.png
+YoutubeExplode-master/Licence.txt
+YoutubeExplode-master/ReadMe.md
+YoutubeExplode-master/YoutubeExplode.sln

@@ -29,7 +29,7 @@ namespace Sally_NET.Database
             try
             {
                 connection.Open();
-                Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    Success");
+                //Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    Success");
             }
             catch (MySqlException ex)
             {
@@ -74,7 +74,7 @@ namespace Sally_NET.Database
                 users.Add(new User((ulong)reader["id"], (int)reader["xp"], (int)reader["isMuted"] == 1, reader["weatherLocation"] == DBNull.Value ? null : (string)reader["weatherLocation"], reader["notifierTime"] == DBNull.Value ? null : (TimeSpan?)reader["notifierTime"]));
             }
             reader.Close();
-            Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    All Users loaded");
+            //Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    All Users loaded");
         }
 
         public void saveMood(Mood mood)

@@ -159,11 +159,11 @@ namespace Sally_NET.Service
             if ((message.Channel as SocketDMChannel) != null)
             {
                 //dm channel
-                    if (message.Author.Id == Program.Client.CurrentUser.Id)
-                        return;
-                    //privat message
-                    Program.RequestCounter++;
-                    
+                if (message.Author.Id == Program.Client.CurrentUser.Id)
+                    return;
+                //privat message
+                Program.RequestCounter++;
+
 
                 dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("cleverapi", message));
                 await message.Channel.SendMessageAsync(messageOutput["output"].ToString());
@@ -177,9 +177,15 @@ namespace Sally_NET.Service
 
             // Don't process the command if it is invalid
             if (message == null)
+            {
                 return;
+            }
+
             if (Program.MyGuild.Users.ToList().Find(u => u.Id == message.Author.Id) == null)
+            {
                 return;
+            }
+
 
             //await MessageHandlerService.DeleteStartMessages(message);
             Input input = ClassifyAs(message);

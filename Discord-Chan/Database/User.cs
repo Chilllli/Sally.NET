@@ -48,7 +48,7 @@ namespace Sally_NET.Database
         public static event LevelUp OnLevelUp;
         public static int getLevelFromXp(int xp)
         {
-            return (int)Math.Floor(Math.Sqrt((xp - 200) / 300) + Math.Sqrt((xp - 200) / 500));
+            return (int)Math.Floor(Math.Sqrt((xp - 200) / (double)300) + Math.Sqrt((xp - 200) / (double)500));
         }
         private bool hasMuted;
         public bool HasMuted

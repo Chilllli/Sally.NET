@@ -89,7 +89,7 @@ namespace Sally_NET.Command
             MusicCommands.client = client;
         }
 
-        public static IAudioClient audioClient;
+        private static IAudioClient audioClient;
         private static List<VideoInfo> audioQueue = new List<VideoInfo>();
         private static bool pause
         {
@@ -125,11 +125,7 @@ namespace Sally_NET.Command
         private static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         public static ulong Id { get; private set; }
 
-        public MusicCommands()
-        {
-
-        }
-        public static DiscordSocketClient client;
+        private static DiscordSocketClient client;
         private static VideoInfo currentVideoInfo;
         private static int currentVideoIndex = -1;
 
@@ -163,7 +159,7 @@ namespace Sally_NET.Command
 
         private async Task AudioClient_SpeakingUpdated(ulong arg1, bool arg2)
         {
-            Console.WriteLine($"Speaking {arg2}");
+            //is speaking
         }
 
         private static int lastPause;
@@ -264,8 +260,18 @@ namespace Sally_NET.Command
         public async Task AddTitle(string url)
         {
             Uri uri;
-            if (!(Uri.TryCreate(url, UriKind.Absolute, out uri) && uri.Scheme == Uri.UriSchemeHttps)) throw new Exception("no valid url");
-            if (!uri.Host.Contains("youtube")) throw new Exception("no youtube link");
+            if (!(Uri.TryCreate(url, UriKind.Absolute, out uri) && uri.Scheme == Uri.UriSchemeHttps))
+            {
+                //no valid url
+                await Context.Message.Channel.SendMessageAsync("no valid url");
+                return;
+            };
+            if (!uri.Host.Contains("youtube"))
+            {
+                //no youtube link
+                await Context.Message.Channel.SendMessageAsync("no youtube link");
+                return;
+            } 
             //new Task(() =>
             // {
             Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}] - beginning downloading: {uri.ToString()}");
@@ -369,7 +375,7 @@ namespace Sally_NET.Command
 
                             stopwatch.Reset();
                             stopwatch.Start();
-                            Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}] - begin playback: {currentVideoInfo.Title}");
+                            //Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}] - begin playback: {currentVideoInfo.Title}");
                             //Update "Playing .."
                             //show what is currently playing
 
@@ -416,7 +422,6 @@ namespace Sally_NET.Command
             await audioClient.SetSpeakingAsync(true);
             try
             {
-                FileInfo fileInfo = new FileInfo(path);
                 using (Stream output = File.Open(path, FileMode.Open))
                 {
                     using (AudioOutStream discord = audioClient.CreatePCMStream(AudioApplication.Mixed))
@@ -441,7 +446,7 @@ namespace Sally_NET.Command
                                 if (read == 0)
                                 {
                                     //No more data available
-                                    Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}] - End of song: {currentVideoInfo.Title}");
+                                    //Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}] - End of song: {currentVideoInfo.Title}");
                                     exit = true;
                                     break;
                                 }
@@ -469,7 +474,7 @@ namespace Sally_NET.Command
                             catch (Exception e)
                             {
                                 fail = true;
-                                Console.WriteLine(e.Message);
+                                //Console.WriteLine(e.Message);
                                 // could not send
                             }
                         }
@@ -481,7 +486,7 @@ namespace Sally_NET.Command
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                //Console.WriteLine(e);
             }
         }
         /// <summary>

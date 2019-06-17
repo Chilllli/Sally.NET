@@ -12,7 +12,6 @@ namespace Sally_NET.Command
     public class GeneralCommands : ModuleBase
     {
         public static readonly string PongMessage = "pong";
-        private static ConcurrentDictionary<ulong, DateTime> pingTracker = new ConcurrentDictionary<ulong, DateTime>();
 
         [Command("ping")]
         public async Task Ping()
