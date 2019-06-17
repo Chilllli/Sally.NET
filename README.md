@@ -2,6 +2,7 @@
 [![forthebadge](https://forthebadge.com/images/badges/made-with-c-sharp.svg)](https://forthebadge.com)
 
 [![Build Status](https://travis-ci.com/Chilllli/Sally.NET.svg?token=e9oxuon9Djni1ERDenE9&branch=master)](https://travis-ci.com/Chilllli/Sally.NET)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3dce132ba96d4ba69cb0de2479196363)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Chilllli/Sally.NET&amp;utm_campaign=Badge_Grade)
 
 # Welcome to Sally .NET!
 
