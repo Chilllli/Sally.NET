@@ -49,7 +49,7 @@ namespace Sally_NET.Service
             //get start values
             DailyTimer_Elapsed(null, null);
             await checkWeather();
-            await setMood(getMood());
+            await setMood(getMood()).ConfigureAwait(false);
             onStart = false;
             client.MessageReceived += Client_MessageReceived;
         }
