@@ -4,12 +4,11 @@
 [![Build Status](https://travis-ci.com/Chilllli/Sally.NET.svg?token=e9oxuon9Djni1ERDenE9&branch=master)](https://travis-ci.com/Chilllli/Sally.NET)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3dce132ba96d4ba69cb0de2479196363)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Chilllli/Sally.NET&amp;utm_campaign=Badge_Grade)
 
-# Welcome to Sally .NET!
+# Welcome to Sally .NET
 
 Hey! Sally, your friendly Discord-Bot. She is a multipurpose bot with many request options and just waiting for you. ^~^
 
-
-# Overview
+## Overview
 
 * **Feature**:
 	* command prediction
@@ -20,11 +19,11 @@ Hey! Sally, your friendly Discord-Bot. She is a multipurpose bot with many reque
 
 The following list shows the available commands at the moment. If you want to use commands you need a "$" as prefix.
 
-* [Game Commands](#game-commands)  
-* [Random Commands](#random-commands) 
-* [User Commands](#user-commands) 
-* [Trivia Commands](#trivia-commands)
-* [Weather Commands](#weather-commands) 
+  * [Game Commands](#game-commands)  
+  * [Random Commands](#random-commands) 
+  * [User Commands](#user-commands) 
+  * [Trivia Commands](#trivia-commands)
+  * [Weather Commands](#weather-commands) 
 
 
 # Commands
