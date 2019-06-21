@@ -9,8 +9,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
-
+using System.Net;
 
 namespace Sally_NET
 {
@@ -71,7 +70,22 @@ namespace Sally_NET
 
         public async Task MainAsync()
         {
-
+            string[] moods = { "Sad", "Meh", "Happy", "Extatic" };
+            if (!Directory.Exists("mood"))
+            {
+                Directory.CreateDirectory("mood");
+            }
+            //download content
+            using (var client = new WebClient())
+            {
+                foreach (string item in moods)
+                {
+                    if (!File.Exists($"mood/{item}.png"))
+                    {
+                        client.DownloadFile($"https://cdn.its-sally.net/content/{item}.png", $"mood/{item}.png");
+                    }
+                }
+            }
 
             BotConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
             DataAccess.Initialize(BotConfiguration);
