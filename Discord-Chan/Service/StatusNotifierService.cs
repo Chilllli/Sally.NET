@@ -23,7 +23,7 @@ namespace Sally_NET.Service
         {
             while (true)
             {
-                using (NamedPipeServerStream npss = new NamedPipeServerStream("/tmp/CoreFXPipe_StatusNotifier=", PipeDirection.In))
+                using (NamedPipeServerStream npss = new NamedPipeServerStream("StatusNotifier", PipeDirection.In))
                 {
                     npss.WaitForConnection();
                     using (StreamReader reader = new StreamReader(npss))
