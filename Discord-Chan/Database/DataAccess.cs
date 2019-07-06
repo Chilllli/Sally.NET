@@ -55,23 +55,24 @@ namespace Sally_NET.Database
 
         public void UpdateUser(User user)
         {
-            MySqlCommand command = new MySqlCommand("UPDATE infos SET xp = @xp, isMuted = @mute, weatherLocation = @weatherLocation, notifierTime = @notifierTime WHERE id = @id", connection);
+            MySqlCommand command = new MySqlCommand("UPDATE infos SET xp = @xp, isMuted = @mute, weatherLocation = @weatherLocation, notifierTime = @notifierTime, embedColor = @embedColor WHERE id = @id", connection);
             command.Parameters.AddWithValue("@id", user.Id);
             command.Parameters.AddWithValue("@xp", user.Xp);
             command.Parameters.AddWithValue("@mute", user.HasMuted ? 1 : 0);
             command.Parameters.AddWithValue("@weatherLocation", user.WeatherLocation);
             command.Parameters.AddWithValue("@notifierTime", user.NotifierTime);
+            command.Parameters.AddWithValue("@embedColor", user.EmbedColor);
             command.Prepare();
             command.ExecuteNonQuery();
         }
         
         void loadUsers()
         {
-            MySqlCommand command = new MySqlCommand("SELECT id,xp,isMuted,weatherLocation,notifierTime FROM infos", connection);
+            MySqlCommand command = new MySqlCommand("SELECT id,xp,isMuted,weatherLocation,notifierTime,embedColor FROM infos", connection);
             MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                users.Add(new User((ulong)reader["id"], (int)reader["xp"], (int)reader["isMuted"] == 1, reader["weatherLocation"] == DBNull.Value ? null : (string)reader["weatherLocation"], reader["notifierTime"] == DBNull.Value ? null : (TimeSpan?)reader["notifierTime"]));
+                users.Add(new User((ulong)reader["id"], (int)reader["xp"], (int)reader["isMuted"] == 1, reader["weatherLocation"] == DBNull.Value ? null : (string)reader["weatherLocation"], reader["notifierTime"] == DBNull.Value ? null : (TimeSpan?)reader["notifierTime"], (string)reader["embedColor"]));
             }
             reader.Close();
             //Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    All Users loaded");

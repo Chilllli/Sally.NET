@@ -71,7 +71,7 @@ namespace Sally_NET.Command
                 .WithDescription("Check how much xp you miss for the next level up.")
                 .AddField("Current Level", myUser.Level)
                 .AddField("Xp needed until level up", (Math.Floor(-50 * (15 * Math.Sqrt(15) * Math.Pow(myUser.Level + 1, 2) - 60 * Math.Pow(myUser.Level + 1, 2) - 4))) - myUser.Xp)
-                .WithColor(0x5e099b)
+                .WithColor(new Color((uint)new System.ComponentModel.UInt32Converter().ConvertFromString(myUser.EmbedColor)))
                 .WithFooter("Provided by your friendly bot Sally");
             await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
         }
@@ -124,6 +124,32 @@ namespace Sally_NET.Command
                 {
                     await Context.Message.Channel.SendMessageAsync($"The bot is currently not muted for you.");
                 }
+            }
+        }
+
+        [Command("setColor")]
+        public async Task SetEmbedColor(string color)
+        {
+            int hexColor;
+            if(Int32.TryParse(color, System.Globalization.NumberStyles.HexNumber, null, out hexColor))
+            {
+                string result = "0x" + color.PadRight(6, '0');
+                if (hexColor < 16777216 && hexColor >= 0)
+                {
+                    //hex value is in range
+                    User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+                    user.EmbedColor = result;
+                    await Context.Message.Channel.SendMessageAsync("you have sucessfully set your color");
+                }
+                else
+                {
+                    await Context.Message.Channel.SendMessageAsync("wrong hex value");
+                }
+            }
+            else
+            {
+                //error
+                await Context.Message.Channel.SendMessageAsync("Something went wrong");
             }
         }
     }

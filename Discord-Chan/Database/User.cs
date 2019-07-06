@@ -7,12 +7,13 @@ namespace Sally_NET.Database
 {
     class User
     {
-        public User(ulong id, int xp, bool mute, string weatherLocation = null, TimeSpan? notifierTime = null){
+        public User(ulong id, int xp, bool mute, string weatherLocation = null, TimeSpan? notifierTime = null, string embedColor = null){
             Id = id;
             this.xp = xp;
             hasMuted = mute;
             this.weatherLocation = weatherLocation;
             this.notifierTime = notifierTime;
+            this.embedColor = embedColor;
         }
 
         public ulong Id;
@@ -90,6 +91,20 @@ namespace Sally_NET.Database
             set
             {
                 notifierTime = value;
+                DataAccess.Instance.UpdateUser(this);
+            }
+        }
+
+        private string embedColor;
+        public string EmbedColor
+        {
+            get
+            {
+                return embedColor;
+            }
+            set
+            {
+                embedColor = value;
                 DataAccess.Instance.UpdateUser(this);
             }
         }
