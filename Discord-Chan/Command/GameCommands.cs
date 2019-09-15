@@ -113,57 +113,68 @@ namespace Sally_NET.Command
             [Command("value")]
             public async Task CheckPrice(string name)
             {
-                //create a generic text format
-                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                ////create a generic text format
+                //TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
 
-                //normalize text input
-                string normInput = textInfo.ToTitleCase(name);
+                ////normalize text input
+                //string normInput = textInfo.ToTitleCase(name);
+
+                string normInput = name.First().ToString().ToUpper() + name.Substring(1);
+
+                IMessage searchMessage = Context.Message.Channel.SendMessageAsync("Searching for item....").Result;
 
                 using (WebClient wc = new WebClient())
                 {
                     string id;
                     var json = wc.DownloadString("https://rsbuddy.com/exchange/summary.json");
-                    JObject json_obj = JObject.Parse(json);
-                    foreach (var item in json_obj)
+                    JObject jsonIdFinder = JObject.Parse(json);
+                    JObject jsonItem = null;
+                    foreach (var item in jsonIdFinder)
                     {
-                        if (normInput == (string)json_obj[item.Key]["name"])
+                        if (normInput == (string)jsonIdFinder[item.Key]["name"])
                         {
                             var parentKey = item.Value.AncestorsAndSelf()
                                                 .FirstOrDefault(k => k != null);
                             id = (string)parentKey["id"];
                             var json2 = wc.DownloadString($"https://services.runescape.com/m=itemdb_rs/api/catalogue/detail.json?item={id}");
-                            JObject jsonObj = JObject.Parse(json2);
-                            string price = (string)jsonObj["item"]["current"]["price"];
-                            string type = (string)jsonObj["item"]["type"];
-                            string description = (string)jsonObj["item"]["description"];
-                            string needMember = (string)jsonObj["item"]["members"];
-
+                            jsonItem = JObject.Parse(json2);
+                            
                             EmbedBuilder rsEmbed = new EmbedBuilder()
                                 .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                                 .WithDescription("Check current prices of items in the grand exchange")
-                                .WithColor(Color.DarkBlue)
+                                .WithColor(Color.DarkGreen)
                                 .WithTimestamp(DateTime.Now)
                                 .WithThumbnailUrl($"https://services.runescape.com/m=itemdb_rs/obj_big.gif?id={id}")
-                                .AddField("Name", (string)jsonObj["item"]["name"], true)
-                                .AddField("Type", (string)jsonObj["item"]["type"], true)
-                                .AddField("Description", (string)jsonObj["item"]["description"], true)
-                                .AddField("Member-Item", (string)jsonObj["item"]["members"] == "true" ? "\u2705" : "\u274E", true)
-                                .AddField("Current Price", (string)jsonObj["item"]["current"]["price"])
-                                .AddField("30 Days Price Trend", (string)jsonObj["item"]["day30"]["change"])
-                                .AddField("90 Days Price Trend", (string)jsonObj["item"]["day90"]["change"])
-                                .AddField("180 Days Price Trend", (string)jsonObj["item"]["day180"]["change"]);
+                                .WithFooter("Powered by Sally", "https://static-cdn.jtvnw.net/emoticons/v1/279825/3.0")
+                                .AddField("Name", (string)jsonItem["item"]["name"], true)
+                                .AddField("Type", (string)jsonItem["item"]["type"], true)
+                                .AddField("Description", (string)jsonItem["item"]["description"], true)
+                                .AddField("Member-Item", (string)jsonItem["item"]["members"] == "true" ? "\u2705" : "\u274E", true)
+                                .AddField("Current Value", (string)jsonItem["item"]["current"]["price"]+ " gp")
+                                .AddField("Buying Price", (string)jsonIdFinder[item.Key]["buy_average"]+ " gp", true)
+                                .AddField("Selling Price", (string)jsonIdFinder[item.Key]["sell_average"]+ " gp", true)
+                                .AddField("30 Days Price Trend", (string)jsonItem["item"]["day30"]["change"])
+                                .AddField("90 Days Price Trend", (string)jsonItem["item"]["day90"]["change"])
+                                .AddField("180 Days Price Trend", (string)jsonItem["item"]["day180"]["change"]);
 
+                            searchMessage.DeleteAsync();
                             await Context.Message.Channel.SendMessageAsync(embed: rsEmbed.Build());
                             break;
                         }
                         else
                         {
-                            await Context.Channel.SendMessageAsync("something wenht wrong");
+                            continue;
                         }
                     }
-
+                    if(jsonItem == null)
+                    {
+                        searchMessage.DeleteAsync();
+                        await Context.Message.Channel.SendMessageAsync("Item not found...");
+                    }
                 }
             }
+
+            
         }
     }
 }

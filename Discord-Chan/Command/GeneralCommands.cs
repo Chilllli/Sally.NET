@@ -22,13 +22,13 @@ namespace Sally_NET.Command
         [Command("help")]
         public async Task GetHelpPage()
         {
-            await Context.Message.Channel.SendMessageAsync("If you are looking for help open the following webpage: https://its-sally.net");
+            await Context.Message.Channel.SendMessageAsync("If you are looking for help open the following webpage: <https://its-sally.net>");
         }
 
         [Command("commands")]
         public async Task GetCommandPage()
         {
-            await Context.Message.Channel.SendMessageAsync("Here you can find the list of all available commands: https://its-sally.net/commands");
+            await Context.Message.Channel.SendMessageAsync("Here you can find the list of all available commands: <https://its-sally.net/commands>");
         }
 
         [Command("meme")]
