@@ -119,7 +119,8 @@ namespace Sally_NET.Command
                 ////normalize text input
                 //string normInput = textInfo.ToTitleCase(name);
 
-                string normInput = name.First().ToString().ToUpper() + name.Substring(1);
+                string lowerName = name.ToLower();
+                string normInput = lowerName.First().ToString().ToUpper() + lowerName.Substring(1);
 
                 IMessage searchMessage = Context.Message.Channel.SendMessageAsync("Searching for item....").Result;
 
@@ -129,17 +130,42 @@ namespace Sally_NET.Command
                     var json = wc.DownloadString("https://rsbuddy.com/exchange/summary.json");
                     JObject jsonIdFinder = JObject.Parse(json);
                     JObject jsonItem = null;
+                    string json2 = null;
                     foreach (var item in jsonIdFinder)
                     {
                         if (normInput == (string)jsonIdFinder[item.Key]["name"])
                         {
+                            EmbedBuilder rsEmbed = new EmbedBuilder();
                             var parentKey = item.Value.AncestorsAndSelf()
                                                 .FirstOrDefault(k => k != null);
                             id = (string)parentKey["id"];
-                            var json2 = wc.DownloadString($"https://services.runescape.com/m=itemdb_rs/api/catalogue/detail.json?item={id}");
-                            jsonItem = JObject.Parse(json2);
+                            try
+                            {
+                                json2 = wc.DownloadString($"https://services.runescape.com/m=itemdb_rs/api/catalogue/detail.json?item={id}");
+                            }
+                            catch (Exception e)
+                            {
+                                json2 = null;
+                            }
                             
-                            EmbedBuilder rsEmbed = new EmbedBuilder()
+
+                            if (json2 == null)
+                            {
+                                jsonItem = new JObject();
+                                rsEmbed
+                                .WithTitle("Oldschool Runescape Grand Exchange Price Check")
+                                .WithDescription("Check current prices of items in the grand exchange")
+                                .WithColor(Color.DarkGreen)
+                                .WithTimestamp(DateTime.Now)
+                                .WithThumbnailUrl($"https://services.runescape.com/m=itemdb_rs/obj_big.gif?id={id}")
+                                .WithFooter("Powered by Sally", "https://static-cdn.jtvnw.net/emoticons/v1/279825/3.0")
+                                .AddField("Buying Price", (string)jsonIdFinder[item.Key]["buy_average"] + " gp", true)
+                                .AddField("Selling Price", (string)jsonIdFinder[item.Key]["sell_average"] + " gp", true);
+                            }
+                            else
+                            {
+                                jsonItem = JObject.Parse(json2);
+                                rsEmbed
                                 .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                                 .WithDescription("Check current prices of items in the grand exchange")
                                 .WithColor(Color.DarkGreen)
@@ -150,12 +176,15 @@ namespace Sally_NET.Command
                                 .AddField("Type", (string)jsonItem["item"]["type"], true)
                                 .AddField("Description", (string)jsonItem["item"]["description"], true)
                                 .AddField("Member-Item", (string)jsonItem["item"]["members"] == "true" ? "\u2705" : "\u274E", true)
-                                .AddField("Current Value", (string)jsonItem["item"]["current"]["price"]+ " gp")
-                                .AddField("Buying Price", (string)jsonIdFinder[item.Key]["buy_average"]+ " gp", true)
-                                .AddField("Selling Price", (string)jsonIdFinder[item.Key]["sell_average"]+ " gp", true)
+                                .AddField("Current Value", (string)jsonItem["item"]["current"]["price"] + " gp")
+                                .AddField("Buying Price", (string)jsonIdFinder[item.Key]["buy_average"] + " gp", true)
+                                .AddField("Selling Price", (string)jsonIdFinder[item.Key]["sell_average"] + " gp", true)
                                 .AddField("30 Days Price Trend", (string)jsonItem["item"]["day30"]["change"])
                                 .AddField("90 Days Price Trend", (string)jsonItem["item"]["day90"]["change"])
                                 .AddField("180 Days Price Trend", (string)jsonItem["item"]["day180"]["change"]);
+
+                            }
+
 
                             searchMessage.DeleteAsync();
                             await Context.Message.Channel.SendMessageAsync(embed: rsEmbed.Build());
@@ -166,7 +195,7 @@ namespace Sally_NET.Command
                             continue;
                         }
                     }
-                    if(jsonItem == null)
+                    if (jsonItem == null)
                     {
                         searchMessage.DeleteAsync();
                         await Context.Message.Channel.SendMessageAsync("Item not found...");
@@ -174,7 +203,7 @@ namespace Sally_NET.Command
                 }
             }
 
-            
+
         }
     }
 }
