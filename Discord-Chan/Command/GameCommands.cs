@@ -159,6 +159,8 @@ namespace Sally_NET.Command
                                 .WithTimestamp(DateTime.Now)
                                 .WithThumbnailUrl($"https://services.runescape.com/m=itemdb_rs/obj_big.gif?id={id}")
                                 .WithFooter("Powered by Sally", "https://static-cdn.jtvnw.net/emoticons/v1/279825/3.0")
+                                .AddField("Name", (string)jsonIdFinder[item.Key]["name"], true)
+                                .AddField("Member-Item", (string)jsonIdFinder[item.Key]["members"] == "true" ? "\u2705" : "\u274E", true)
                                 .AddField("Buying Price", (string)jsonIdFinder[item.Key]["buy_average"] + " gp", true)
                                 .AddField("Selling Price", (string)jsonIdFinder[item.Key]["sell_average"] + " gp", true);
                             }
