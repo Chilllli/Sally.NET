@@ -126,14 +126,24 @@ namespace Sally_NET.Command
 
                 using (WebClient wc = new WebClient())
                 {
-                    string id;
+                    string id = null;
                     var json = wc.DownloadString("https://rsbuddy.com/exchange/summary.json");
                     JObject jsonIdFinder = JObject.Parse(json);
                     JObject jsonItem = null;
                     string json2 = null;
+                    int[] ids;
+                    Dictionary<string, int> itemNameComparison = new Dictionary<string, int>();
+                    bool hasBreaked = false;
+                    //make foreach smaller. need to overthink the code body of foreach
                     foreach (var item in jsonIdFinder)
                     {
-                        if (normInput == (string)jsonIdFinder[item.Key]["name"])
+                        string dataItemName = (string)jsonIdFinder[item.Key]["name"];
+                        if (!itemNameComparison.ContainsKey(dataItemName))
+                        {
+                            itemNameComparison.Add(dataItemName, CommandHandlerService.CalcLevenshteinDistance(dataItemName, normInput));
+                        }
+
+                        if (normInput == dataItemName && !hasBreaked)
                         {
                             EmbedBuilder rsEmbed = new EmbedBuilder();
                             var parentKey = item.Value.AncestorsAndSelf()
@@ -147,7 +157,7 @@ namespace Sally_NET.Command
                             {
                                 json2 = null;
                             }
-                            
+
 
                             if (json2 == null)
                             {
@@ -190,7 +200,7 @@ namespace Sally_NET.Command
 
                             searchMessage.DeleteAsync();
                             await Context.Message.Channel.SendMessageAsync(embed: rsEmbed.Build());
-                            break;
+                            hasBreaked = true;
                         }
                         else
                         {
@@ -199,13 +209,13 @@ namespace Sally_NET.Command
                     }
                     if (jsonItem == null)
                     {
+                        int minValue = itemNameComparison.Values.Min();
+                        string result = itemNameComparison.Where(v => v.Value == minValue).FirstOrDefault().Key;
                         searchMessage.DeleteAsync();
-                        await Context.Message.Channel.SendMessageAsync("Item not found...");
+                        await Context.Message.Channel.SendMessageAsync($"Item not found... But do you mean {result}?");
                     }
                 }
             }
-
-
         }
     }
 }

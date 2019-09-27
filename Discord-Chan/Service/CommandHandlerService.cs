@@ -192,7 +192,7 @@ namespace Sally_NET.Service
             await HandleMessage(input);
         }
 
-        private static int CalcLevenshteinDistance(string a, string b)
+        public static int CalcLevenshteinDistance(string a, string b)
         {
             if (String.IsNullOrEmpty(a) && String.IsNullOrEmpty(b))
             {
