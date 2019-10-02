@@ -152,7 +152,7 @@ namespace Sally_NET.Command
                             {
                                 json2 = wc.DownloadString($"https://services.runescape.com/m=itemdb_rs/api/catalogue/detail.json?item={id}");
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
                                 json2 = null;
                             }
@@ -197,7 +197,7 @@ namespace Sally_NET.Command
                             }
 
 
-                            searchMessage.DeleteAsync();
+                            await searchMessage.DeleteAsync();
                             await Context.Message.Channel.SendMessageAsync(embed: rsEmbed.Build());
                             hasBreaked = true;
                         }
@@ -210,7 +210,7 @@ namespace Sally_NET.Command
                     {
                         int minValue = itemNameComparison.Values.Min();
                         string result = itemNameComparison.Where(v => v.Value == minValue).FirstOrDefault().Key;
-                        searchMessage.DeleteAsync();
+                        await searchMessage.DeleteAsync();
                         await Context.Message.Channel.SendMessageAsync($"Item not found... But do you mean {result}?");
                     }
                 }

@@ -31,7 +31,7 @@ namespace Sally_NET.Service
             { 75, 583714339018637314}
 
         };
-        public static async Task InitializeHandler()
+        public static void InitializeHandler()
         {
             User.OnLevelUp += User_OnLevelUp;
         }

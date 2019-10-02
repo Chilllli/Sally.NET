@@ -15,7 +15,7 @@ namespace Sally_NET.Command
         public class ProfileManagement : ModuleBase
         {
             [Command("add")]
-            public async Task AddProfile(string game, string active, string avatar, string password)
+            public void AddProfile(string game, string active, string avatar, string password)
             {
 
                 Console.WriteLine(game);
@@ -42,7 +42,7 @@ namespace Sally_NET.Command
         }
 #if DEBUG
         [Command("getrich")]
-        public async Task QuickExp()
+        public void QuickExp()
         {
             //check if user has the specific role
             SocketGuildUser myGuildUser = Context.Message.Author as SocketGuildUser;

@@ -409,7 +409,7 @@ namespace Sally_NET.Command
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     //audio can't be played
 
@@ -471,7 +471,7 @@ namespace Sally_NET.Command
                             {
                                 exit = true;
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
                                 fail = true;
                                 //Console.WriteLine(e.Message);
@@ -484,7 +484,7 @@ namespace Sally_NET.Command
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //Console.WriteLine(e);
             }

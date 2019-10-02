@@ -37,7 +37,6 @@ namespace Sally_NET
             get;
             private set;
         }
-        private static bool isRestarted;
         private static int requestCounter;
         public static int RequestCounter
         {
@@ -101,7 +100,7 @@ namespace Sally_NET
             UserManagerService.InitializeHandler(Client);
             MoodDictionary.InitializeMoodDictionary();
             WeatherSubService.InitializeWeatherSub();
-            await RoleManagerService.InitializeHandler();
+            RoleManagerService.InitializeHandler();
             await CommandHandlerService.InitializeHandler(Client);
             Client.Ready += Client_Ready;
 
