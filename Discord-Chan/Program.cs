@@ -51,13 +51,13 @@ namespace Sally_NET
                 File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
             }
         }
-        private static string startValue;
+        private static int startValue;
 
         public static void Main(string[] args)
         {
             if (args.Length > 0)
             {
-                startValue = args[0];
+                startValue = Int32.Parse(args[0]);
             }
             Console.CancelKeyPress += Console_CancelKeyPress;
             new Program().MainAsync().GetAwaiter().GetResult();
@@ -142,17 +142,16 @@ namespace Sally_NET
             }
             StatusNotifierService.InitializeService();
             MusicCommands.Initialize(Client);
-            await MoodHandleService.InitializeHandler(Client);
             switch (startValue)
             {
-                case "0":
+                case 0:
                     //shutdown
                     break;
-                case "1":
+                case 1:
                     //restarting
                     await Me.SendMessageAsync("I have restored and restarted successfully.");
                     break;
-                case "2":
+                case 2:
                     //updating
                     //check if an update is nessasarry
                     await Me.SendMessageAsync("I at all the new features and restarted successfully.");
@@ -160,6 +159,8 @@ namespace Sally_NET
                 default:
                     break;
             }
+            await MoodHandleService.InitializeHandler(Client);
+            
         }
     }
 }

@@ -131,7 +131,6 @@ namespace Sally_NET.Command
                     JObject jsonIdFinder = JObject.Parse(json);
                     JObject jsonItem = null;
                     string json2 = null;
-                    int[] ids;
                     Dictionary<string, int> itemNameComparison = new Dictionary<string, int>();
                     bool hasBreaked = false;
                     //make foreach smaller. need to overthink the code body of foreach

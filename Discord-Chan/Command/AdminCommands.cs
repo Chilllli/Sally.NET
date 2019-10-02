@@ -66,7 +66,7 @@ namespace Sally_NET.Command
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
                 }
-                await Program.Me.SendMessageAsync("Bot is shutting down now");
+                await Program.Me.SendMessageAsync("I am shutting down now");
                 Environment.Exit(0);
             }
 
@@ -78,7 +78,7 @@ namespace Sally_NET.Command
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
                 }
-                await Program.Me.SendMessageAsync("Bot is restarting now");
+                await Program.Me.SendMessageAsync("I am restarting now");
                 Environment.Exit(1);
             }
 
@@ -92,7 +92,7 @@ namespace Sally_NET.Command
                 }
 
                 //perform update
-                await Program.Me.SendMessageAsync("Bot is updating now");
+                await Program.Me.SendMessageAsync("I am updating now");
                 Environment.Exit(2);
             }
         }
