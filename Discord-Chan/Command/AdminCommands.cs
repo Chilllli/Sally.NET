@@ -45,16 +45,17 @@ namespace Sally_NET.Command
                     await guildUser.ModifyAsync(u => u.Nickname = new String((guildUser.Nickname != null ? guildUser.Nickname : guildUser.Username).Reverse().ToArray())); 
                 }
             }
-            [Command("restart")]
-            public async Task RestartBot()
+            
+
+            [Command("apiRequests")]
+            public async Task ShowCurrentApiRequests()
             {
-                if(Context.Message.Author.Id != Program.BotConfiguration.meId)
+                if (Context.Message.Author.Id != Program.BotConfiguration.meId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
                 }
-                await Program.Me.SendMessageAsync("Bot is restarting now");
-                Environment.Exit(1);
+                await Program.Me.SendMessageAsync($"There are currently {Program.RequestCounter} Requests.");
             }
 
             [Command("shutdown")]
@@ -69,15 +70,30 @@ namespace Sally_NET.Command
                 Environment.Exit(0);
             }
 
-            [Command("apiRequests")]
-            public async Task ShowCurrentApiRequests()
+            [Command("restart")]
+            public async Task RestartBot()
             {
                 if (Context.Message.Author.Id != Program.BotConfiguration.meId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
                 }
-                await Program.Me.SendMessageAsync($"There are currently {Program.RequestCounter} Requests.");
+                await Program.Me.SendMessageAsync("Bot is restarting now");
+                Environment.Exit(1);
+            }
+
+            [Command("update")]
+            public async Task PerformUpdate()
+            {
+                if(Context.Message.Author.Id != Program.BotConfiguration.meId)
+                {
+                    await Context.Message.Channel.SendMessageAsync("permission denied");
+                    return;
+                }
+
+                //perform update
+                await Program.Me.SendMessageAsync("Bot is updating now");
+                Environment.Exit(2);
             }
         }
     }

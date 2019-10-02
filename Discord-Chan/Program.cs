@@ -51,12 +51,13 @@ namespace Sally_NET
                 File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
             }
         }
+        private static string startValue;
 
         public static void Main(string[] args)
         {
             if (args.Length > 0)
             {
-                isRestarted = args[0] == "true";
+                startValue = args[0];
             }
             Console.CancelKeyPress += Console_CancelKeyPress;
             new Program().MainAsync().GetAwaiter().GetResult();
@@ -142,9 +143,22 @@ namespace Sally_NET
             StatusNotifierService.InitializeService();
             MusicCommands.Initialize(Client);
             await MoodHandleService.InitializeHandler(Client);
-            if (isRestarted)
+            switch (startValue)
             {
-                await Me.SendMessageAsync("Bot successfully restarted");
+                case "0":
+                    //shutdown
+                    break;
+                case "1":
+                    //restarting
+                    await Me.SendMessageAsync("I have restored and restarted successfully.");
+                    break;
+                case "2":
+                    //updating
+                    //check if an update is nessasarry
+                    await Me.SendMessageAsync("I at all the new features and restarted successfully.");
+                    break;
+                default:
+                    break;
             }
         }
     }
