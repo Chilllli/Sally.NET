@@ -501,7 +501,7 @@ namespace Sally_NET.Command
                 dynamicEmbed
                 .WithAuthor("Welcome to the music player")
                 .WithColor(Color.DarkBlue)
-                .WithTitle("Use `!add url` to add music to the queue")
+                .WithTitle("Use `$add url` to add music to the queue")
                 .WithFooter(f => f.Text = "stop \u23EF, skip \u23ED, previous \u23EE, repeat \U0001F502")
                 .Build();
             }
