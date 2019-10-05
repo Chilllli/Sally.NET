@@ -78,7 +78,6 @@ namespace Sally_NET.Database
             //Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    All Users loaded");
         }
 
-#if RELEASE
         public void saveMood(Mood mood)
         {
             MySqlCommand command = new MySqlCommand("INSERT INTO moodtable(mood) VALUES (@mood)", connection);
@@ -86,7 +85,7 @@ namespace Sally_NET.Database
             command.Prepare();
             command.ExecuteNonQuery();
         }
-#endif
+
         public void Dispose()
         {
             if (connection.State == System.Data.ConnectionState.Open)

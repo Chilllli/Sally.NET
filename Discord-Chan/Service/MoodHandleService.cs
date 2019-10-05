@@ -134,9 +134,8 @@ namespace Sally_NET.Service
             {
                 return;
             }
-#if RELEASE
             DataAccess.Instance.saveMood(mood);
-
+#if RELEASE
             await client.SetActivityAsync(new Game(mood.ToString()));
             await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
 #endif

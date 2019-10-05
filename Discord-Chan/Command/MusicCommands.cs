@@ -78,8 +78,8 @@ namespace Sally_NET.Command
         private static Stopwatch stopwatch = new Stopwatch();
         public static void Initialize(DiscordSocketClient client)
         {
-            Task.Run(() => playAudio());
-            Task.Run(() => messageWatcher());
+            Task.Run(() =>  playAudio() );
+            Task.Run(() => messageWatcher() );
             if (File.Exists("songQueue.json"))
             {
                 audioQueue = JsonConvert.DeserializeObject<List<VideoInfo>>(File.ReadAllText("songQueue.json"));
@@ -124,7 +124,6 @@ namespace Sally_NET.Command
         private static TaskCompletionSource<bool> taskCompletionSource = new TaskCompletionSource<bool>();
         private static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         public static ulong Id { get; private set; }
-        private static IUserMessage oneMessage = null;
 
         private static DiscordSocketClient client;
         private static VideoInfo currentVideoInfo;
@@ -134,11 +133,7 @@ namespace Sally_NET.Command
         public async Task Join(IVoiceChannel voiceChannel = null)
         {
             voiceChannel = voiceChannel ?? (Context.Message.Author as IGuildUser)?.VoiceChannel;
-            if (voiceChannel == null) 
-            {
-                await Context.Message.Channel.SendMessageAsync("You are not in a voice channel.");
-                return;
-            }
+            if (voiceChannel == null) throw new Exception("Youre not in a voice channel");
             SocketVoiceChannel lastVoiceChannel = Context.Client.Guilds.Select(g => g.VoiceChannels.Where(c => c.Users.Count(u => u.Id == Context.Client.CurrentUser.Id) > 0).FirstOrDefault()).Where(c => c != null).FirstOrDefault();
             if (lastVoiceChannel != null)
             {
@@ -150,14 +145,14 @@ namespace Sally_NET.Command
 
             //alle nachrichten löschen
             ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.BotConfiguration.radioControlChannel) as SocketTextChannel;
-            List<IMessage> userMessages = await (textChannel.GetMessagesAsync().Flatten()).ToList();
+            List<IMessage> userMessages = await( textChannel.GetMessagesAsync().Flatten()).ToList();
             foreach (IMessage message in userMessages)
             {
                 await message.DeleteAsync();
             }
 
 
-            oneMessage = await textChannel.SendMessageAsync("♪♫♪ Media Player ♫♪♫", embed: audioInfoEmbed());
+            IUserMessage oneMessage = await textChannel.SendMessageAsync("♪♫♪ Media Player ♫♪♫", embed: audioInfoEmbed());
             Id = oneMessage.Id;
             await Context.Message.DeleteAsync();
         }
@@ -167,10 +162,10 @@ namespace Sally_NET.Command
             //is speaking
         }
 
-        private static int lastPause = 0;
-        private static int lastPrevious = 0;
-        private static int lastSkip = 0;
-        private static int lastRepeat = 0;
+        private static int lastPause;
+        private static int lastPrevious;
+        private static int lastSkip;
+        private static int lastRepeat;
         private static string lastStatus = "laden";
 
         public static async void messageWatcher()
@@ -180,16 +175,12 @@ namespace Sally_NET.Command
                 await Task.Delay(1000);
                 if (Id == 0) continue;
                 SocketTextChannel textChannel = client.Guilds.First(g => g.GetChannel(Program.BotConfiguration.radioControlChannel) != null).GetChannel(Program.BotConfiguration.radioControlChannel) as SocketTextChannel;
-                //SocketUserMessage oneMessage = textChannel.GetMessageAsync(Id).Result as SocketUserMessage;
+                RestUserMessage oneMessage = await textChannel.GetMessageAsync(Id) as RestUserMessage;
                 if (oneMessage == null) continue;
-                var flattenPause = await (oneMessage.GetReactionUsersAsync(new Emoji("\u23EF"), 10000)).FlattenAsync();
-                int currentPause = flattenPause.Count();
-                var flattenPrevious =  await (oneMessage.GetReactionUsersAsync(new Emoji("\u23EE"), 10000)).FlattenAsync();
-                int currentPrevious = flattenPrevious.Count();
-                var flattenSkip = await (oneMessage.GetReactionUsersAsync(new Emoji("\u23ED"), 10000)).FlattenAsync();
-                int currentSkip = flattenSkip.Count();
-                var flattenRepeat = await (oneMessage.GetReactionUsersAsync(new Emoji("\U0001F502"), 10000)).FlattenAsync();
-                int currentRepeat = flattenRepeat.Count();
+                int currentPause = await ( oneMessage.GetReactionUsersAsync(new Emoji("\u23EF"), 10000)).Count();
+                int currentPrevious = await ( oneMessage.GetReactionUsersAsync(new Emoji("\u23EE"), 10000)).Count();
+                int currentSkip = await ( oneMessage.GetReactionUsersAsync(new Emoji("\u23ED"), 10000)).Count();
+                int currentRepeat = await ( oneMessage.GetReactionUsersAsync(new Emoji("\U0001F502"), 10000)).Count();
 
                 if (currentPause + currentPrevious + currentRepeat + currentSkip == 0)
                 {
@@ -207,7 +198,7 @@ namespace Sally_NET.Command
                     lastSkip = 1;
                     lock (lastStatus)
                     {
-                        lastStatus = "Ready, use $add with url";
+                        lastStatus = "Ready, use !add with url";
                     }
                     continue;
                 }
@@ -280,7 +271,7 @@ namespace Sally_NET.Command
                 //no youtube link
                 await Context.Message.Channel.SendMessageAsync("no youtube link");
                 return;
-            }
+            } 
             //new Task(() =>
             // {
             Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}] - beginning downloading: {uri.ToString()}");
@@ -300,39 +291,14 @@ namespace Sally_NET.Command
             {
                 using (MemoryStream outputStream = new MemoryStream())
                 {
-                    try
-                    {
-                        //https://www.youtube.com/watch?v=LDU_Txk06tM outputStream
-                        await tubeClient.DownloadMediaStreamAsync(streamInfo, path);
-                    }
-                    catch (Exception e)
-                    {
-
-                    }
-
+                    await tubeClient.DownloadMediaStreamAsync(streamInfo, outputStream);
                     outputStream.Seek(0, SeekOrigin.Begin);
-                    try
+                    using (FileStream fileStream = new FileStream(path, FileMode.Open))
                     {
-                        using (FileStream fileStream = new FileStream(path, FileMode.Open))
-                        {
-                            try
-                            {
-                                await outputStream.CopyToAsync(fileStream);
-                            }
-                            catch (Exception e)
-                            {
-
-                            }
-
-                        }
+                        await outputStream.CopyToAsync(fileStream);
                     }
-                    catch (Exception e)
-                    {
-
-                    }
-
                 }
-
+                    
                 Process.Start(new ProcessStartInfo()
                 {
                     FileName = "ffmpeg",
@@ -353,8 +319,6 @@ namespace Sally_NET.Command
                 pause = false;
             });
             await Context.Message.DeleteAsync();
-
-            //delete message from user
         }
 
         private static async void playAudio()
@@ -411,7 +375,7 @@ namespace Sally_NET.Command
 
                             stopwatch.Reset();
                             stopwatch.Start();
-                            Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}] - begin playback: {currentVideoInfo.Title}");
+                            //Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}] - begin playback: {currentVideoInfo.Title}");
                             //Update "Playing .."
                             //show what is currently playing
 
