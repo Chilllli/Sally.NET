@@ -186,6 +186,11 @@ namespace Sally_NET.Service
                 return;
             }
 
+            if (arg.Author.IsBot)
+            {
+                return;
+            }
+
 
             //await MessageHandlerService.DeleteStartMessages(message);
             Input input = ClassifyAs(message);

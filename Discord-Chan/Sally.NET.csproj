@@ -16,10 +16,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\YoutubeExplode-master\YoutubeExplode\YoutubeExplode.csproj" />
+    <ProjectReference Include="..\..\..\YoutubeExplodeCore\YoutubeExplodeCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ffmpeg.exe">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <None Update="Libs\ffmpeg.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
