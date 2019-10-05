@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="obj\Debug\net45\YoutubeExplode.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\netstandard1.1\YoutubeExplode.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\netstandard2.0\YoutubeExplode.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\project.assets.json" />
+    <Content Include="obj\YoutubeExplode.csproj.nuget.dgspec.json" />
+    <Content Include="obj\YoutubeExplodeCore.csproj.nuget.dgspec.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="obj\Debug\net45\YoutubeExplode.AssemblyInfoInputs.cache" />
+    <None Include="obj\Debug\net45\YoutubeExplode.assets.cache" />
+    <None Include="obj\Debug\net45\YoutubeExplode.csproj.CopyComplete" />
+    <None Include="obj\Debug\net45\YoutubeExplode.csprojAssemblyReference.cache" />
+    <None Include="obj\Debug\net45\YoutubeExplode.dll" />
+    <None Include="obj\Debug\net45\YoutubeExplode.pdb" />
+    <None Include="obj\Debug\netcoreapp3.0\YoutubeExplodeCore.AssemblyInfoInputs.cache" />
+    <None Include="obj\Debug\netcoreapp3.0\YoutubeExplodeCore.assets.cache" />
+    <None Include="obj\Debug\netcoreapp3.0\YoutubeExplodeCore.csprojAssemblyReference.cache" />
+    <None Include="obj\Debug\netstandard1.1\YoutubeExplode.AssemblyInfoInputs.cache" />
+    <None Include="obj\Debug\netstandard1.1\YoutubeExplode.assets.cache" />
+    <None Include="obj\Debug\netstandard1.1\YoutubeExplode.csprojAssemblyReference.cache" />
+    <None Include="obj\Debug\netstandard1.1\YoutubeExplode.dll" />
+    <None Include="obj\Debug\netstandard1.1\YoutubeExplode.pdb" />
+    <None Include="obj\Debug\netstandard2.0\YoutubeExplode.AssemblyInfoInputs.cache" />
+    <None Include="obj\Debug\netstandard2.0\YoutubeExplode.assets.cache" />
+    <None Include="obj\Debug\netstandard2.0\YoutubeExplode.csprojAssemblyReference.cache" />
+    <None Include="obj\Debug\netstandard2.0\YoutubeExplode.dll" />
+    <None Include="obj\Debug\netstandard2.0\YoutubeExplode.pdb" />
+    <None Include="obj\Debug\YoutubeExplode.4.7.10.nuspec" />
+    <None Include="obj\YoutubeExplode.csproj.nuget.cache" />
+    <None Include="obj\YoutubeExplode.csproj.nuget.g.props" />
+    <None Include="obj\YoutubeExplode.csproj.nuget.g.targets" />
+    <None Include="obj\YoutubeExplodeCore.csproj.nuget.cache" />
+    <None Include="obj\YoutubeExplodeCore.csproj.nuget.g.props" />
+    <None Include="obj\YoutubeExplodeCore.csproj.nuget.g.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LtGt" Version="1.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+</Project>
