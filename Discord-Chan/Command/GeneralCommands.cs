@@ -37,5 +37,12 @@ namespace Sally_NET.Command
             dynamic jsonResponse = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("memeapi"));
             await Context.Message.Channel.SendMessageAsync((string)jsonResponse.image);
         }
+
+        [Command("uptime")]
+        public async Task CalculateUptime()
+        {
+            TimeSpan uptime = DateTime.Now - Program.StartTime;
+            await Context.Message.Channel.SendMessageAsync($"My current uptime is {uptime.Days} {(uptime.Days == 1 ? "Day" : "Days")} {uptime.Minutes} Minutes {uptime.Seconds} Seconds. I'm online since {Program.StartTime.ToString()} .");
+        }
     }
 }

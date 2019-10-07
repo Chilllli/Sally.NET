@@ -37,6 +37,12 @@ namespace Sally_NET
             get;
             private set;
         }
+
+        public static DateTime StartTime
+        {
+            get;
+            private set;
+        }
         private static int requestCounter;
         public static int RequestCounter
         {
@@ -70,6 +76,7 @@ namespace Sally_NET
 
         public async Task MainAsync()
         {
+            StartTime = DateTime.Now;
             string[] moods = { "Sad", "Meh", "Happy", "Extatic" };
             if (!Directory.Exists("mood"))
             {
@@ -89,8 +96,6 @@ namespace Sally_NET
 
             BotConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
             DataAccess.Initialize(BotConfiguration);
-
-
 
             RequestCounter = Int32.Parse(File.ReadAllText("ApiRequests.txt"));
 
