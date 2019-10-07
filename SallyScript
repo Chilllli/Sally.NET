@@ -1,0 +1,151 @@
+#!/bin/bash
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' #no color
+answer="USER INPUT"
+update="USER INPUT"
+isRestarting=""
+result=""
+showResult=false
+PID=0
+while true
+do
+clear
+echo " "
+echo -e "   _____           _   _               _   _          _   "
+echo -e "  / ____|         | | | |             | \ | |        | |  "
+echo -e " | (___     __ _  | | | |  _   _      |  \| |   ___  | |_ "
+echo -e "  \___ \   / _  | | | | | | | | |     |     |  / _ \ | __|"
+echo -e "  ____) | | (_| | | | | | | |_| |  _  | |\  | |  __/ | |_ "
+echo -e " |_____/   \__,_| |_| |_|  \__, | (_) |_| \_|  \___|  \__|"
+echo -e "                            __/ |                         "
+echo -e "                           |___/                          "
+echo -e "__________________________________________________________"
+if pgrep -f "dotnet Sally.NET.dll" > /dev/null 2>&1
+then
+	echo -e "Current State: ${GREEN}Online${NC}"
+else
+	echo -e "Current State: ${RED}Offline${NC}"
+fi
+echo " "
+echo " "
+if $showResult
+then
+	echo -e "Result: ${result}"
+else
+	showResult=true
+fi
+echo " "
+echo "See Script Options down below:"
+echo "Starting [1]"
+echo "Updating [2]"
+echo "Stopping [3]"
+echo "Status [4]"
+echo "Exit [5]"
+echo " "
+read -p "What you want to do?" answer
+case "$answer" in
+	1)
+		#Start
+		if pgrep -f "dotnet Sally.NET.dll" > /dev/null 2>&1
+		then
+			result="${RED}Sally is already online.${NC}"
+			clear
+			continue
+		else
+			echo -e "${GREEN}Starting Sally...${NC}"
+			dotnet build Sally.NET.sln -c Release
+			cd Discord-Chan/bin/Release/netcoreapp2.1/
+			while true
+			do
+				dotnet Sally.NET.dll $isRestarting > sallyOutput 2>&1
+				case $? in
+					0)
+						break
+					;;
+					1)
+						isRestarting=1
+						continue
+					;;
+					2)
+						isRestarting=2
+						cd ~/Sally.NET/
+						git pull origin master
+						dotnet build Sally.NET.sln -c Release
+						cd Discord-Chan/bin/Release/netcoreapp2.1/
+						continue
+					;;
+				esac
+			done
+			break
+		fi
+	;;
+	2)
+		#Update
+		if pgrep -f "dotnet Sally.NET.dll" > /dev/null 2>&1
+		then
+			echo "You cant update. Sally is online."
+			echo "Do you want to stop Sally?"
+			select yn in "Yes" "No"; do
+				case $yn in
+					Yes)
+						#Stopping Sally
+						echo "Stoping Sally..."
+						pkill -f "dotnet Sally.NET.dll"
+						echo "Sally stopped."
+						#Continue Update
+						echo "Updating Sally..."
+						cd ~/Sally.NET/
+						git pull origin master
+						result="${GREEN}Sally updated successfully!${NC}"
+						break
+					;;
+					No)
+						#Keep alive
+						result="${RED}Returned.${NC}"
+						break
+					;;
+				esac
+			done
+			clear
+			continue
+		else
+			echo "Updating..."
+			cd ~
+			cd Sally.NET/
+			git pull origin master
+			result="${GREEN}Sally updated successfully!${NC}"
+			clear
+			continue
+		fi
+	;;
+	3)
+		#Stop
+		if pgrep -f "dotnet Sally.NET.dll" > /dev/null 2>&1
+		then
+			#Process is running
+			echo "Stopping Sally..."
+			pkill -f "dotnet Sally.NET.dll"
+			result="${GREEN}Sally stopped successfully!${NC}"
+			clear
+			continue
+		else
+			#Process is not running
+			result="${RED}Sally is not online.${NC}"
+			clear
+			continue
+		fi
+	;;
+	4)
+		#Status (RAM Usage, Uptime, PID, etc.)
+		PID="$(pgrep dotnet -f Sally.NET.dll)"
+		result="\nPID: ${PID}"
+		continue
+	;;
+	5)
+		#Exit
+		echo "Bye"
+		break;
+		;;
+esac
+done
