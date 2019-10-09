@@ -11,17 +11,17 @@ namespace Sally_NET.Command
 {
     public class AdminCommands : ModuleBase
     {
+        //execute commands need admin permission
         [Group("sudo")]
         public class SudoCommands : ModuleBase
         {
             [Command("whois")]
             public async Task WhoIs(ulong userId)
             {
-                //check if the user, which has written the message, has admin rights
-                if((Context.Message.Author as SocketGuildUser).Roles.ToList().Find(r => r.Id == Program.BotConfiguration.AdminRole) != null)
+                //check if the user, which has written the message, has admin rights or is server owner
+                if ((Context.Message.Author as SocketGuildUser).Roles.ToList().FindAll(r => r.Permissions.Administrator) != null || Context.Message.Author.Id != Context.Guild.OwnerId)
                 {
-                    //user has not admin rights
-                    await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you have no rights to do that.");
+                    await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you dont have the permissions to do this!");
                     return;
                 }
                 //user has admin rights
@@ -31,10 +31,9 @@ namespace Sally_NET.Command
             public async Task ReverseUsernames()
             {
                 //check if the user, which has written the message, has admin rights
-                if ((Context.Message.Author as SocketGuildUser).Roles.ToList().Find(r => r.Id == Program.BotConfiguration.AdminRole) == null)
+                if ((Context.Message.Author as SocketGuildUser).Roles.ToList().FindAll(r => r.Permissions.Administrator) != null || Context.Message.Author.Id != Context.Guild.OwnerId)
                 {
-                   //user has not admin rights
-                    await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you have no rights to do that.");
+                    await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you dont have the permissions to do this!");
                     return;
                 }
                 foreach (SocketGuildUser guildUser in Program.MyGuild.Users)
@@ -44,9 +43,14 @@ namespace Sally_NET.Command
                         continue;
                     await guildUser.ModifyAsync(u => u.Nickname = new String((guildUser.Nickname != null ? guildUser.Nickname : guildUser.Username).Reverse().ToArray())); 
                 }
-            }
-            
+            } 
+        }
 
+
+        //execute commands only when the author is the bot owner
+        [Group("owner")]
+        public class OwnerCommands : ModuleBase
+        {
             [Command("apiRequests")]
             public async Task ShowCurrentApiRequests()
             {
@@ -85,7 +89,7 @@ namespace Sally_NET.Command
             [Command("update")]
             public async Task PerformUpdate()
             {
-                if(Context.Message.Author.Id != Program.BotConfiguration.meId)
+                if (Context.Message.Author.Id != Program.BotConfiguration.meId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
