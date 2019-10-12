@@ -44,7 +44,8 @@ namespace Sally_NET.Service
                     .AddField("Min. Temp for today", $"{temperature.main.temp_min} °C")
                     .AddField("Weather Condition", (string)temperature.weather[0].main)
                     .WithColor(Color.Blue)
-                    .WithTimestamp(DateTime.Now);
+                    .WithTimestamp(DateTime.Now)
+                    .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
                 await disUser.SendMessageAsync(embed: weatherEmbed.Build()).ConfigureAwait(false);
             }
         }

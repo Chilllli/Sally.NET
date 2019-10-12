@@ -21,7 +21,7 @@ namespace Sally_NET.Command
             EmbedBuilder searchEmbed = new EmbedBuilder()
                 .WithTitle($"What is \"{searchTerm}\"?")
                 .WithDescription($"Results for {searchTerm}")
-                .WithFooter("Provided by your friendly bot Sally")
+                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)
                 .WithTimestamp(DateTime.Now)
                 .WithColor(0xffffff);
                 for (int i = 0; i < 5; i++)

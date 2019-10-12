@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -19,7 +20,7 @@ using YoutubeExplode.Models.MediaStreams;
 
 namespace Sally_NET.Command
 {
-    struct VideoInfo
+    struct VideoInfo : IEquatable<VideoInfo>
     {
         public string Id { get; set; }
         public string Path { get; set; }
@@ -62,6 +63,11 @@ namespace Sally_NET.Command
                 }
                 return SongTitle.Substring(SongTitle.IndexOf("-") + 1).Trim();
             }
+        }
+
+        public bool Equals(VideoInfo other)
+        {
+            throw new NotImplementedException();
         }
     }
     public static class TimeSpanExtension
@@ -178,9 +184,15 @@ namespace Sally_NET.Command
             while (true)
             {
                 await Task.Delay(1000);
-                if (Id == 0) continue;
+                if (Id == 0) 
+                { 
+                    continue;
+                }
                 SocketTextChannel textChannel = client.Guilds.First(g => g.GetChannel(Program.BotConfiguration.radioControlChannel) != null).GetChannel(Program.BotConfiguration.radioControlChannel) as SocketTextChannel;
-                if (oneMessage == null) continue;
+                if (oneMessage == null)
+                {
+                    continue;
+                }
                 var flattenPause = await (oneMessage.GetReactionUsersAsync(new Emoji("\u23EF"), 10000)).FlattenAsync();
                 int currentPause = flattenPause.Count();
                 var flattenPrevious = await (oneMessage.GetReactionUsersAsync(new Emoji("\u23EE"), 10000)).FlattenAsync();

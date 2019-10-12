@@ -57,6 +57,16 @@ namespace Sally_NET
             }
         }
         private static int startValue;
+        public static string GenericFooter 
+        {
+            get;
+            private set;
+        }
+        public static string GenericThumbnailUrl
+        {
+            get;
+            private set;
+        }
 
         public static void Main(string[] args)
         {
@@ -126,6 +136,9 @@ namespace Sally_NET
 
         private async Task Client_Ready()
         {
+            GenericFooter = "Provided by Sally, your friendly and helpful Discordbot!";
+            GenericThumbnailUrl = "https://static-cdn.jtvnw.net/emoticons/v1/279825/3.0";
+
             MyGuild = Client.Guilds.Where(g => g.Id == BotConfiguration.guildId).First();
             foreach (SocketGuildUser user in MyGuild.Users)
             {

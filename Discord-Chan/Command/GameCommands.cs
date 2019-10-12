@@ -121,6 +121,7 @@ namespace Sally_NET.Command
 
                 string lowerName = name.ToLower();
                 string normInput = lowerName.First().ToString().ToUpper() + lowerName.Substring(1);
+                string itemUrl = normInput.Replace(" ", "_");
 
                 IMessage searchMessage = Context.Message.Channel.SendMessageAsync("Searching for item....").Result;
 
@@ -166,12 +167,13 @@ namespace Sally_NET.Command
                                 .WithDescription("Check current prices of items in the grand exchange")
                                 .WithColor(Color.DarkGreen)
                                 .WithTimestamp(DateTime.Now)
-                                .WithThumbnailUrl($"https://services.runescape.com/m=itemdb_rs/obj_big.gif?id={id}")
-                                .WithFooter("Powered by Sally", "https://static-cdn.jtvnw.net/emoticons/v1/279825/3.0")
+                                .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
+                                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)
                                 .AddField("Name", (string)jsonIdFinder[item.Key]["name"], true)
                                 .AddField("Member-Item", (string)jsonIdFinder[item.Key]["members"] == "true" ? "\u2705" : "\u274E", true)
                                 .AddField("Buying Price", (string)jsonIdFinder[item.Key]["buy_average"] + " gp", true)
-                                .AddField("Selling Price", (string)jsonIdFinder[item.Key]["sell_average"] + " gp", true);
+                                .AddField("Selling Price", (string)jsonIdFinder[item.Key]["sell_average"] + " gp", true)
+                                .AddField("Further Reading", $"https://oldschool.runescape.wiki/w/{itemUrl}");
                             }
                             else
                             {
@@ -181,8 +183,8 @@ namespace Sally_NET.Command
                                 .WithDescription("Check current prices of items in the grand exchange")
                                 .WithColor(Color.DarkGreen)
                                 .WithTimestamp(DateTime.Now)
-                                .WithThumbnailUrl($"https://services.runescape.com/m=itemdb_rs/obj_big.gif?id={id}")
-                                .WithFooter("Powered by Sally", "https://static-cdn.jtvnw.net/emoticons/v1/279825/3.0")
+                                .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
+                                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)
                                 .AddField("Name", (string)jsonItem["item"]["name"], true)
                                 .AddField("Type", (string)jsonItem["item"]["type"], true)
                                 .AddField("Description", (string)jsonItem["item"]["description"], true)
@@ -192,8 +194,8 @@ namespace Sally_NET.Command
                                 .AddField("Selling Price", (string)jsonIdFinder[item.Key]["sell_average"] + " gp", true)
                                 .AddField("30 Days Price Trend", (string)jsonItem["item"]["day30"]["change"])
                                 .AddField("90 Days Price Trend", (string)jsonItem["item"]["day90"]["change"])
-                                .AddField("180 Days Price Trend", (string)jsonItem["item"]["day180"]["change"]);
-
+                                .AddField("180 Days Price Trend", (string)jsonItem["item"]["day180"]["change"])
+                                .AddField("Further Reading", $"https://oldschool.runescape.wiki/w/{itemUrl}");
                             }
 
 

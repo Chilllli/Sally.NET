@@ -72,7 +72,7 @@ namespace Sally_NET.Command
                 .AddField("Current Level", myUser.Level)
                 .AddField("Xp needed until level up", (Math.Floor(-50 * (15 * Math.Sqrt(15) * Math.Pow(myUser.Level + 1, 2) - 60 * Math.Pow(myUser.Level + 1, 2) - 4))) - myUser.Xp)
                 .WithColor(new Color((uint)new System.ComponentModel.UInt32Converter().ConvertFromString(myUser.EmbedColor)))
-                .WithFooter("Provided by your friendly bot Sally");
+                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
             await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
         }
 
