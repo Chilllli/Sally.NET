@@ -34,7 +34,7 @@ namespace Sally_NET.Service
                 if (disUser == null)
                     continue;
 
-                dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi", location: user.WeatherLocation));
+                dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi", location: user.WeatherLocation).Result);
 
                 EmbedBuilder weatherEmbed = new EmbedBuilder()
                     .WithTitle("Weather Info")

@@ -78,7 +78,7 @@ namespace Sally_NET.Service
 
         private static async Task checkWeather()
         {
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi"));
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi").Result);
             //main.temp 60%,
             pointsSum = calculateWeatherPoints(15f, 20f, 0.6f, (float)temperature.main.temp);
             //main.humidity 5%, 

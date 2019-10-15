@@ -1,16 +1,21 @@
 ﻿using Discord.WebSocket;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using static Sally_NET.Command.PictureCommands;
 
 namespace Sally_NET.Service
 {
     static class ApiRequestService
     {
-        public static string StartRequest(string endpoint, SocketUserMessage message = null, string term = null, string location = null)
+        public static async Task<string> StartRequest(string endpoint, SocketUserMessage message = null, string term = null, string location = null, string[] tags = null, Rating? rating = null)
         {
             switch (endpoint)
             {
@@ -22,6 +27,10 @@ namespace Sally_NET.Service
                     return request2weatherAsync(location).Result;
                 case "memeapi":
                     return request2memapi().Result;
+                case "konachan":
+                    return request2konachan(tags).Result;
+                case "konachanWithRating":
+                    return request2konachan(tags, rating.Value).Result;
                 default:
                     throw new Exception("no valid api endpoint");
             }
@@ -67,5 +76,92 @@ namespace Sally_NET.Service
             HttpResponseMessage responseMessage = await client.GetAsync(urlExtension);
             return responseMessage;
         }
+
+        private static async Task<string> request2konachan(string[] tags)
+        {
+            JObject parsedResponse = new JObject();
+            int pageCounter = 0;
+            string tagUrl = "";
+            const int limit = 50;
+            const int pageResultLimit = 2;
+            List<string> responseCollector = new List<string>();
+
+            foreach (string tag in tags)
+            {
+                tagUrl = tagUrl + $"{tag}%20";
+            }
+
+            string response = String.Empty;
+
+            while (response != "[]" && pageCounter < pageResultLimit)
+            {
+                response = await (CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}&page={pageCounter}").Result).Content.ReadAsStringAsync();
+                responseCollector.Add(response);
+                pageCounter++;
+            }
+
+            if (response == "[]" && pageCounter == 1)
+            {
+                return "";
+            }
+            Random rng = new Random();
+            //int randImage = rng.Next(limit);
+            int randPage = rng.Next(pageCounter);
+            dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>((responseCollector.ToArray())[randPage]);
+            int randImage = rng.Next(Enumerable.Count(dynResponse));
+            return (string)dynResponse[randImage]["jpeg_url"];
+
+        }
+
+        private static async Task<string> request2konachan(string[] tags, Rating rating)
+        {
+            const int limit = 50; 
+            string tagUrl = String.Empty;
+            string response = String.Empty;
+            //create hhtp request and get result
+            foreach (string tag in tags)
+            {
+                tagUrl = tagUrl + $"{tag}%20";
+            }
+            response = await (CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}").Result).Content.ReadAsStringAsync();
+            //check if response is empty
+            if(response == "[]")
+            {
+                return "";
+            }
+            Random rng = new Random();
+            int randImage = rng.Next(limit);
+            dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>(response);
+            //get value from enum
+            Type enumType = typeof(Rating);
+            MemberInfo[] memInfo = enumType.GetMember(rating.ToString());
+            Object[] attributes = memInfo[0].GetCustomAttributes(typeof(RatingShortCutAttribute), false);
+            string attributeValue = ((RatingShortCutAttribute)attributes[0]).ShortCut;
+            //search through response
+            List<string> imageRatingResults = new List<string>();
+            for (int i = 0; i < limit; i++)
+            {
+                //check item for rating
+                if(dynResponse[i]["rating"] == attributeValue)
+                {
+                    //image found with rating
+                    imageRatingResults.Add((string)dynResponse[i]["jpeg_url"]);
+                }
+            }
+            //check for added results
+            if(imageRatingResults.Count == 0)
+            {
+                //list is empty
+                //no results found
+                return "";
+            }
+            else
+            {
+                //collection of images found
+                //return random item from list
+                return imageRatingResults[rng.Next(imageRatingResults.Count)];
+            }
+        }
+
     }
 }

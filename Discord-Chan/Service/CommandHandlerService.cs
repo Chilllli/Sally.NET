@@ -165,7 +165,7 @@ namespace Sally_NET.Service
                 Program.RequestCounter++;
 
 
-                dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("cleverapi", message));
+                dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("cleverapi", message).Result);
                 await message.Channel.SendMessageAsync(messageOutput["output"].ToString());
             }
         }

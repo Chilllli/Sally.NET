@@ -16,7 +16,7 @@ namespace Sally_NET.Command
         [Command("ask")]
         public async Task AskWikipedia(string searchTerm)
         {
-            dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("wikipedia", term: searchTerm));
+            dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("wikipedia", term: searchTerm).Result);
 
             EmbedBuilder searchEmbed = new EmbedBuilder()
                 .WithTitle($"What is \"{searchTerm}\"?")

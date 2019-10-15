@@ -19,7 +19,7 @@ namespace Sally_NET.Command
                 return;
             }
 
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi", location: location));
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi", location: location).Result);
             if(temperature.cod != 200)
             {
                 await Context.Message.Channel.SendMessageAsync((string)temperature.message);
@@ -42,7 +42,7 @@ namespace Sally_NET.Command
         [Command("currentWeather")]
         public async Task CheckCurrentWeather(string location)
         {
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi", location: location));
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("weatherapi", location: location).Result);
             if (temperature.cod != 200)
             {
                 await Context.Message.Channel.SendMessageAsync((string)temperature.message);

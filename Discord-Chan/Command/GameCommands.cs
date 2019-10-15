@@ -197,8 +197,6 @@ namespace Sally_NET.Command
                                 .AddField("180 Days Price Trend", (string)jsonItem["item"]["day180"]["change"])
                                 .AddField("Further Reading", $"https://oldschool.runescape.wiki/w/{itemUrl}");
                             }
-
-
                             await searchMessage.DeleteAsync();
                             await Context.Message.Channel.SendMessageAsync(embed: rsEmbed.Build());
                             hasBreaked = true;
