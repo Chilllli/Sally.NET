@@ -125,6 +125,7 @@ namespace Sally_NET.Command
 
                 IMessage searchMessage = Context.Message.Channel.SendMessageAsync("Searching for item....").Result;
 
+                //use api service instead
                 using (WebClient wc = new WebClient())
                 {
                     string id = null;

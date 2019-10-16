@@ -88,7 +88,8 @@ namespace Sally_NET.Service
             //clouds.all 10%,
             pointsSum += calculateWeatherPoints(50f, 10f, 0.1f, (float)temperature.clouds.all);
             //rain.1h 0.2 10%,
-            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.rain != null ? (float)temperature.rain["1h"] : 0f);
+            //changing condition because it throws a nullpointerexception
+            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.rain.ToString() != "{}" ? (float)temperature.rain["1h"] : 0f);
             //snow.1h 0.1 10% 
             pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.snow != null ? (float)temperature.snow["1h"] : 0f);
         }

@@ -18,6 +18,7 @@ namespace Sally_NET.Command
             }
         }
 
+        //Enum for Image Rating Classification
         public enum Rating
         {
             None = 0,
@@ -27,17 +28,27 @@ namespace Sally_NET.Command
         }
 
         [Command("konachan")]
-
+        public async Task SendPicture()
+        {
+            //search for image without tags and rating
+            string response = ApiRequestService.StartRequest("konachan").Result;
+            await generateImageEmbed(response);
+        }
+        [Command("konachan")]
         public async Task SendPicture(params String[] tags)
         {
+            string[] lowerTags = tags.Select(s => s.ToLowerInvariant()).ToArray();
             string tagUrl = String.Empty;
             Rating rating;
+            //generalize rating input, so misstyping isnt so bad
+            string lowerRating = tags[0].ToLower();
+            string ratingElement = lowerRating.First().ToString().ToUpper() + lowerRating.Substring(1);
             //try to parse as enum
             //check if first tag is equal to a rating
-            if (Enum.TryParse<Rating>(tags[0], out rating))
+            if (Enum.TryParse<Rating>(ratingElement, out rating))
             {
                 //get rest of the tags
-                string[] tagCollection = tags.Skip(1).ToArray();
+                string[] tagCollection = lowerTags.Skip(1).ToArray();
                 foreach (string tag in tagCollection)
                 {
                     tagUrl = tagUrl + $"{tag} ";
@@ -48,13 +59,22 @@ namespace Sally_NET.Command
             else
             {
                 //first arg isn't an enum
-                foreach (string tag in tags)
+                foreach (string tag in lowerTags)
                 {
                     tagUrl = tagUrl + $"{tag} ";
                 }
-                string response = ApiRequestService.StartRequest("konachan", tags: tags).Result;
+                string response = ApiRequestService.StartRequest("konachanWithTag", tags: lowerTags).Result;
                 await generateImageEmbed(response, tagUrl);
             }
+        }
+
+        //helper method for generate discord embed
+        private async Task generateImageEmbed(string response)
+        {
+            EmbedBuilder embedBuilder = new EmbedBuilder()
+                .WithTitle("Result")
+                .WithImageUrl(response);
+            await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
         }
 
         private async Task generateImageEmbed(string response, string tagUrl)

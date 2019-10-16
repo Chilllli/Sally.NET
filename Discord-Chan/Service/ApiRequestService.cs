@@ -28,6 +28,8 @@ namespace Sally_NET.Service
                 case "memeapi":
                     return request2memapi().Result;
                 case "konachan":
+                    return request2konachan().Result;
+                case "konachanWithTag":
                     return request2konachan(tags).Result;
                 case "konachanWithRating":
                     return request2konachan(tags, rating.Value).Result;
@@ -77,6 +79,18 @@ namespace Sally_NET.Service
             return responseMessage;
         }
 
+        private static async Task<string> request2konachan()
+        {
+            string response = await (CreateHttpRequest("https://konachan.com", "/post.json?limit=100").Result).Content.ReadAsStringAsync();
+            if(response == "[]")
+            {
+                return "";
+            }
+            dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>(response);
+            Random rng = new Random();
+            int randImage = rng.Next(Enumerable.Count(dynResponse));
+            return dynResponse[randImage]["jpeg_url"];
+        }
         private static async Task<string> request2konachan(string[] tags)
         {
             JObject parsedResponse = new JObject();
@@ -93,6 +107,7 @@ namespace Sally_NET.Service
 
             string response = String.Empty;
 
+            //make multiple http requests, so there is more variety
             while (response != "[]" && pageCounter < pageResultLimit)
             {
                 response = await (CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}&page={pageCounter}").Result).Content.ReadAsStringAsync();
@@ -118,11 +133,12 @@ namespace Sally_NET.Service
             const int limit = 50; 
             string tagUrl = String.Empty;
             string response = String.Empty;
-            //create hhtp request and get result
+            //convert string array to string, so you can pass it in the url
             foreach (string tag in tags)
             {
                 tagUrl = tagUrl + $"{tag}%20";
             }
+            //create http request and get result
             response = await (CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}").Result).Content.ReadAsStringAsync();
             //check if response is empty
             if(response == "[]")
@@ -162,6 +178,5 @@ namespace Sally_NET.Service
                 return imageRatingResults[rng.Next(imageRatingResults.Count)];
             }
         }
-
     }
 }
