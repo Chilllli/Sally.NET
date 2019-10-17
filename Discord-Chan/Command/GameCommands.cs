@@ -118,7 +118,6 @@ namespace Sally_NET.Command
 
                 ////normalize text input
                 //string normInput = textInfo.ToTitleCase(name);
-
                 string lowerName = name.ToLower();
                 string normInput = lowerName.First().ToString().ToUpper() + lowerName.Substring(1);
                 string itemUrl = normInput.Replace(" ", "_");
@@ -138,18 +137,20 @@ namespace Sally_NET.Command
                     //make foreach smaller. need to overthink the code body of foreach
                     foreach (var item in jsonIdFinder)
                     {
+                        //fill dictionary with item names
                         string dataItemName = (string)jsonIdFinder[item.Key]["name"];
                         if (!itemNameComparison.ContainsKey(dataItemName))
                         {
                             itemNameComparison.Add(dataItemName, CommandHandlerService.CalcLevenshteinDistance(dataItemName, normInput));
                         }
-
+                        //check if the item is equal to the input
                         if (normInput == dataItemName && !hasBreaked)
                         {
                             EmbedBuilder rsEmbed = new EmbedBuilder();
                             var parentKey = item.Value.AncestorsAndSelf()
                                                 .FirstOrDefault(k => k != null);
                             id = (string)parentKey["id"];
+                            //for some reason the official api has not every item. check the response
                             try
                             {
                                 json2 = wc.DownloadString($"https://services.runescape.com/m=itemdb_rs/api/catalogue/detail.json?item={id}");
@@ -209,6 +210,7 @@ namespace Sally_NET.Command
                     }
                     if (jsonItem == null)
                     {
+                        //if item wasnt found, give the user an item, which may be correct
                         int minValue = itemNameComparison.Values.Min();
                         string result = itemNameComparison.Where(v => v.Value == minValue).FirstOrDefault().Key;
                         await searchMessage.DeleteAsync();

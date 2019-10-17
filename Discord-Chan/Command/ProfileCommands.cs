@@ -11,20 +11,6 @@ namespace Sally_NET.Command
 
     public class ProfileCommands : ModuleBase
     {
-        [Group("profile")]
-        public class ProfileManagement : ModuleBase
-        {
-            [Command("add")]
-            public void AddProfile(string game, string active, string avatar, string password)
-            {
-
-                Console.WriteLine(game);
-                Console.WriteLine(active);
-                Console.WriteLine(avatar);
-                Console.WriteLine(password);
-            }
-        }
-
         [Command("mute")]
         public async Task MuteBot()
         {

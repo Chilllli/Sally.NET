@@ -11,7 +11,7 @@ namespace Sally_NET.Command
 {
     public class AdminCommands : ModuleBase
     {
-        //execute commands need admin permission
+        //execution of commands need admin permission
         [Group("sudo")]
         public class SudoCommands : ModuleBase
         {

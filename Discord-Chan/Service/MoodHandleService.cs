@@ -1,23 +1,16 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Sally_NET.Database;
+﻿using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Web;
-using Sally_NET.Config;
 
 
 namespace Sally_NET.Service
 {
     static class MoodHandleService
     {
-        
         private static DiscordSocketClient client;
         private static double dailyPoints;
         private static float pointsSum;
@@ -27,6 +20,14 @@ namespace Sally_NET.Service
         {
             get
             {
+                //calculate which mood sally will have
+                //it depends on:
+                //  a random value, whoch will generated daily
+                //  the current weather
+                //      each weather property is weighted differently
+                //  how many users are currently logged in
+                //  if there are users in voice channels
+                // how many messages were send to sally
                 return (dailyPoints + pointsSum + (Program.MyGuild.Users.ToList().Count(u => u.Status != Discord.UserStatus.Offline) / (double)Program.MyGuild.Users.Count) + (Program.MyGuild.Users.ToList().Find(u => u.VoiceChannel != null) != null ? 1 : 0) + (1 - 1 / (1 + messageCounter()))) / (onStart ? 3.0f : 5.0f);
             }
         }
@@ -38,12 +39,13 @@ namespace Sally_NET.Service
             //Initialize Timer
             Timer dailyTimer = new Timer(24 * 60 * 60 * 1000);
             Timer weatherTimer = new Timer(8 * 60 * 60 * 1000);
+            //question: does this timer even run? because its not started anywhere.
             Timer changeMoodTimer = new Timer(60 * 1000);
             //hook timer events
             dailyTimer.Elapsed += DailyTimer_Elapsed;
             weatherTimer.Elapsed += WeatherTimer_Elapsed;
             changeMoodTimer.Elapsed += ChangeMoodTimer_Elapsed;
-            //start timmer
+            //start timer
             dailyTimer.Start();
             weatherTimer.Start();
             //get start values
@@ -89,7 +91,9 @@ namespace Sally_NET.Service
             pointsSum += calculateWeatherPoints(50f, 10f, 0.1f, (float)temperature.clouds.all);
             //rain.1h 0.2 10%,
             //changing condition because it throws a nullpointerexception
-            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.rain.ToString() != "{}" ? (float)temperature.rain["1h"] : 0f);
+            //deactivating rain addition because it seems it was removed from the api as a field of the json response
+            //pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.rain.ToString() != "{}" ? (float)temperature.rain["1h"] : 0f);
+            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, 0.5f);
             //snow.1h 0.1 10% 
             pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.snow != null ? (float)temperature.snow["1h"] : 0f);
         }
