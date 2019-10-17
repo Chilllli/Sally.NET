@@ -55,7 +55,7 @@ namespace Sally_NET.Command
                     .AddField("Current Max. Temp", $"{temperature.main.temp_max} °C")
                     .AddField("Current Min. Temp", $"{temperature.main.temp_min} °C")
                     .AddField("Current Weather Condition", (string)temperature.weather[0].main)
-                    .WithColor(Color.Blue)
+                    .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                     .WithTimestamp(DateTime.Now)
                     .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
             await Context.Message.Channel.SendMessageAsync(embed: weatherEmbed.Build()).ConfigureAwait(false);

@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Sally_NET.Database;
 
 namespace Sally_NET.Service
 {
@@ -21,6 +22,7 @@ namespace Sally_NET.Service
         private static CommandService commands;
         private static IServiceProvider services;
         private static char prefix = '$';
+        public static User messageAuthor { get; set; }
 
         public static async Task InitializeHandler(DiscordSocketClient client)
         {
@@ -190,6 +192,7 @@ namespace Sally_NET.Service
                 return;
             }
 
+            messageAuthor = DataAccess.Instance.users.Find(u => u.Id == message.Author.Id);
 
             //await MessageHandlerService.DeleteStartMessages(message);
             Input input = ClassifyAs(message);

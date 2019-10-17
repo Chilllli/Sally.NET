@@ -72,8 +72,10 @@ namespace Sally_NET.Command
         private async Task generateImageEmbed(string response)
         {
             EmbedBuilder embedBuilder = new EmbedBuilder()
-                .WithTitle("Result")
-                .WithImageUrl(response);
+                .WithDescription($"[Result]({response})")
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithImageUrl(response)
+                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
         }
 
@@ -85,8 +87,10 @@ namespace Sally_NET.Command
                 return;
             }
             EmbedBuilder embedBuilder = new EmbedBuilder()
-                .WithTitle($"Tags: {tagUrl}")
-                .WithImageUrl(response);
+                .WithDescription($"Tags: [{tagUrl}]({response})")
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithImageUrl(response)
+                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
         }
     }

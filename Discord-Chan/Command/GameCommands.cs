@@ -42,7 +42,7 @@ namespace Sally_NET.Command
             EmbedBuilder dynamicEmbed = new EmbedBuilder()
                 .WithTitle("Terraria Server")
                 .WithDescription("Mods, which are currently running on the server")
-                .WithColor(Color.Green)
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                 .WithTimestamp(DateTime.Now)
                 .WithFooter(footer =>
                 {
@@ -167,7 +167,7 @@ namespace Sally_NET.Command
                                 rsEmbed
                                 .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                                 .WithDescription("Check current prices of items in the grand exchange")
-                                .WithColor(Color.DarkGreen)
+                                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                                 .WithTimestamp(DateTime.Now)
                                 .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
                                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)
@@ -183,7 +183,7 @@ namespace Sally_NET.Command
                                 rsEmbed
                                 .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                                 .WithDescription("Check current prices of items in the grand exchange")
-                                .WithColor(Color.DarkGreen)
+                                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                                 .WithTimestamp(DateTime.Now)
                                 .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
                                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)

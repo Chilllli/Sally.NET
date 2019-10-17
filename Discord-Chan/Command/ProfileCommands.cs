@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using Sally_NET.Database;
+using Sally_NET.Service;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ namespace Sally_NET.Command
         [Command("myxp")]
         public async Task LevelOverview()
         {
-            User myUser = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+            User myUser = CommandHandlerService.messageAuthor;
             EmbedBuilder lvlEmbed = new EmbedBuilder()
                 .WithAuthor($"To {Context.Message.Author}")
                 .WithTimestamp(DateTime.Now)
@@ -57,7 +58,7 @@ namespace Sally_NET.Command
                 .WithDescription("Check how much xp you miss for the next level up.")
                 .AddField("Current Level", myUser.Level)
                 .AddField("Xp needed until level up", (Math.Floor(-50 * (15 * Math.Sqrt(15) * Math.Pow(myUser.Level + 1, 2) - 60 * Math.Pow(myUser.Level + 1, 2) - 4))) - myUser.Xp)
-                .WithColor(new Color((uint)new System.ComponentModel.UInt32Converter().ConvertFromString(myUser.EmbedColor)))
+                .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
             await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
         }

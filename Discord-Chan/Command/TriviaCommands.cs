@@ -23,7 +23,7 @@ namespace Sally_NET.Command
                 .WithDescription($"Results for {searchTerm}")
                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)
                 .WithTimestamp(DateTime.Now)
-                .WithColor(0xffffff);
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)));
                 for (int i = 0; i < 5; i++)
                 {
                     if (searchResult[1][i] == null || searchResult[2][i] == null)
