@@ -1,5 +1,7 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Newtonsoft.Json;
+using Sally_NET.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
