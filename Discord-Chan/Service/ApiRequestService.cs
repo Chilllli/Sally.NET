@@ -96,8 +96,8 @@ namespace Sally_NET.Service
             JObject parsedResponse = new JObject();
             int pageCounter = 0;
             string tagUrl = "";
-            const int limit = 99;
-            const int pageResultLimit = 8;
+            const int limit = 90;
+            const int pageResultLimit = 7;
             List<string> responseCollector = new List<string>();
 
             foreach (string tag in tags)
@@ -134,8 +134,8 @@ namespace Sally_NET.Service
         private static async Task<string> request2konachan(string[] tags, Rating rating)
         {
             int pageCounter = 0;
-            const int pageResultLimit = 8;
-            const int limit = 99;
+            const int pageResultLimit = 7;
+            const int limit = 90;
             string tagUrl = String.Empty;
             string response = String.Empty;
             List<string> responseCollector = new List<string>();
