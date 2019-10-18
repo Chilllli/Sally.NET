@@ -96,7 +96,7 @@ namespace Sally_NET.Service
             JObject parsedResponse = new JObject();
             int pageCounter = 0;
             string tagUrl = "";
-            const int limit = 100;
+            const int limit = 75;
             const int pageResultLimit = 2;
             List<string> responseCollector = new List<string>();
 
@@ -130,7 +130,7 @@ namespace Sally_NET.Service
 
         private static async Task<string> request2konachan(string[] tags, Rating rating)
         {
-            const int limit = 100; 
+            const int limit = 75; 
             string tagUrl = String.Empty;
             string response = String.Empty;
             //convert string array to string, so you can pass it in the url
