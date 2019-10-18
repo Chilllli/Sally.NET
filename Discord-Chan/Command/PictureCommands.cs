@@ -28,6 +28,7 @@ namespace Sally_NET.Command
         }
 
         [Command("konachan")]
+        [Alias("k")]
         public async Task SendPicture()
         {
             //search for image without tags and rating
@@ -35,6 +36,7 @@ namespace Sally_NET.Command
             await generateImageEmbed(response);
         }
         [Command("konachan")]
+        [Alias("k")]
         public async Task SendPicture(params String[] tags)
         {
             string[] lowerTags = tags.Select(s => s.ToLowerInvariant()).ToArray();

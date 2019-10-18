@@ -82,7 +82,7 @@ namespace Sally_NET.Service
         private static async Task<string> request2konachan()
         {
             string response = await (CreateHttpRequest("https://konachan.com", "/post.json?limit=100").Result).Content.ReadAsStringAsync();
-            if(response == "[]")
+            if (response == "[]")
             {
                 return "";
             }
@@ -96,8 +96,8 @@ namespace Sally_NET.Service
             JObject parsedResponse = new JObject();
             int pageCounter = 0;
             string tagUrl = "";
-            const int limit = 90;
-            const int pageResultLimit = 2;
+            const int limit = 99;
+            const int pageResultLimit = 8;
             List<string> responseCollector = new List<string>();
 
             foreach (string tag in tags)
@@ -108,6 +108,9 @@ namespace Sally_NET.Service
             string response = String.Empty;
 
             //make multiple http requests, so there is more variety
+            //it may occure that the randImage index is out of bound. think about, creating a new construct to store all parts of the response and work with that
+            //caching response. current matrix[99][8]. there is no need for refreshing the response with every new command
+            //the size of the matrix sets a good portion of randomness
             while (response != "[]" && pageCounter < pageResultLimit)
             {
                 response = await (CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}&page={pageCounter}").Result).Content.ReadAsStringAsync();
@@ -130,24 +133,31 @@ namespace Sally_NET.Service
 
         private static async Task<string> request2konachan(string[] tags, Rating rating)
         {
-            const int limit = 90; 
+            int pageCounter = 0;
+            const int pageResultLimit = 8;
+            const int limit = 99;
             string tagUrl = String.Empty;
             string response = String.Empty;
+            List<string> responseCollector = new List<string>();
             //convert string array to string, so you can pass it in the url
             foreach (string tag in tags)
             {
                 tagUrl = tagUrl + $"{tag}%20";
             }
             //create http request and get result
-            response = await (CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}").Result).Content.ReadAsStringAsync();
-            //check if response is empty
-            if(response == "[]")
+            while (response != "[]" && pageCounter < pageResultLimit)
+            {
+                response = await (CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}&page={pageCounter}").Result).Content.ReadAsStringAsync();
+                responseCollector.Add(response);
+                pageCounter++;
+            }
+
+            if (response == "[]" && pageCounter == 1)
             {
                 return "";
             }
             Random rng = new Random();
             int randImage = rng.Next(limit);
-            dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>(response);
             //get value from enum
             Type enumType = typeof(Rating);
             MemberInfo[] memInfo = enumType.GetMember(rating.ToString());
@@ -155,17 +165,21 @@ namespace Sally_NET.Service
             string attributeValue = ((RatingShortCutAttribute)attributes[0]).ShortCut;
             //search through response
             List<string> imageRatingResults = new List<string>();
-            for (int i = 0; i < limit; i++)
+            foreach (var page in responseCollector)
             {
-                //check item for rating
-                if(dynResponse[i]["rating"] == attributeValue)
+                dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>(page);
+                for (int i = 0; i < Enumerable.Count(dynResponse); i++)
                 {
-                    //image found with rating
-                    imageRatingResults.Add((string)dynResponse[i]["jpeg_url"]);
+                    //check item for rating
+                    if (dynResponse[i]["rating"] == attributeValue)
+                    {
+                        //image found with rating
+                        imageRatingResults.Add((string)dynResponse[i]["jpeg_url"]);
+                    }
                 }
             }
             //check for added results
-            if(imageRatingResults.Count == 0)
+            if (imageRatingResults.Count == 0)
             {
                 //list is empty
                 //no results found
