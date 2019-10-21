@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sally_NET.ApiReference;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -93,10 +94,10 @@ namespace Sally_NET.Service
             {
                 return "";
             }
-            dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>(response);
+            List<KonachanApi> imageCollection = JsonConvert.DeserializeObject<List<KonachanApi>>(response);
             Random rng = new Random();
-            int randImage = rng.Next(Enumerable.Count(dynResponse));
-            return dynResponse[randImage]["jpeg_url"];
+            int randImage = rng.Next(imageCollection.Count());
+            return imageCollection[randImage].ImageUrl;
         }
         private static async Task<string> request2konachan(string[] tags)
         {
@@ -129,10 +130,10 @@ namespace Sally_NET.Service
             Random rng = new Random();
             //int randImage = rng.Next(limit);
             int randPage = rng.Next(pageCounter);
-            dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>((responseCollector.ToArray())[randPage]);
-            int randImage = rng.Next(Enumerable.Count(dynResponse));
+            List<KonachanApi> imageCollection = JsonConvert.DeserializeObject<List<KonachanApi>>((responseCollector.ToArray())[randPage]);
+            int randImage = rng.Next(imageCollection.Count());
             checkAndSaveTagPopularity(tagUrl);
-            return (string)dynResponse[randImage]["jpeg_url"];
+            return imageCollection[randImage].ImageUrl;
 
         }
 
@@ -143,6 +144,7 @@ namespace Sally_NET.Service
             string tagUrl = String.Empty;
             string response = String.Empty;
             List<string> responseCollector = new List<string>();
+            List<KonachanApi> imageCollection = new List<KonachanApi>();
             //convert string array to string, so you can pass it in the url
             foreach (string tag in tags)
             {
@@ -152,7 +154,10 @@ namespace Sally_NET.Service
             while (response != "[]" && pageCounter < pageResultLimit)
             {
                 response = await (CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}&page={pageCounter}").Result).Content.ReadAsStringAsync();
-                responseCollector.Add(response);
+                if(response != "[]")
+                {
+                    imageCollection.AddRange(JsonConvert.DeserializeObject<List<KonachanApi>>(response));
+                }
                 pageCounter++;
             }
 
@@ -161,27 +166,28 @@ namespace Sally_NET.Service
                 return "";
             }
             Random rng = new Random();
-            int randImage = rng.Next(limit);
+            int randImage = rng.Next(imageCollection.Count());
             //get value from enum
             Type enumType = typeof(Rating);
             MemberInfo[] memInfo = enumType.GetMember(rating.ToString());
             Object[] attributes = memInfo[0].GetCustomAttributes(typeof(RatingShortCutAttribute), false);
-            string attributeValue = ((RatingShortCutAttribute)attributes[0]).ShortCut;
+            char attributeValue = ((RatingShortCutAttribute)attributes[0]).ShortCut;
             //search through response
-            List<string> imageRatingResults = new List<string>();
-            foreach (var page in responseCollector)
-            {
-                dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>(page);
-                for (int i = 0; i < Enumerable.Count(dynResponse); i++)
-                {
-                    //check item for rating
-                    if (dynResponse[i]["rating"] == attributeValue)
-                    {
-                        //image found with rating
-                        imageRatingResults.Add((string)dynResponse[i]["jpeg_url"]);
-                    }
-                }
-            }
+            List<KonachanApi> imageRatingResults = new List<KonachanApi>();
+            imageRatingResults = imageCollection.FindAll(i => i.Rating == attributeValue);
+            //foreach (var page in responseCollector)
+            //{
+            //    dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>(page);
+            //    for (int i = 0; i < Enumerable.Count(dynResponse); i++)
+            //    {
+            //        //check item for rating
+            //        if (dynResponse[i]["rating"] == attributeValue)
+            //        {
+            //            //image found with rating
+            //            imageRatingResults.Add((string)dynResponse[i]["jpeg_url"]);
+            //        }
+            //    }
+            //}
             //check for added results
             if (imageRatingResults.Count == 0)
             {
@@ -194,7 +200,7 @@ namespace Sally_NET.Service
                 checkAndSaveTagPopularity(tagUrl);
                 //collection of images found
                 //return random item from list
-                return imageRatingResults[rng.Next(imageRatingResults.Count)];
+                return imageRatingResults[rng.Next(imageRatingResults.Count)].ImageUrl;
             }
         }
 

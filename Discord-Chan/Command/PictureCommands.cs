@@ -11,8 +11,8 @@ namespace Sally_NET.Command
     {
         public class RatingShortCutAttribute : Attribute
         {
-            public string ShortCut;
-            public RatingShortCutAttribute(string shortCut)
+            public char ShortCut;
+            public RatingShortCutAttribute(char shortCut)
             {
                 ShortCut = shortCut;
             }
@@ -22,9 +22,9 @@ namespace Sally_NET.Command
         public enum Rating
         {
             None = 0,
-            [RatingShortCut("s")] Safe,
-            [RatingShortCut("q")] Questionable,
-            [RatingShortCut("e")] Explicit
+            [RatingShortCut('s')] Safe,
+            [RatingShortCut('q')] Questionable,
+            [RatingShortCut('e')] Explicit
         }
 
         [Command("konachan")]
