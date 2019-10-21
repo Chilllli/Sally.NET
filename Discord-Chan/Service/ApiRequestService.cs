@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -15,6 +16,12 @@ namespace Sally_NET.Service
 {
     static class ApiRequestService
     {
+#if RELEASE
+        private const int pageResultLimit = 7;
+#endif
+#if DEBUG
+        private const int pageResultLimit = 1;
+#endif
         public static async Task<string> StartRequest(string endpoint, SocketUserMessage message = null, string term = null, string location = null, string[] tags = null, Rating? rating = null)
         {
             switch (endpoint)
@@ -93,20 +100,17 @@ namespace Sally_NET.Service
         }
         private static async Task<string> request2konachan(string[] tags)
         {
+
+            string tagUrl = "";
             JObject parsedResponse = new JObject();
             int pageCounter = 0;
-            string tagUrl = "";
             const int limit = 90;
-            const int pageResultLimit = 7;
             List<string> responseCollector = new List<string>();
-
             foreach (string tag in tags)
             {
                 tagUrl = tagUrl + $"{tag}%20";
             }
-
             string response = String.Empty;
-
             //make multiple http requests, so there is more variety
             //it may occure that the randImage index is out of bound. think about, creating a new construct to store all parts of the response and work with that
             //caching response. current matrix[99][8]. there is no need for refreshing the response with every new command
@@ -127,6 +131,7 @@ namespace Sally_NET.Service
             int randPage = rng.Next(pageCounter);
             dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>((responseCollector.ToArray())[randPage]);
             int randImage = rng.Next(Enumerable.Count(dynResponse));
+            checkAndSaveTagPopularity(tagUrl);
             return (string)dynResponse[randImage]["jpeg_url"];
 
         }
@@ -134,7 +139,6 @@ namespace Sally_NET.Service
         private static async Task<string> request2konachan(string[] tags, Rating rating)
         {
             int pageCounter = 0;
-            const int pageResultLimit = 7;
             const int limit = 90;
             string tagUrl = String.Empty;
             string response = String.Empty;
@@ -187,10 +191,49 @@ namespace Sally_NET.Service
             }
             else
             {
+                checkAndSaveTagPopularity(tagUrl);
                 //collection of images found
                 //return random item from list
                 return imageRatingResults[rng.Next(imageRatingResults.Count)];
             }
+        }
+
+        private static void checkAndSaveTagPopularity(string tagUrl)
+        {
+            string formattedTagString = tagUrl.Replace("%20", " ");
+            formattedTagString = formattedTagString.Remove(formattedTagString.Length - 1);
+            const string tagJsonPath = "meta/tagPopularity.json";
+            if (!Directory.Exists("meta"))
+            {
+                Directory.CreateDirectory("meta");
+            }
+            //check if json file exists
+            if (!File.Exists(tagJsonPath))
+            {
+                //file doesnt exists
+                File.Create(tagJsonPath);
+            }
+            Dictionary<string, int> tagPopularity = new Dictionary<string, int>();
+            //check if json is empty
+            if(JsonConvert.DeserializeObject<Dictionary<string, int>>(File.ReadAllText(tagJsonPath)) != null)
+            {
+                tagPopularity = JsonConvert.DeserializeObject<Dictionary<string, int>>(File.ReadAllText(tagJsonPath));
+            }
+            //file exists
+            //check if current search tag string already present in the json file aka dictionary
+            if (tagPopularity.ContainsKey(formattedTagString))
+            {
+                //tag string is already a key
+                //increase the counter by one
+                tagPopularity[formattedTagString] += 1;
+            }
+            else
+            {
+                //tag string isnt in dictionary
+                //add new entry
+                tagPopularity.Add(formattedTagString, 1);
+            }
+            File.WriteAllText(tagJsonPath, JsonConvert.SerializeObject(tagPopularity));
         }
     }
 }

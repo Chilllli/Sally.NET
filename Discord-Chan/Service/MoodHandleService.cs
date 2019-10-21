@@ -92,10 +92,8 @@ namespace Sally_NET.Service
             //clouds.all 10%,
             pointsSum += calculateWeatherPoints(50f, 10f, 0.1f, (float)temperature.clouds.all);
             //rain.1h 0.2 10%,
-            //changing condition because it throws a nullpointerexception
-            //deactivating rain addition because it seems it was removed from the api as a field of the json response
-            //pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.rain.ToString() != "{}" ? (float)temperature.rain["1h"] : 0f);
-            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, 0.5f);
+            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.rain != null ? (float)temperature.rain["1h"] : 0f);
+            //pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, 0.5f);
             //snow.1h 0.1 10% 
             pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.snow != null ? (float)temperature.snow["1h"] : 0f);
         }
