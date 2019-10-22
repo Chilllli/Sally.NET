@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using Sally_NET.Core.Enum;
 
 namespace Sally_NET.Command
 {
@@ -77,33 +78,6 @@ namespace Sally_NET.Command
                 Color color = ((RankAttribute)attributes[0]).color;
 
                 RoleManagerService.CreateOrAddRole(rank != Rank.GrandChampion ? $"{rank} {level}" : rank.ToString(), Context.Message.Author.Id, Enum.GetNames(typeof(Rank)), color);
-            }
-            public enum Rank
-            {
-                [RankAttribute(0x77391a)] Wood,
-                [RankAttribute(0xc95d1a)] Bronze,
-                [RankAttribute(0x5eedea)] Silver,
-                [RankAttribute(0xd2d60a)] Gold,
-                [RankAttribute(0x62c4ba)] Platinum,
-                [RankAttribute(0x1653e2)] Diamond,
-                [RankAttribute(0x801aed)] Champion,
-                [RankAttribute(0x801aed)] GrandChampion
-            }
-            public class RankAttribute : Attribute
-            {
-                public uint HexColor;
-                public Color color
-                {
-                    get
-                    {
-                        return new Color(HexColor);
-                    }
-                }
-                public RankAttribute(uint hexColor)
-                {
-                    HexColor = hexColor;
-                    Color color = new Color(hexColor);
-                }
             }
         }
 

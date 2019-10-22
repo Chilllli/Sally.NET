@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sally_NET.ApiReference;
+using Sally_NET.Core.Enum;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,36 +24,9 @@ namespace Sally_NET.Service
 #if DEBUG
         private const int pageResultLimit = 1;
 #endif
-        public static async Task<string> StartRequest(string endpoint, SocketUserMessage message = null, string term = null, string location = null, string[] tags = null, Rating? rating = null)
-        {
-            switch (endpoint)
-            {
-                case "wikipedia":
-                    return request2wikiAsync(term).Result;
-                case "cleverapi":
-                    return request2cleverapiAsync(message).Result;
-                case "weatherapi":
-                    return request2weatherAsync(location).Result;
-                case "memeapi":
-                    return request2memapi().Result;
-                case "konachan":
-                    return request2konachan().Result;
-                case "konachanWithTag":
-                    return request2konachan(tags).Result;
-                case "konachanWithRating":
-                    return request2konachan(tags, rating.Value).Result;
-                default:
-                    throw new Exception("no valid api endpoint");
-            }
-        }
+        private static HttpClient client = new HttpClient();
 
-        private static async Task<string> request2memapi()
-        {
-            string stringResult = await (CreateHttpRequest("https://api.memeload.us", "/v1/random").Result).Content.ReadAsStringAsync();
-            return stringResult;
-        }
-
-        private static async Task<string> request2weatherAsync(string location = null)
+        public static async Task<string> request2weatherAsync(string location = null)
         {
             if (location == null)
             {
@@ -67,27 +41,26 @@ namespace Sally_NET.Service
             }
         }
 
-        private static async Task<string> request2cleverapiAsync(SocketUserMessage message)
+        public static async Task<string> request2cleverapiAsync(SocketUserMessage message)
         {
             string stringResult = await (CreateHttpRequest("https://www.cleverbot.com", $"/getreply?key={Program.BotConfiguration.CleverApi}&input={message.Content}").Result).Content.ReadAsStringAsync();
             return stringResult;
         }
 
-        private static async Task<string> request2wikiAsync(string term)
+        public static async Task<string> request2wikiAsync(string term)
         {
             string stringResult = await (CreateHttpRequest("https://en.wikipedia.org", $"/w/api.php?action=opensearch&format=json&search={term}&namespace=0&limit=5&utf8=1").Result).Content.ReadAsStringAsync();
             return stringResult;
         }
 
-        private static async Task<HttpResponseMessage> CreateHttpRequest(string url, string urlExtension)
+        public static async Task<HttpResponseMessage> CreateHttpRequest(string url, string urlExtension)
         {
-            HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(url);
             HttpResponseMessage responseMessage = await client.GetAsync(urlExtension);
             return responseMessage;
         }
 
-        private static async Task<string> request2konachan()
+        public static async Task<string> request2konachanAsync()
         {
             string response = await (CreateHttpRequest("https://konachan.com", "/post.json?limit=100").Result).Content.ReadAsStringAsync();
             if (response == "[]")
@@ -99,7 +72,7 @@ namespace Sally_NET.Service
             int randImage = rng.Next(imageCollection.Count());
             return imageCollection[randImage].ImageUrl;
         }
-        private static async Task<string> request2konachan(string[] tags)
+        public static async Task<string> request2konachanAsync(string[] tags)
         {
 
             string tagUrl = "";
@@ -134,10 +107,9 @@ namespace Sally_NET.Service
             int randImage = rng.Next(imageCollection.Count());
             checkAndSaveTagPopularity(tagUrl);
             return imageCollection[randImage].ImageUrl;
-
         }
 
-        private static async Task<string> request2konachan(string[] tags, Rating rating)
+        public static async Task<string> request2konachanAsync(string[] tags, Rating rating)
         {
             int pageCounter = 0;
             const int limit = 90;
@@ -175,19 +147,6 @@ namespace Sally_NET.Service
             //search through response
             List<KonachanApi> imageRatingResults = new List<KonachanApi>();
             imageRatingResults = imageCollection.FindAll(i => i.Rating == attributeValue);
-            //foreach (var page in responseCollector)
-            //{
-            //    dynamic dynResponse = JsonConvert.DeserializeObject<dynamic>(page);
-            //    for (int i = 0; i < Enumerable.Count(dynResponse); i++)
-            //    {
-            //        //check item for rating
-            //        if (dynResponse[i]["rating"] == attributeValue)
-            //        {
-            //            //image found with rating
-            //            imageRatingResults.Add((string)dynResponse[i]["jpeg_url"]);
-            //        }
-            //    }
-            //}
             //check for added results
             if (imageRatingResults.Count == 0)
             {

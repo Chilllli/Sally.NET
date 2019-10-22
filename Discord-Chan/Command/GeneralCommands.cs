@@ -31,13 +31,6 @@ namespace Sally_NET.Command
             await Context.Message.Channel.SendMessageAsync("Here you can find the list of all available commands: <https://its-sally.net/commands>");
         }
 
-        [Command("meme")]
-        public async Task SendRandomMeme()
-        {
-            dynamic jsonResponse = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("memeapi").Result);
-            await Context.Message.Channel.SendMessageAsync((string)jsonResponse.image);
-        }
-
         [Command("uptime")]
         public async Task CalculateUptime()
         {

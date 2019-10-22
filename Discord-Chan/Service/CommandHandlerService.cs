@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Sally_NET.Database;
+using Sally_NET.ApiReference;
 
 namespace Sally_NET.Service
 {
@@ -167,8 +168,8 @@ namespace Sally_NET.Service
                 Program.RequestCounter++;
 
 
-                dynamic messageOutput = JsonConvert.DeserializeObject<dynamic>(ApiRequestService.StartRequest("cleverapi", message).Result);
-                await message.Channel.SendMessageAsync(messageOutput["output"].ToString());
+                CleverApi messageOutput = JsonConvert.DeserializeObject<CleverApi>(await ApiRequestService.request2cleverapiAsync(message));
+                await message.Channel.SendMessageAsync(messageOutput.Answer);
             }
         }
 

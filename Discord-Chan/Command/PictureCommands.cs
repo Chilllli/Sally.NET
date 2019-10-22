@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Sally_NET.Core.Enum;
 using Sally_NET.Service;
 using System;
 using System.Linq;
@@ -9,30 +10,12 @@ namespace Sally_NET.Command
 {
     public class PictureCommands : ModuleBase
     {
-        public class RatingShortCutAttribute : Attribute
-        {
-            public char ShortCut;
-            public RatingShortCutAttribute(char shortCut)
-            {
-                ShortCut = shortCut;
-            }
-        }
-
-        //Enum for Image Rating Classification
-        public enum Rating
-        {
-            None = 0,
-            [RatingShortCut('s')] Safe,
-            [RatingShortCut('q')] Questionable,
-            [RatingShortCut('e')] Explicit
-        }
-
         [Command("konachan")]
         [Alias("k")]
         public async Task SendPicture()
         {
             //search for image without tags and rating
-            string response = ApiRequestService.StartRequest("konachan").Result;
+            string response = await ApiRequestService.request2konachanAsync();
             await generateImageEmbed(response);
         }
         [Command("konachan")]
@@ -55,7 +38,7 @@ namespace Sally_NET.Command
                 {
                     tagUrl = tagUrl + $"{tag} ";
                 }
-                string response = ApiRequestService.StartRequest("konachanWithRating", rating: rating, tags: tagCollection).Result;
+                string response = await ApiRequestService.request2konachanAsync(tagCollection, rating);
                 await generateImageEmbed(response, tagUrl);
             }
             else
@@ -65,7 +48,7 @@ namespace Sally_NET.Command
                 {
                     tagUrl = tagUrl + $"{tag} ";
                 }
-                string response = ApiRequestService.StartRequest("konachanWithTag", tags: lowerTags).Result;
+                string response = await ApiRequestService.request2konachanAsync(lowerTags);
                 await generateImageEmbed(response, tagUrl);
             }
         }
