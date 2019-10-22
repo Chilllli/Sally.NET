@@ -24,7 +24,6 @@ namespace Sally_NET.Service
 #if DEBUG
         private const int pageResultLimit = 1;
 #endif
-        private static HttpClient client = new HttpClient();
 
         public static async Task<string> request2weatherAsync(string location = null)
         {
@@ -55,6 +54,7 @@ namespace Sally_NET.Service
 
         public static async Task<HttpResponseMessage> CreateHttpRequest(string url, string urlExtension)
         {
+            HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(url);
             HttpResponseMessage responseMessage = await client.GetAsync(urlExtension);
             return responseMessage;
@@ -89,21 +89,44 @@ namespace Sally_NET.Service
             //it may occure that the randImage index is out of bound. think about, creating a new construct to store all parts of the response and work with that
             //caching response. current matrix[99][8]. there is no need for refreshing the response with every new command
             //the size of the matrix sets a good portion of randomness
-            while (response != "[]" && pageCounter < pageResultLimit)
+            string formattedTagString = tagUrl.Replace("%20", " ");
+            formattedTagString = formattedTagString.Remove(formattedTagString.Length - 1);
+            List<KonachanApi> imageCollection = new List<KonachanApi>();
+            if (File.Exists($"cached/{formattedTagString}.json"))
             {
-                response = await (CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}&page={pageCounter}").Result).Content.ReadAsStringAsync();
-                responseCollector.Add(response);
-                pageCounter++;
-            }
 
-            if (response == "[]" && pageCounter == 1)
+
+                // read JSON directly from a file
+                using (StreamReader file = File.OpenText($"cached/{formattedTagString}.json"))
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    JToken o2 = JToken.ReadFrom(reader);
+                    imageCollection = JsonConvert.DeserializeObject<List<KonachanApi>>(o2.ToString());
+                }
+            }
+            else
             {
-                return "";
+                while (response != "[]" && pageCounter < pageResultLimit)
+                {
+                    response = await (await CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}&page={pageCounter}")).Content.ReadAsStringAsync();
+
+                    if (response != "[]")
+                    {
+                        imageCollection.AddRange(JsonConvert.DeserializeObject<List<KonachanApi>>(response));
+                    }
+                    responseCollector.Add(response);
+                    pageCounter++;
+                }
+
+                if (response == "[]" && pageCounter == 1)
+                {
+                    return "";
+                }
+                saveJsonToFile(imageCollection, formattedTagString);
             }
             Random rng = new Random();
             //int randImage = rng.Next(limit);
             int randPage = rng.Next(pageCounter);
-            List<KonachanApi> imageCollection = JsonConvert.DeserializeObject<List<KonachanApi>>((responseCollector.ToArray())[randPage]);
             int randImage = rng.Next(imageCollection.Count());
             checkAndSaveTagPopularity(tagUrl);
             return imageCollection[randImage].ImageUrl;
@@ -122,21 +145,42 @@ namespace Sally_NET.Service
             {
                 tagUrl = tagUrl + $"{tag}%20";
             }
+            string formattedTagString = tagUrl.Replace("%20", " ");
+            formattedTagString = formattedTagString.Remove(formattedTagString.Length - 1);
             //create http request and get result
-            while (response != "[]" && pageCounter < pageResultLimit)
+            if (File.Exists($"cached/{formattedTagString}.json"))
             {
-                response = await (CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}&page={pageCounter}").Result).Content.ReadAsStringAsync();
-                if(response != "[]")
+
+
+                // read JSON directly from a file
+                using (StreamReader file = File.OpenText($"cached/{formattedTagString}.json"))
+                using (JsonTextReader reader = new JsonTextReader(file))
                 {
-                    imageCollection.AddRange(JsonConvert.DeserializeObject<List<KonachanApi>>(response));
+                    JToken o2 = JToken.ReadFrom(reader);
+                    imageCollection = JsonConvert.DeserializeObject<List<KonachanApi>>(o2.ToString());
                 }
-                pageCounter++;
+            }
+            else
+            {
+                while (response != "[]" && pageCounter < pageResultLimit)
+                {
+                    response = await (await CreateHttpRequest("https://konachan.com", $"/post.json?limit={limit}&tags={tagUrl}&page={pageCounter}")).Content.ReadAsStringAsync();
+
+                    if (response != "[]")
+                    {
+                        imageCollection.AddRange(JsonConvert.DeserializeObject<List<KonachanApi>>(response));
+                    }
+                    responseCollector.Add(response);
+                    pageCounter++;
+                }
+
+                if (response == "[]" && pageCounter == 1)
+                {
+                    return "";
+                }
+                saveJsonToFile(imageCollection, formattedTagString);
             }
 
-            if (response == "[]" && pageCounter == 1)
-            {
-                return "";
-            }
             Random rng = new Random();
             int randImage = rng.Next(imageCollection.Count());
             //get value from enum
@@ -180,7 +224,7 @@ namespace Sally_NET.Service
             }
             Dictionary<string, int> tagPopularity = new Dictionary<string, int>();
             //check if json is empty
-            if(JsonConvert.DeserializeObject<Dictionary<string, int>>(File.ReadAllText(tagJsonPath)) != null)
+            if (JsonConvert.DeserializeObject<Dictionary<string, int>>(File.ReadAllText(tagJsonPath)) != null)
             {
                 tagPopularity = JsonConvert.DeserializeObject<Dictionary<string, int>>(File.ReadAllText(tagJsonPath));
             }
@@ -199,6 +243,21 @@ namespace Sally_NET.Service
                 tagPopularity.Add(formattedTagString, 1);
             }
             File.WriteAllText(tagJsonPath, JsonConvert.SerializeObject(tagPopularity));
+        }
+
+        private static void saveJsonToFile(List<KonachanApi> json, string tagString)
+        {
+            string cachePath = $"cached/{tagString}.json";
+            if (!Directory.Exists("cached"))
+            {
+                Directory.CreateDirectory("cached");
+            }
+            //check if json file exists
+            if (!File.Exists(cachePath))
+            {
+                //file doesnt exists
+                File.WriteAllText(cachePath, JsonConvert.SerializeObject(json));
+            }
         }
     }
 }

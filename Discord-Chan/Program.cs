@@ -117,6 +117,7 @@ namespace Sally_NET
             WeatherSubService.InitializeWeatherSub();
             RoleManagerService.InitializeHandler();
             await CommandHandlerService.InitializeHandler(Client);
+            await CachedService.InitializeHandler();
             Client.Ready += Client_Ready;
 
             Client.Log += Log;
