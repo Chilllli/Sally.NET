@@ -1,7 +1,9 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Newtonsoft.Json;
 using Sally.NET.Core.Configuration;
 using Sally.NET.Core.Enum;
+using Sally.NET.DataAccess.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -126,7 +128,7 @@ namespace Sally.NET.Service
                 return;
             }
 #if RELEASE
-            DataAccess.Instance.saveMood(mood);
+            DatabaseAccess.Instance.saveMood(mood);
 
             await client.SetActivityAsync(new Game(mood.ToString()));
             await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
