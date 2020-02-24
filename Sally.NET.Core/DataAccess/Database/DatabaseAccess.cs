@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using Sally.NET.Core;
+using Sally.NET.Core.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
