@@ -21,7 +21,7 @@ echo -e " |_____/   \__,_| |_| |_|  \__, | (_) |_| \_|  \___|  \__|"
 echo -e "                            __/ |                         "
 echo -e "                           |___/                          "
 echo -e "__________________________________________________________"
-if pgrep -f "dotnet Sally.NET.dll" > /dev/null 2>&1
+if pgrep -f "dotnet Sally.dll" > /dev/null 2>&1
 then
 	echo -e "Current State: ${GREEN}Online${NC}"
 else
@@ -47,18 +47,18 @@ read -p "What you want to do?" answer
 case "$answer" in
 	1)
 		#Start
-		if pgrep -f "dotnet Sally.NET.dll" > /dev/null 2>&1
+		if pgrep -f "dotnet Sally.dll" > /dev/null 2>&1
 		then
 			result="${RED}Sally is already online.${NC}"
 			clear
 			continue
 		else
 			echo -e "${GREEN}Starting Sally...${NC}"
-			dotnet build Sally.NET.sln -c Release
-			cd Discord-Chan/bin/Release/netcoreapp2.1/
+			dotnet build Sally/Sally.csproj -c Release
+			cd Sally/bin/Release/netcoreapp3.0/
 			while true
 			do
-				dotnet Sally.NET.dll $isRestarting > sallyOutput 2>&1
+				dotnet Sally.dll $isRestarting > sallyOutput 2>&1
 				case $? in
 					0)
 						break
@@ -71,8 +71,8 @@ case "$answer" in
 						isRestarting=2
 						cd ~/Sally.NET/
 						git pull origin master
-						dotnet build Sally.NET.sln -c Release
-						cd Discord-Chan/bin/Release/netcoreapp2.1/
+						dotnet build Sally/Sally.csproj -c Release
+						cd Sally/bin/Release/netcoreapp3.0/
 						continue
 					;;
 				esac
@@ -82,7 +82,7 @@ case "$answer" in
 	;;
 	2)
 		#Update
-		if pgrep -f "dotnet Sally.NET.dll" > /dev/null 2>&1
+		if pgrep -f "dotnet Sally.dll" > /dev/null 2>&1
 		then
 			echo "You cant update. Sally is online."
 			echo "Do you want to stop Sally?"
@@ -91,7 +91,7 @@ case "$answer" in
 					Yes)
 						#Stopping Sally
 						echo "Stoping Sally..."
-						pkill -f "dotnet Sally.NET.dll"
+						pkill -f "dotnet Sally.dll"
 						echo "Sally stopped."
 						#Continue Update
 						echo "Updating Sally..."
@@ -121,11 +121,11 @@ case "$answer" in
 	;;
 	3)
 		#Stop
-		if pgrep -f "dotnet Sally.NET.dll" > /dev/null 2>&1
+		if pgrep -f "dotnet Sally.dll" > /dev/null 2>&1
 		then
 			#Process is running
 			echo "Stopping Sally..."
-			pkill -f "dotnet Sally.NET.dll"
+			pkill -f "dotnet Sally.dll"
 			result="${GREEN}Sally stopped successfully!${NC}"
 			clear
 			continue
