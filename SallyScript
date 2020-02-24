@@ -138,7 +138,7 @@ case "$answer" in
 	;;
 	4)
 		#Status (RAM Usage, Uptime, PID, etc.)
-		PID="$(pgrep dotnet -f Sally.NET.dll)"
+		PID="$(pgrep -f 'dotnet Sally.dll')"
 		result="\nPID: ${PID}"
 		continue
 	;;
