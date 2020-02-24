@@ -1,4 +1,5 @@
 ﻿using Discord.Commands;
+using Sally.NET.Module;
 using System;
 using System.Threading.Tasks;
 
@@ -30,7 +31,7 @@ namespace Sally.Command
         public async Task CalculateUptime()
         {
             TimeSpan uptime = DateTime.Now - Program.StartTime;
-            await Context.Message.Channel.SendMessageAsync($"My current uptime is {uptime.Days} {(uptime.Days == 1 ? "Day" : "Days")} {uptime.Minutes} Minutes {uptime.Seconds} Seconds. I'm online since {Program.StartTime.ToString()} .");
+            await Context.Message.Channel.SendMessageAsync($"My current uptime is{GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime.ToString()} .");
         }
     }
 }
