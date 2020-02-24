@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sally_NET.Command
+namespace Sally.Command
 {
     public class AdminCommands : ModuleBase
     {

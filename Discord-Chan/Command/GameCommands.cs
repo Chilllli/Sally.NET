@@ -1,21 +1,19 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Sally_NET.Service;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using System.Globalization;
 using Newtonsoft.Json.Linq;
 using System.Net;
-using Sally_NET.Core.Enum;
+using Sally.NET.Core.Enum;
+using Sally.NET.Module;
 
-namespace Sally_NET.Command
+namespace Sally.Command
 {
     public class GameCommands : ModuleBase
     {
@@ -31,9 +29,9 @@ namespace Sally_NET.Command
                     return;
                 }
 #if DEBUG
-                string[] mods = JsonConvert.DeserializeObject<string[]>(File.ReadAllText("debug.json"));
+                string[] mods = GameModule.GetTerrariaMods("debug.json");
 #else
-                string[] mods = JsonConvert.DeserializeObject<string[]>(File.ReadAllText("/srv/terraria/.local/share/Terraria/ModLoader/Mods/enabled.json"));
+                string[] mods = GameModule.GetTerrariaMods("/srv/terraria/.local/share/Terraria/ModLoader/Mods/enabled.json");
 #endif
                 await Context.Message.Channel.SendMessageAsync(null, embed: modInfoEmbed(mods)).ConfigureAwait(false);
             }
@@ -43,7 +41,7 @@ namespace Sally_NET.Command
             EmbedBuilder dynamicEmbed = new EmbedBuilder()
                 .WithTitle("Terraria Server")
                 .WithDescription("Mods, which are currently running on the server")
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(Program.commandHandlerService.messageAuthor.EmbedColor, 16)))
                 .WithTimestamp(DateTime.Now)
                 .WithFooter(footer =>
                 {
@@ -77,7 +75,7 @@ namespace Sally_NET.Command
                 Object[] attributes = memInfo[0].GetCustomAttributes(typeof(RankAttribute), false);
                 Color color = ((RankAttribute)attributes[0]).color;
 
-                RoleManagerService.CreateOrAddRole(rank != Rank.GrandChampion ? $"{rank} {level}" : rank.ToString(), Context.Message.Author.Id, Enum.GetNames(typeof(Rank)), color);
+                Program.roleManagerService.CreateOrAddRole(rank != Rank.GrandChampion ? $"{rank} {level}" : rank.ToString(), Context.Message.Author.Id, Enum.GetNames(typeof(Rank)), color);
             }
         }
 
@@ -115,7 +113,7 @@ namespace Sally_NET.Command
                         string dataItemName = (string)jsonIdFinder[item.Key]["name"];
                         if (!itemNameComparison.ContainsKey(dataItemName))
                         {
-                            itemNameComparison.Add(dataItemName, CommandHandlerService.CalcLevenshteinDistance(dataItemName, normInput));
+                            itemNameComparison.Add(dataItemName, Program.commandHandlerService.CalcLevenshteinDistance(dataItemName, normInput));
                         }
                         //check if the item is equal to the input
                         if (normInput == dataItemName && !hasBreaked)
@@ -141,7 +139,7 @@ namespace Sally_NET.Command
                                 rsEmbed
                                 .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                                 .WithDescription("Check current prices of items in the grand exchange")
-                                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                                .WithColor(new Color((uint)Convert.ToInt32(Program.commandHandlerService.messageAuthor.EmbedColor, 16)))
                                 .WithTimestamp(DateTime.Now)
                                 .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
                                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)
@@ -157,7 +155,7 @@ namespace Sally_NET.Command
                                 rsEmbed
                                 .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                                 .WithDescription("Check current prices of items in the grand exchange")
-                                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                                .WithColor(new Color((uint)Convert.ToInt32(Program.commandHandlerService.messageAuthor.EmbedColor, 16)))
                                 .WithTimestamp(DateTime.Now)
                                 .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
                                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)

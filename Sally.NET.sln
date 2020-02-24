@@ -3,12 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29001.49
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sally.NET", "Discord-Chan\Sally.NET.csproj", "{8D943F4D-CD50-4AC5-9282-1B13B29C138D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sally", "Discord-Chan\Sally.csproj", "{8D943F4D-CD50-4AC5-9282-1B13B29C138D}"
 	ProjectSection(ProjectDependencies) = postProject
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E} = {176C5E02-0600-4BAD-BD62-AB29505A5E0E}
 		{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F} = {5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YoutubeExplodeCore", "YoutubeExplodeCore\YoutubeExplodeCore.csproj", "{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sally.NET", "Sally.NET.Core\Sally.NET.csproj", "{176C5E02-0600-4BAD-BD62-AB29505A5E0E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F} = {5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sally.NET.Core.XUnit", "Sally.NET.Core.XUnit\Sally.NET.Core.XUnit.csproj", "{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E} = {176C5E02-0600-4BAD-BD62-AB29505A5E0E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +55,30 @@ Global
 		{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}.Release|x64.Build.0 = Release|Any CPU
 		{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}.Release|x86.ActiveCfg = Release|Any CPU
 		{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}.Release|x86.Build.0 = Release|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Debug|x64.Build.0 = Debug|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Debug|x86.Build.0 = Debug|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Release|x64.ActiveCfg = Release|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Release|x64.Build.0 = Release|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Release|x86.ActiveCfg = Release|Any CPU
+		{176C5E02-0600-4BAD-BD62-AB29505A5E0E}.Release|x86.Build.0 = Release|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Debug|x64.Build.0 = Debug|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Debug|x86.Build.0 = Debug|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Release|x64.ActiveCfg = Release|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Release|x64.Build.0 = Release|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Release|x86.ActiveCfg = Release|Any CPU
+		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

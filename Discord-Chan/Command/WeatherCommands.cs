@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
-using Sally_NET.Database;
-using Sally_NET.Service;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using Sally.NET.DataAccess.Database;
+using Sally.NET.Core;
 
-namespace Sally_NET.Command
+namespace Sally.Command
 {
     public class WeatherCommands : ModuleBase
     {
@@ -19,14 +19,14 @@ namespace Sally_NET.Command
                 return;
             }
 
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.request2weatherAsync(location));
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await Program.apiRequestService.request2weatherAsync(location));
             if(temperature.cod != 200)
             {
                 await Context.Message.Channel.SendMessageAsync((string)temperature.message);
                 return;
             }
 
-            User currentUser = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+            User currentUser = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             currentUser.WeatherLocation = location;
             currentUser.NotifierTime = notiferTime;
             await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author}, you successfully subbed to weather notifications.");
@@ -34,7 +34,7 @@ namespace Sally_NET.Command
         [Command("unsub2weather")]
         public async Task UnSubToService()
         {
-            User currentUser = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+            User currentUser = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             currentUser.WeatherLocation = null;
             currentUser.NotifierTime = null;
             await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author}, you successfully unsubbed to weather notifications.");
@@ -42,7 +42,7 @@ namespace Sally_NET.Command
         [Command("currentWeather")]
         public async Task CheckCurrentWeather(string location)
         {
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.request2weatherAsync(location));
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await Program.apiRequestService.request2weatherAsync(location));
             if (temperature.cod != 200)
             {
                 await Context.Message.Channel.SendMessageAsync((string)temperature.message);
@@ -55,7 +55,7 @@ namespace Sally_NET.Command
                     .AddField("Current Max. Temp", $"{temperature.main.temp_max} °C")
                     .AddField("Current Min. Temp", $"{temperature.main.temp_min} °C")
                     .AddField("Current Weather Condition", (string)temperature.weather[0].main)
-                    .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                    .WithColor(new Color((uint)Convert.ToInt32(Program.commandHandlerService.messageAuthor.EmbedColor, 16)))
                     .WithTimestamp(DateTime.Now)
                     .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
             await Context.Message.Channel.SendMessageAsync(embed: weatherEmbed.Build()).ConfigureAwait(false);

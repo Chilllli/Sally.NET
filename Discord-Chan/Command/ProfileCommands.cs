@@ -1,13 +1,13 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Sally_NET.Database;
-using Sally_NET.Service;
+using Sally.NET.Core;
+using Sally.NET.DataAccess.Database;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Sally_NET.Command
+namespace Sally.Command
 {
 
     public class ProfileCommands : ModuleBase
@@ -15,7 +15,7 @@ namespace Sally_NET.Command
         [Command("mute")]
         public async Task MuteBot()
         {
-            User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+            User user = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             user.HasMuted = true;
             await Context.Message.Channel.SendMessageAsync("The bot is muted now");
         }
@@ -23,7 +23,7 @@ namespace Sally_NET.Command
         [Command("unmute")]
         public async Task UnmuteBot()
         {
-            User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+            User user = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             user.HasMuted = false;
             await Context.Message.Channel.SendMessageAsync("The bot is unmuted now");
         }
@@ -42,7 +42,7 @@ namespace Sally_NET.Command
             {
                 return;
             }
-            User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+            User user = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
             user.Xp += 10000;
         }
 #endif
@@ -50,7 +50,7 @@ namespace Sally_NET.Command
         [Command("myxp")]
         public async Task LevelOverview()
         {
-            User myUser = CommandHandlerService.messageAuthor;
+            User myUser = Program.commandHandlerService.messageAuthor;
             EmbedBuilder lvlEmbed = new EmbedBuilder()
                 .WithAuthor($"To {Context.Message.Author}")
                 .WithTimestamp(DateTime.Now)
@@ -102,7 +102,7 @@ namespace Sally_NET.Command
             [Command("isMuted")]
             public async Task ShowMuteStatus()
             {
-                User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+                User user = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
                 if(user.HasMuted)
                 {
                     await Context.Message.Channel.SendMessageAsync($"The bot is currently muted for you.");
@@ -124,7 +124,7 @@ namespace Sally_NET.Command
                 if (hexColor < 16777216 && hexColor >= 0)
                 {
                     //hex value is in range
-                    User user = DataAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+                    User user = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
                     user.EmbedColor = result;
                     await Context.Message.Channel.SendMessageAsync("you have sucessfully set your color");
                 }

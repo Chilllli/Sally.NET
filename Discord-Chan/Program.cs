@@ -1,21 +1,24 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Sally_NET.Command;
-using Sally_NET.Config;
-using Sally_NET.Database;
-using Sally_NET.Service;
+using Sally.Command;
 using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
+using Sally.NET.Core.Configuration;
+using Sally.NET.DataAccess.Database;
+using Sally.NET.Service;
+using System.Collections.Generic;
+using Discord.Commands;
+using Sally.NET.Core;
 
-namespace Sally_NET
+namespace Sally
 {
     class Program
     {
-        public static BotConfiguration BotConfiguration
+        public static BotCredentials BotConfiguration
         {
             get;
             private set;
@@ -57,6 +60,14 @@ namespace Sally_NET
             }
         }
         private static int startValue;
+        public static ApiRequestService apiRequestService;
+        private VoiceRewardService voiceRewardService;
+        private MoodDictionary moodDictionary;
+        private WeatherSubscriptionService weatherSubscriptionService;
+        public static RoleManagerService roleManagerService;
+        public static CommandHandlerService commandHandlerService;
+        private MoodHandlerService moodHandlerService;
+
         public static string GenericFooter 
         {
             get;
@@ -67,6 +78,7 @@ namespace Sally_NET
             get;
             private set;
         }
+        public StatusNotifierService statusNotifierService { get; private set; }
 
         public static void Main(string[] args)
         {
@@ -80,7 +92,7 @@ namespace Sally_NET
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
-            DataAccess.Instance.Dispose();
+            DatabaseAccess.Instance.Dispose();
             Environment.Exit(0);
         }
 
@@ -104,20 +116,30 @@ namespace Sally_NET
                 }
             }
 
-            BotConfiguration = JsonConvert.DeserializeObject<BotConfiguration>(File.ReadAllText("configuration.json"));
-            DataAccess.Initialize(BotConfiguration);
+            BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("configuration.json"));
+            DatabaseAccess.Initialize(BotConfiguration.db_user, BotConfiguration.db_password, BotConfiguration.db_database);
 
             RequestCounter = Int32.Parse(File.ReadAllText("ApiRequests.txt"));
 
             Client = new DiscordSocketClient();
 
-            VoiceRewardService.InitializeHandler(Client);
+            List<Type> commandClasses = typeof(GeneralCommands)
+                    .Assembly.GetTypes()
+                    .Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList();
+
+            apiRequestService = new ApiRequestService(BotConfiguration);
+            voiceRewardService = new VoiceRewardService(Client, BotConfiguration);
+            voiceRewardService.InitializeHandler();
             UserManagerService.InitializeHandler(Client);
-            MoodDictionary.InitializeMoodDictionary();
-            WeatherSubService.InitializeWeatherSub();
-            RoleManagerService.InitializeHandler();
-            await CommandHandlerService.InitializeHandler(Client);
-            await CachedService.InitializeHandler();
+            moodDictionary = new MoodDictionary(Client, BotConfiguration);
+            moodDictionary.InitializeMoodDictionary();
+            weatherSubscriptionService = new WeatherSubscriptionService(Client, BotConfiguration);
+            weatherSubscriptionService.InitializeWeatherSub();
+            roleManagerService = new RoleManagerService(BotConfiguration);
+            roleManagerService.InitializeHandler();
+            commandHandlerService = new CommandHandlerService(Client, BotConfiguration, commandClasses);
+            await commandHandlerService.InitializeHandler(Client);
+            await CacheService.InitializeHandler();
             Client.Ready += Client_Ready;
 
             Client.Log += Log;
@@ -143,22 +165,23 @@ namespace Sally_NET
             MyGuild = Client.Guilds.Where(g => g.Id == BotConfiguration.guildId).First();
             foreach (SocketGuildUser user in MyGuild.Users)
             {
-                if (DataAccess.Instance.users.Find(u => u.Id == user.Id) == null)
+                if (DatabaseAccess.Instance.users.Find(u => u.Id == user.Id) == null)
                 {
-                    DataAccess.Instance.InsertUser(new Database.User(user.Id, 10, false));
+                    DatabaseAccess.Instance.InsertUser(new User(user.Id, 10, false));
                 }
                 //check if user is already in a voice channel
                 if (user.VoiceChannel != null)
                 {
                     //start tracking if user detected
-                    VoiceRewardService.StartTrackingVoiceChannel(DataAccess.Instance.users.Find(u => u.Id == user.Id));
+                    voiceRewardService.StartTrackingVoiceChannel(DatabaseAccess.Instance.users.Find(u => u.Id == user.Id));
                 }
                 if (user.Id == BotConfiguration.meId)
                 {
                     Me = user as SocketUser;
                 }
             }
-            StatusNotifierService.InitializeService();
+            statusNotifierService = new StatusNotifierService(Me);
+            statusNotifierService.InitializeService();
             MusicCommands.Initialize(Client);
             switch (startValue)
             {
@@ -177,7 +200,8 @@ namespace Sally_NET
                 default:
                     break;
             }
-            await MoodHandleService.InitializeHandler(Client);
+            moodHandlerService = new MoodHandlerService(Client, BotConfiguration);
+            await moodHandlerService.InitializeHandler();
             
         }
     }

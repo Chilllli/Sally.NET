@@ -16,7 +16,7 @@ using YoutubeExplode.Models;
 using YoutubeExplode.Models.MediaStreams;
 
 
-namespace Sally_NET.Command
+namespace Sally.Command
 {
     struct VideoInfo : IEquatable<VideoInfo>
     {

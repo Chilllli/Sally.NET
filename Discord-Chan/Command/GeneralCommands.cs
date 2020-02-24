@@ -1,13 +1,8 @@
 ﻿using Discord.Commands;
-using Newtonsoft.Json;
-using Sally_NET.Service;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Sally_NET.Command
+namespace Sally.Command
 {
     public class GeneralCommands : ModuleBase
     {
