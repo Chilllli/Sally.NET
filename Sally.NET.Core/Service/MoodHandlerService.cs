@@ -13,7 +13,7 @@ using System.Timers;
 
 namespace Sally.NET.Service
 {
-    public class MoodHandlerService
+    public static class MoodHandlerService
     {
         private static DiscordSocketClient client;
         private static BotCredentials credentials;
@@ -22,14 +22,10 @@ namespace Sally.NET.Service
         private static float pointsSum;
         private static List<DateTime> messageList = new List<DateTime>();
         private static bool onStart;
-        public MoodHandlerService(DiscordSocketClient client, BotCredentials credentials)
+        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials)
         {
             MoodHandlerService.client = client;
             MoodHandlerService.credentials = credentials;
-        }
-
-        public async Task InitializeHandler()
-        {
             myGuild = client.Guilds.Where(g => g.Id == credentials.guildId).First();
             //set start to true
             onStart = true;
@@ -54,31 +50,31 @@ namespace Sally.NET.Service
             client.MessageReceived += Client_MessageReceived;
         }
 
-        private async void ChangeMoodTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private static async void ChangeMoodTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             await setMood(getMood());
         }
 
-        private Task Client_MessageReceived(SocketMessage message)
+        private static Task Client_MessageReceived(SocketMessage message)
         {
             messageList.Add(message.CreatedAt.DateTime);
             messageList = messageList.Where(t => DateTime.Now.Subtract(new TimeSpan(0, 5, 0)) > t).ToList();
             return Task.CompletedTask;
         }
 
-        private async void WeatherTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private static async void WeatherTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             await checkWeather();
         }
 
-        private void DailyTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private static void DailyTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             dailyPoints = new Random().NextDouble();
         }
 
-        private async Task checkWeather()
+        private static async Task checkWeather()
         {
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await new ApiRequestService(credentials).request2weatherAsync());
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.request2weatherAsync());
             //main.temp 60%,
             pointsSum = calculateWeatherPoints(15f, 20f, 0.6f, (float)temperature.main.temp);
             //main.humidity 5%, 
@@ -93,15 +89,15 @@ namespace Sally.NET.Service
             //snow.1h 0.1 10% 
             pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.snow != null ? (float)temperature.snow["1h"] : 0f);
         }
-        private float calculateWeatherPoints(float width, float optimum, float weigth, float weatherValue)
+        private static float calculateWeatherPoints(float width, float optimum, float weigth, float weatherValue)
             => MathF.Max(-(1 / MathF.Pow(width, 2)) * MathF.Pow((weatherValue - optimum), 2) + 1, -1) * weigth;
 
-        private int messageCounter()
+        private static int messageCounter()
         {
             return messageList.Count(m => m > DateTime.Now.Subtract(new TimeSpan(0, 1, 0)));
         }
 
-        public Mood getMood()
+        public static Mood getMood()
         {
             double currentMood = getMoodPoints();
             if (currentMood >= 0 && currentMood <= 0.25)
@@ -120,7 +116,7 @@ namespace Sally.NET.Service
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private async Task setMood(Mood mood)
+        private static async Task setMood(Mood mood)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             if (client.Activity?.Name == mood.ToString())
@@ -135,7 +131,7 @@ namespace Sally.NET.Service
 #endif
         }
 
-        private double getMoodPoints()
+        private static double getMoodPoints()
         {
             //calculate which mood sally will have
             //it depends on:

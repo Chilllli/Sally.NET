@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29001.49
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sally", "Discord-Chan\Sally.csproj", "{8D943F4D-CD50-4AC5-9282-1B13B29C138D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{176C5E02-0600-4BAD-BD62-AB29505A5E0E} = {176C5E02-0600-4BAD-BD62-AB29505A5E0E}
-		{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F} = {5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YoutubeExplodeCore", "YoutubeExplodeCore\YoutubeExplodeCore.csproj", "{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sally.NET", "Sally.NET.Core\Sally.NET.csproj", "{176C5E02-0600-4BAD-BD62-AB29505A5E0E}"
@@ -21,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sally.NET.Core.XUnit", "Sal
 		{176C5E02-0600-4BAD-BD62-AB29505A5E0E} = {176C5E02-0600-4BAD-BD62-AB29505A5E0E}
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sally", "Sally\Sally.csproj", "{F6A96FBF-522B-4E2D-A841-716380EF2B1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,18 +27,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Debug|x64.Build.0 = Debug|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Debug|x86.Build.0 = Debug|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Release|x64.ActiveCfg = Release|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Release|x64.Build.0 = Release|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Release|x86.ActiveCfg = Release|Any CPU
-		{8D943F4D-CD50-4AC5-9282-1B13B29C138D}.Release|x86.Build.0 = Release|Any CPU
 		{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A8CEDD0-D873-4FA5-B922-BB6AC640A16F}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -79,6 +63,18 @@ Global
 		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Release|x64.Build.0 = Release|Any CPU
 		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Release|x86.ActiveCfg = Release|Any CPU
 		{39225CA0-02B7-4FDA-B5A7-F85D4EE64ABF}.Release|x86.Build.0 = Release|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Debug|x64.Build.0 = Debug|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Debug|x86.Build.0 = Debug|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Release|x64.ActiveCfg = Release|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Release|x64.Build.0 = Release|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Release|x86.ActiveCfg = Release|Any CPU
+		{F6A96FBF-522B-4E2D-A841-716380EF2B1D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

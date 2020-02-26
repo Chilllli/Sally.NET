@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Sally.NET.Service
 {
-    public class RoleManagerService
+    public static class RoleManagerService
     {
         public static Dictionary<int, ulong> roleDictionary = new Dictionary<int, ulong>
         {
@@ -32,19 +32,15 @@ namespace Sally.NET.Service
 
         };
 
-        public BotCredentials credentials { get; set; }
-        public SocketGuild myGuild { get; set; }
+        public static BotCredentials credentials { get; set; }
+        public static SocketGuild myGuild { get; set; }
 
-
-        public RoleManagerService(BotCredentials credentials)
+        public static void InitializeHandler(BotCredentials credentials)
         {
-            this.credentials = credentials;
-        }
-        public void InitializeHandler()
-        {
+            RoleManagerService.credentials = credentials;
             User.OnLevelUp += User_OnLevelUp;
         }
-        private async void User_OnLevelUp(User user)
+        private static async void User_OnLevelUp(User user)
         {
             //check if user level is a key
             if (roleDictionary.ContainsKey(user.Level))
@@ -64,7 +60,7 @@ namespace Sally.NET.Service
             }
             //CreateOrAddRole($"Level {user.Level}", user.Id, new[] { $"Level " });
         }
-        public async void CreateOrAddRole(string role, ulong id, string[] removeCriteria = null, Color? color = null)
+        public static async void CreateOrAddRole(string role, ulong id, string[] removeCriteria = null, Color? color = null)
         {
             SocketRole newRole = myGuild.Roles.ToList().Find(r => r.Name == role);
             if (newRole == null)

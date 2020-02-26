@@ -10,8 +10,10 @@ namespace Sally.NET.Service
 {
     public static class UserManagerService
     {
+        private static DiscordSocketClient client;
         public static void InitializeHandler(DiscordSocketClient client)
         {
+            UserManagerService.client = client;
             client.UserJoined += Client_UserJoined;
         }
 

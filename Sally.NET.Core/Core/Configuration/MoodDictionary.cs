@@ -9,31 +9,25 @@ using System.Text;
 
 namespace Sally.NET.Core.Configuration
 {
-    public class MoodDictionary
+    public static class MoodDictionary
     {
         private static Dictionary<Mood, Dictionary<string, string>> moodDictionary = new Dictionary<Mood, Dictionary<string, string>>();
-        private DiscordSocketClient client;
-        private BotCredentials credentials;
-        private MoodHandlerService moodHandlerService;
+        private static DiscordSocketClient client;
+        private static BotCredentials credentials;
 
-        public MoodDictionary(DiscordSocketClient client, BotCredentials credentials)
+        public static void InitializeMoodDictionary(DiscordSocketClient client, BotCredentials credentials)
         {
-            this.client = client;
-            this.credentials = credentials;
-            moodHandlerService = new MoodHandlerService(client, credentials);
-        }
-
-        public void InitializeMoodDictionary()
-        {
+            MoodDictionary.client = client;
+            MoodDictionary.credentials = credentials;
             foreach (Mood mood in System.Enum.GetValues(typeof(Mood)))
             {
                 moodDictionary.Add(mood, JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"./mood/{mood}.json")));
             }
         }
 
-        public string getMoodMessage(string message)
+        public static string getMoodMessage(string message)
         {
-            return moodDictionary[client.Activity != null ? System.Enum.Parse<Mood>(client.Activity?.Name) : moodHandlerService.getMood()][message];
+            return moodDictionary[client.Activity != null ? System.Enum.Parse<Mood>(client.Activity?.Name) : MoodHandlerService.getMood()][message];
         }
     }
 }

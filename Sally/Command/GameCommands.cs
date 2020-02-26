@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using System.Net;
 using Sally.NET.Core.Enum;
 using Sally.NET.Module;
+using Sally.NET.Service;
 
 namespace Sally.Command
 {
@@ -41,7 +42,7 @@ namespace Sally.Command
             EmbedBuilder dynamicEmbed = new EmbedBuilder()
                 .WithTitle("Terraria Server")
                 .WithDescription("Mods, which are currently running on the server")
-                .WithColor(new Color((uint)Convert.ToInt32(Program.commandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                 .WithTimestamp(DateTime.Now)
                 .WithFooter(footer =>
                 {
@@ -75,7 +76,7 @@ namespace Sally.Command
                 Object[] attributes = memInfo[0].GetCustomAttributes(typeof(RankAttribute), false);
                 Color color = ((RankAttribute)attributes[0]).color;
 
-                Program.roleManagerService.CreateOrAddRole(rank != Rank.GrandChampion ? $"{rank} {level}" : rank.ToString(), Context.Message.Author.Id, Enum.GetNames(typeof(Rank)), color);
+                RoleManagerService.CreateOrAddRole(rank != Rank.GrandChampion ? $"{rank} {level}" : rank.ToString(), Context.Message.Author.Id, Enum.GetNames(typeof(Rank)), color);
             }
         }
 
@@ -113,7 +114,7 @@ namespace Sally.Command
                         string dataItemName = (string)jsonIdFinder[item.Key]["name"];
                         if (!itemNameComparison.ContainsKey(dataItemName))
                         {
-                            itemNameComparison.Add(dataItemName, Program.commandHandlerService.CalcLevenshteinDistance(dataItemName, normInput));
+                            itemNameComparison.Add(dataItemName, CommandHandlerService.CalcLevenshteinDistance(dataItemName, normInput));
                         }
                         //check if the item is equal to the input
                         if (normInput == dataItemName && !hasBreaked)
@@ -139,7 +140,7 @@ namespace Sally.Command
                                 rsEmbed
                                 .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                                 .WithDescription("Check current prices of items in the grand exchange")
-                                .WithColor(new Color((uint)Convert.ToInt32(Program.commandHandlerService.messageAuthor.EmbedColor, 16)))
+                                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                                 .WithTimestamp(DateTime.Now)
                                 .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
                                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)
@@ -155,7 +156,7 @@ namespace Sally.Command
                                 rsEmbed
                                 .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                                 .WithDescription("Check current prices of items in the grand exchange")
-                                .WithColor(new Color((uint)Convert.ToInt32(Program.commandHandlerService.messageAuthor.EmbedColor, 16)))
+                                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                                 .WithTimestamp(DateTime.Now)
                                 .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
                                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)

@@ -16,7 +16,7 @@ using System.Web;
 
 namespace Sally.NET.Service
 {
-    public class ApiRequestService
+    public static class ApiRequestService
     {
 #if RELEASE
         private const int pageResultLimit = 7;
@@ -24,14 +24,14 @@ namespace Sally.NET.Service
 #if DEBUG
         private const int pageResultLimit = 1;
 #endif
-        private BotCredentials credentials;
+        private static BotCredentials credentials;
 
-        public ApiRequestService(BotCredentials botCredentials)
+        public static void Initialize(BotCredentials credentials)
         {
-            credentials = botCredentials;
+            ApiRequestService.credentials = credentials;
         }
 
-        public async Task<string> request2weatherAsync(string location = null)
+        public static async Task<string> request2weatherAsync(string location = null)
         {
             if (location == null)
             {
@@ -46,19 +46,19 @@ namespace Sally.NET.Service
             }
         }
 
-        public async Task<string> request2cleverapiAsync(SocketUserMessage message)
+        public static async Task<string> request2cleverapiAsync(SocketUserMessage message)
         {
             string stringResult = await (CreateHttpRequest("https://www.cleverbot.com", $"/getreply?key={credentials.CleverApi}&input={message.Content}").Result).Content.ReadAsStringAsync();
             return stringResult;
         }
 
-        public async Task<string> request2wikiAsync(string term)
+        public static async Task<string> request2wikiAsync(string term)
         {
             string stringResult = await (CreateHttpRequest("https://en.wikipedia.org", $"/w/api.php?action=opensearch&format=json&search={term}&namespace=0&limit=5&utf8=1").Result).Content.ReadAsStringAsync();
             return stringResult;
         }
 
-        private async Task<HttpResponseMessage> CreateHttpRequest(string url, string urlExtension)
+        private static async Task<HttpResponseMessage> CreateHttpRequest(string url, string urlExtension)
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(url);
@@ -66,7 +66,7 @@ namespace Sally.NET.Service
             return responseMessage;
         }
 
-        public async Task<string> request2konachanAsync()
+        public static async Task<string> request2konachanAsync()
         {
             string response = await (CreateHttpRequest("https://konachan.com", "/post.json?limit=100").Result).Content.ReadAsStringAsync();
             if (response == "[]")
@@ -78,7 +78,7 @@ namespace Sally.NET.Service
             int randImage = rng.Next(imageCollection.Count());
             return imageCollection[randImage].ImageUrl;
         }
-        public async Task<string> request2konachanAsync(string[] tags)
+        public static async Task<string> request2konachanAsync(string[] tags)
         {
 
             string tagUrl = "";
@@ -138,7 +138,7 @@ namespace Sally.NET.Service
             return imageCollection[randImage].ImageUrl;
         }
 
-        public async Task<string> request2konachanAsync(string[] tags, Rating rating)
+        public static async Task<string> request2konachanAsync(string[] tags, Rating rating)
         {
             int pageCounter = 0;
             const int limit = 90;
@@ -213,7 +213,7 @@ namespace Sally.NET.Service
             }
         }
 
-        private void checkAndSaveTagPopularity(string tagUrl)
+        private static void checkAndSaveTagPopularity(string tagUrl)
         {
             string formattedTagString = tagUrl.Replace("%20", " ");
             formattedTagString = formattedTagString.Remove(formattedTagString.Length - 1);
@@ -251,7 +251,7 @@ namespace Sally.NET.Service
             File.WriteAllText(tagJsonPath, JsonConvert.SerializeObject(tagPopularity));
         }
 
-        private void saveJsonToFile(List<KonachanApi> json, string tagString)
+        private static void saveJsonToFile(List<KonachanApi> json, string tagString)
         {
             string cachePath = $"cached/{tagString}.json";
             if (!Directory.Exists("cached"))

@@ -18,17 +18,17 @@ using System.Threading.Tasks;
 
 namespace Sally.NET.Service
 {
-    public class CommandHandlerService
+    public static class CommandHandlerService
     {
-        private DiscordSocketClient client;
-        private BotCredentials credentials;
-        private CommandService commands;
-        private List<Type> commandClasses;
-        private IServiceProvider services;
-        private char prefix = '$';
-        public User messageAuthor { get; set; }
-        private int requestCounter;
-        public int RequestCounter 
+        private static DiscordSocketClient client;
+        private static BotCredentials credentials;
+        private static CommandService commands;
+        private static List<Type> commandClasses;
+        private static IServiceProvider services;
+        private static char prefix = '$';
+        public static User messageAuthor { get; set; }
+        private static int requestCounter;
+        public static int RequestCounter 
         { 
             get 
             {
@@ -41,14 +41,11 @@ namespace Sally.NET.Service
             } 
         }
 
-        public CommandHandlerService(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses)
+        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses)
         {
-            this.client = client;
-            this.credentials = credentials;
-            this.commandClasses = commandClasses;
-        }
-        public async Task InitializeHandler(DiscordSocketClient client)
-        {
+            CommandHandlerService.client = client;
+            CommandHandlerService.credentials = credentials;
+            CommandHandlerService.commandClasses = commandClasses;
             commands = new CommandService();
             services = new ServiceCollection()
               .AddSingleton(client)
@@ -63,7 +60,7 @@ namespace Sally.NET.Service
         /// </summary>
         /// <param name="message">Raw input</param>
         /// <returns>Classified message including input</returns>
-        private Input ClassifyAs(SocketUserMessage message)
+        private static Input ClassifyAs(SocketUserMessage message)
         {
             int argPos = 0;
 
@@ -85,7 +82,7 @@ namespace Sally.NET.Service
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        private async Task HandleMessage(Input input)
+        private static async Task HandleMessage(Input input)
         {
             if (input.Type == InputType.Command || input.Type == InputType.Mention)
             {
@@ -100,7 +97,7 @@ namespace Sally.NET.Service
             }
         }
 
-        private async Task HandleCommand(Input input)
+        private static async Task HandleCommand(Input input)
         {
             int argPos = input.ArgumentPosition ?? 0;
 
@@ -175,7 +172,7 @@ namespace Sally.NET.Service
                 await context.Channel.SendMessageAsync($"{result.ErrorReason} ¯\\_(ツ)_/¯");
         }
 
-        private async Task HandleNaturalInput(Input input)
+        private static async Task HandleNaturalInput(Input input)
         {
             SocketUserMessage message = input.Message;
 
@@ -188,12 +185,12 @@ namespace Sally.NET.Service
                 RequestCounter++;
 
 
-                CleverApi messageOutput = JsonConvert.DeserializeObject<CleverApi>(await new ApiRequestService(credentials).request2cleverapiAsync(message));
+                CleverApi messageOutput = JsonConvert.DeserializeObject<CleverApi>(await ApiRequestService.request2cleverapiAsync(message));
                 await message.Channel.SendMessageAsync(messageOutput.Answer);
             }
         }
 
-        private async Task CommandHandler(SocketMessage arg)
+        private static async Task CommandHandler(SocketMessage arg)
         {
             // Don't process the command if it was a System Message
             SocketUserMessage message = arg as SocketUserMessage;
@@ -220,7 +217,7 @@ namespace Sally.NET.Service
             await HandleMessage(input);
         }
 
-        public int CalcLevenshteinDistance(string a, string b)
+        public static int CalcLevenshteinDistance(string a, string b)
         {
             if (String.IsNullOrEmpty(a) && String.IsNullOrEmpty(b))
             {

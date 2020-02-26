@@ -59,15 +59,6 @@ namespace Sally
                 File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
             }
         }
-        private static int startValue;
-        public static ApiRequestService apiRequestService;
-        private VoiceRewardService voiceRewardService;
-        private MoodDictionary moodDictionary;
-        private WeatherSubscriptionService weatherSubscriptionService;
-        public static RoleManagerService roleManagerService;
-        public static CommandHandlerService commandHandlerService;
-        private MoodHandlerService moodHandlerService;
-
         public static string GenericFooter 
         {
             get;
@@ -78,7 +69,7 @@ namespace Sally
             get;
             private set;
         }
-        public StatusNotifierService statusNotifierService { get; private set; }
+        private static int startValue;
 
         public static void Main(string[] args)
         {
@@ -127,18 +118,13 @@ namespace Sally
                     .Assembly.GetTypes()
                     .Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList();
 
-            apiRequestService = new ApiRequestService(BotConfiguration);
-            voiceRewardService = new VoiceRewardService(Client, BotConfiguration);
-            voiceRewardService.InitializeHandler();
+            ApiRequestService.Initialize(BotConfiguration);
+            VoiceRewardService.InitializeHandler(Client, BotConfiguration);
             UserManagerService.InitializeHandler(Client);
-            moodDictionary = new MoodDictionary(Client, BotConfiguration);
-            moodDictionary.InitializeMoodDictionary();
-            weatherSubscriptionService = new WeatherSubscriptionService(Client, BotConfiguration);
-            weatherSubscriptionService.InitializeWeatherSub();
-            roleManagerService = new RoleManagerService(BotConfiguration);
-            roleManagerService.InitializeHandler();
-            commandHandlerService = new CommandHandlerService(Client, BotConfiguration, commandClasses);
-            await commandHandlerService.InitializeHandler(Client);
+            MoodDictionary.InitializeMoodDictionary(Client, BotConfiguration);
+            WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration);
+            RoleManagerService.InitializeHandler(BotConfiguration);
+            await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses);
             await CacheService.InitializeHandler();
             Client.Ready += Client_Ready;
 
@@ -173,15 +159,14 @@ namespace Sally
                 if (user.VoiceChannel != null)
                 {
                     //start tracking if user detected
-                    voiceRewardService.StartTrackingVoiceChannel(DatabaseAccess.Instance.users.Find(u => u.Id == user.Id));
+                    VoiceRewardService.StartTrackingVoiceChannel(DatabaseAccess.Instance.users.Find(u => u.Id == user.Id));
                 }
                 if (user.Id == BotConfiguration.meId)
                 {
                     Me = user as SocketUser;
                 }
             }
-            statusNotifierService = new StatusNotifierService(Me);
-            statusNotifierService.InitializeService();
+            StatusNotifierService.InitializeService(Me);
             MusicCommands.Initialize(Client);
             switch (startValue)
             {
@@ -200,8 +185,7 @@ namespace Sally
                 default:
                     break;
             }
-            moodHandlerService = new MoodHandlerService(Client, BotConfiguration);
-            await moodHandlerService.InitializeHandler();
+            await MoodHandlerService.InitializeHandler(Client, BotConfiguration);
             
         }
     }

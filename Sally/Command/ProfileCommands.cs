@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Sally.NET.Core;
 using Sally.NET.DataAccess.Database;
+using Sally.NET.Service;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,7 +51,7 @@ namespace Sally.Command
         [Command("myxp")]
         public async Task LevelOverview()
         {
-            User myUser = Program.commandHandlerService.messageAuthor;
+            User myUser = CommandHandlerService.messageAuthor;
             EmbedBuilder lvlEmbed = new EmbedBuilder()
                 .WithAuthor($"To {Context.Message.Author}")
                 .WithTimestamp(DateTime.Now)

@@ -13,24 +13,21 @@ using System.Timers;
 
 namespace Sally.NET.Service
 {
-    public class WeatherSubscriptionService
+    public static class WeatherSubscriptionService
     {
-        public DiscordSocketClient client { get; set; }
-        public BotCredentials credentials { get; set; }
+        public static DiscordSocketClient client { get; set; }
+        public static BotCredentials credentials { get; set; }
 
-        public WeatherSubscriptionService(DiscordSocketClient client, BotCredentials credentials)
+        public static void InitializeWeatherSub(DiscordSocketClient client, BotCredentials credentials)
         {
-            this.client = client;
-            this.credentials = credentials;
-        }
-        public void InitializeWeatherSub()
-        {
+            WeatherSubscriptionService.client = client;
+            WeatherSubscriptionService.credentials = credentials;
             Timer checkWeather = new Timer(60 * 1000);
             checkWeather.Start();
             checkWeather.Elapsed += CheckWeather_Elapsed;
         }
 
-        private async void CheckWeather_Elapsed(object sender, ElapsedEventArgs e)
+        private static async void CheckWeather_Elapsed(object sender, ElapsedEventArgs e)
         {
             foreach (User user in DatabaseAccess.Instance.users)
             {
@@ -42,7 +39,7 @@ namespace Sally.NET.Service
                 if (disUser == null)
                     continue;
 
-                dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await new ApiRequestService(credentials).request2weatherAsync(user.WeatherLocation));
+                dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.request2weatherAsync(user.WeatherLocation));
 
                 EmbedBuilder weatherEmbed = new EmbedBuilder()
                     .WithTitle("Weather Info")

@@ -9,22 +9,19 @@ using System.Threading.Tasks;
 
 namespace Sally.NET.Service
 {
-    public class StatusNotifierService
+    public static class StatusNotifierService
     {
-        private SocketUser me;
+        private static SocketUser me;
 
-        public StatusNotifierService(SocketUser me)
+        public static void InitializeService(SocketUser me)
         {
-            this.me = me;
-        }
-        public void InitializeService()
-        {
+            StatusNotifierService.me = me;
 #pragma warning disable CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
             Task.Run(observeNotifierPipe);
 #pragma warning restore CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
         }
 
-        private async Task observeNotifierPipe()
+        private static async Task observeNotifierPipe()
         {
             while (true)
             {

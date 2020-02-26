@@ -12,25 +12,20 @@ using System.Timers;
 
 namespace Sally.NET.Service
 {
-    public class VoiceRewardService
+    public static class VoiceRewardService
     {
-        private DiscordSocketClient client;
-        private BotCredentials credentials;
-        private MoodDictionary moodDictionary;
+        private static DiscordSocketClient client;
+        private static BotCredentials credentials;
 
-        public VoiceRewardService(DiscordSocketClient client, BotCredentials credentials)
+        public static void InitializeHandler(DiscordSocketClient client, BotCredentials credentials)
         {
-            this.client = client;
-            this.credentials = credentials;
-        }
-        public void InitializeHandler()
-        {
+            VoiceRewardService.client = client;
+            VoiceRewardService.credentials = credentials;
             client.UserVoiceStateUpdated += voiceChannelJoined;
             client.UserVoiceStateUpdated += voiceChannelLeft;
-            moodDictionary = new MoodDictionary(client, credentials);
         }
 
-        private async Task voiceChannelLeft(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
+        private static async Task voiceChannelLeft(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
         {
             if (voiceStateNew.VoiceChannel != null || voiceStateOld.VoiceChannel?.Id == voiceStateNew.VoiceChannel?.Id || disUser.IsBot)
             {
@@ -40,13 +35,13 @@ namespace Sally.NET.Service
             if (!currentUser.HasMuted && (DateTime.Now - currentUser.LastFarewell).TotalHours > 12)
             {
                 //send private message
-                await disUser.SendMessageAsync(moodDictionary.getMoodMessage("Bye"));//Bye
+                await disUser.SendMessageAsync(MoodDictionary.getMoodMessage("Bye"));//Bye
                 currentUser.LastFarewell = DateTime.Now;
             }
             stopTrackingVoiceChannel(DatabaseAccess.Instance.users.Find(u => u.Id == disUser.Id));
         }
 
-        private async Task voiceChannelJoined(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
+        private static async Task voiceChannelJoined(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
         {
             //if guild joined
             if (voiceStateOld.VoiceChannel?.Id == voiceStateNew.VoiceChannel?.Id || voiceStateNew.VoiceChannel == null || disUser.IsBot)
@@ -57,20 +52,20 @@ namespace Sally.NET.Service
             if (!currentUser.HasMuted && (DateTime.Now - currentUser.LastGreeting).TotalHours > 12)
             {
                 //send private message
-                await disUser.SendMessageAsync(String.Format(moodDictionary.getMoodMessage("Hello"), disUser.Username));//Hello
+                await disUser.SendMessageAsync(String.Format(MoodDictionary.getMoodMessage("Hello"), disUser.Username));//Hello
                 currentUser.LastGreeting = DateTime.Now;
             }
             StartTrackingVoiceChannel(currentUser);
         }
 
-        public void StartTrackingVoiceChannel(User user)
+        public static void StartTrackingVoiceChannel(User user)
         {
             user.LastXpTime = DateTime.Now;
             user.XpTimer = new Timer(credentials.xpTimerInMin * 1000 * 60);
             user.XpTimer.Elapsed += (s, e) => trackVoiceChannel(user);
         }
 
-        private void trackVoiceChannel(User user)
+        private static void trackVoiceChannel(User user)
         {
             SocketGuildUser trackedUser = (client.Guilds.Where(g => g.Id == credentials.guildId).First()).Users.ToList().Find(u => u.Id == user.Id);
             if (trackedUser == null)
@@ -85,7 +80,7 @@ namespace Sally.NET.Service
             user.LastXpTime = DateTime.Now;
         }
 
-        private void stopTrackingVoiceChannel(User user)
+        private static void stopTrackingVoiceChannel(User user)
         {
             user.XpTimer.Stop();
             user.Xp += (int)Math.Round(((DateTime.Now - user.LastXpTime).TotalMilliseconds / (credentials.xpTimerInMin * 1000 * 60)) * credentials.gainedXp);

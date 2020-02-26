@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Sally.NET.Core.Enum;
+using Sally.NET.Service;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace Sally.Command
         public async Task SendPicture()
         {
             //search for image without tags and rating
-            string response = await Program.apiRequestService.request2konachanAsync();
+            string response = await ApiRequestService.request2konachanAsync();
             await generateImageEmbed(response);
         }
         [Command("konachan")]
@@ -37,7 +38,7 @@ namespace Sally.Command
                 {
                     tagUrl = tagUrl + $"{tag} ";
                 }
-                string response = await Program.apiRequestService.request2konachanAsync(tagCollection, rating);
+                string response = await ApiRequestService.request2konachanAsync(tagCollection, rating);
                 await generateImageEmbed(response, tagUrl);
             }
             else
@@ -47,7 +48,7 @@ namespace Sally.Command
                 {
                     tagUrl = tagUrl + $"{tag} ";
                 }
-                string response = await Program.apiRequestService.request2konachanAsync(lowerTags);
+                string response = await ApiRequestService.request2konachanAsync(lowerTags);
                 await generateImageEmbed(response, tagUrl);
             }
         }
@@ -57,7 +58,7 @@ namespace Sally.Command
         {
             EmbedBuilder embedBuilder = new EmbedBuilder()
                 .WithDescription($"[Result]({response})")
-                .WithColor(new Color((uint)Convert.ToInt32(Program.commandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
@@ -72,7 +73,7 @@ namespace Sally.Command
             }
             EmbedBuilder embedBuilder = new EmbedBuilder()
                 .WithDescription($"Tags: [{tagUrl}]({response})")
-                .WithColor(new Color((uint)Convert.ToInt32(Program.commandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
