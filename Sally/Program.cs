@@ -118,6 +118,7 @@ namespace Sally
                     .Assembly.GetTypes()
                     .Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList();
 
+            LoggerService.Initialize();
             ApiRequestService.Initialize(BotConfiguration);
             VoiceRewardService.InitializeHandler(Client, BotConfiguration);
             UserManagerService.InitializeHandler(Client);

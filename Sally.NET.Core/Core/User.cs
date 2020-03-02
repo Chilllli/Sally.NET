@@ -1,4 +1,5 @@
 ﻿using Sally.NET.DataAccess.Database;
+using Sally.NET.Service;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -26,6 +27,7 @@ namespace Sally.NET.Core
                 {
                     xp = value;
                     OnLevelUp?.Invoke(this);
+                    LoggerService.levelUpLogger.Log($"{this.Id} has reached Level {this.Level}");
                 }
                 xp = value;
                 Update(this);

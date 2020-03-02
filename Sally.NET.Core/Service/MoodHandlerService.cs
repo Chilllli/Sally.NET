@@ -22,6 +22,8 @@ namespace Sally.NET.Service
         private static float pointsSum;
         private static List<DateTime> messageList = new List<DateTime>();
         private static bool onStart;
+        private static Mood oldMood;
+        private static Mood newMood;
         public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials)
         {
             MoodHandlerService.client = client;
@@ -45,14 +47,17 @@ namespace Sally.NET.Service
             //get start values
             DailyTimer_Elapsed(null, null);
             await checkWeather();
-            await setMood(getMood()).ConfigureAwait(false);
+            newMood = getMood();
+            await setMood(newMood).ConfigureAwait(false);
             onStart = false;
             client.MessageReceived += Client_MessageReceived;
         }
 
         private static async void ChangeMoodTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            await setMood(getMood());
+            oldMood = newMood;
+            newMood = getMood();
+            await setMood(newMood);
         }
 
         private static Task Client_MessageReceived(SocketMessage message)
@@ -126,9 +131,10 @@ namespace Sally.NET.Service
 #if RELEASE
             DatabaseAccess.Instance.saveMood(mood);
 
-            await client.SetActivityAsync(new Game(mood.ToString()));
             await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
 #endif
+            await client.SetActivityAsync(new Game(mood.ToString()));
+            LoggerService.moodLogger.Log($"Mood Changed: {oldMood} -> {newMood}");
         }
 
         private static double getMoodPoints()

@@ -18,11 +18,20 @@ namespace Sally.Command
             [Command("whois")]
             public async Task WhoIs(ulong userId)
             {
+                if(Context.Guild == null)
+                {
+                    await Context.Message.Channel.SendMessageAsync("This command can't be used here.");
+                    return;
+                }
                 //check if the user, which has written the message, has admin rights or is server owner
-                if ((Context.Message.Author as SocketGuildUser).Roles.ToList().FindAll(r => r.Permissions.Administrator) != null || Context.Message.Author.Id != Context.Guild.OwnerId)
+                if (isAuthorized())
                 {
                     await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you dont have the permissions to do this!");
                     return;
+                }
+                if(Program.MyGuild.Users.ToList().Find(u => u.Id == userId) == null)
+                {
+                    await Context.Message.Channel.SendMessageAsync("User couldn't be found.");
                 }
                 //user has admin rights
                 await Context.Message.Channel.SendMessageAsync($"{userId} => {Program.MyGuild.Users.ToList().Find(u => u.Id == userId)}");
@@ -30,8 +39,13 @@ namespace Sally.Command
             [Command("reverse")]
             public async Task ReverseUsernames()
             {
+                if (Context.Guild == null)
+                {
+                    await Context.Message.Channel.SendMessageAsync("This command can't be used here.");
+                    return;
+                }
                 //check if the user, which has written the message, has admin rights
-                if ((Context.Message.Author as SocketGuildUser).Roles.ToList().FindAll(r => r.Permissions.Administrator) != null || Context.Message.Author.Id != Context.Guild.OwnerId)
+                if (isAuthorized())
                 {
                     await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you dont have the permissions to do this!");
                     return;
@@ -44,6 +58,14 @@ namespace Sally.Command
                     await guildUser.ModifyAsync(u => u.Nickname = new String((guildUser.Nickname != null ? guildUser.Nickname : guildUser.Username).Reverse().ToArray())); 
                 }
             } 
+            private bool isAuthorized()
+            {
+                if((Context.Message.Author as SocketGuildUser)?.Roles.ToList().FindAll(r => r.Permissions.Administrator) == null || Context.Message.Author.Id != Context.Guild?.OwnerId)
+                {
+                    return false;
+                }
+                return true;
+            }
         }
 
 

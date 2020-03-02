@@ -26,4 +26,10 @@
     <ProjectReference Include="..\Sally.NET.Core\Sally.NET.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>bin\Debug\netcoreapp3.0\log4net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

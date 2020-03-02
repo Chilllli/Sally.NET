@@ -170,6 +170,8 @@ namespace Sally.NET.Service
             //Error Handler
             if (!result.IsSuccess)
                 await context.Channel.SendMessageAsync($"{result.ErrorReason} ¯\\_(ツ)_/¯");
+
+            LoggerService.commandLogger.Log($"{context.Message.Content} from {context.Message.Author}");
         }
 
         private static async Task HandleNaturalInput(Input input)

@@ -30,7 +30,7 @@ namespace Sally.Command
         }
 #if DEBUG
         [Command("getrich")]
-        public void QuickExp()
+        public async Task QuickExp()
         {
             //check if user has the specific role
             SocketGuildUser myGuildUser = Context.Message.Author as SocketGuildUser;
@@ -39,7 +39,7 @@ namespace Sally.Command
             {
                 return;
             }
-            if (myGuildUser.Roles.ToList().Find(r => r.Id == 483327985349558272) == null)
+            if (!isAuthorized())
             {
                 return;
             }
@@ -139,6 +139,14 @@ namespace Sally.Command
                 //error
                 await Context.Message.Channel.SendMessageAsync("Something went wrong");
             }
+        }
+        private bool isAuthorized()
+        {
+            if ((Context.Message.Author as SocketGuildUser)?.Roles.ToList().FindAll(r => r.Permissions.Administrator) == null || Context.Message.Author.Id != Context.Guild?.OwnerId)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
