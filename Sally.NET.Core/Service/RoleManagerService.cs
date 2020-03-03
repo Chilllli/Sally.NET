@@ -58,7 +58,7 @@ namespace Sally.NET.Service
                 //add new role to user
                 await guildUser.AddRoleAsync(myGuild.Roles.ToList().Find(r => r.Id == roleId));
             }
-            //CreateOrAddRole($"Level {user.Level}", user.Id, new[] { $"Level " });
+            CreateOrAddRole($"Level {user.Level}", user.Id, new[] { $"Level " });
         }
         public static async void CreateOrAddRole(string role, ulong id, string[] removeCriteria = null, Color? color = null)
         {
