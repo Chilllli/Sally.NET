@@ -23,7 +23,7 @@ namespace Sally.NET.Service
             User joinedUser = DatabaseAccess.Instance.users.Find(u => u.Id == userNew.Id);
             if (joinedUser == null)
             {
-                User user = new User(userNew.Id, 10, false);
+                User user = new User(userNew.Id, 500, false);
                 DatabaseAccess.Instance.InsertUser(user);
             }
             return Task.CompletedTask;
