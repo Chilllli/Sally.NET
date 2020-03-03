@@ -23,9 +23,9 @@ namespace Sally.NET.Service
         private static DiscordSocketClient client;
         private static BotCredentials credentials;
         private static CommandService commands;
+        public static Dictionary<ulong, char> IdPrefixCollection = new Dictionary<ulong, char>();
         private static List<Type> commandClasses;
         private static IServiceProvider services;
-        private static char prefix = '$';
         public static User messageAuthor { get; set; }
         private static int requestCounter;
         public static int RequestCounter 
@@ -41,11 +41,12 @@ namespace Sally.NET.Service
             } 
         }
 
-        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses)
+        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses, Dictionary<ulong, char> collection)
         {
             CommandHandlerService.client = client;
             CommandHandlerService.credentials = credentials;
             CommandHandlerService.commandClasses = commandClasses;
+            CommandHandlerService.IdPrefixCollection = collection;
             commands = new CommandService();
             services = new ServiceCollection()
               .AddSingleton(client)
@@ -62,9 +63,29 @@ namespace Sally.NET.Service
         /// <returns>Classified message including input</returns>
         private static Input ClassifyAs(SocketUserMessage message)
         {
+            char newPrefix;
             int argPos = 0;
 
-            if (message.HasCharPrefix(prefix, ref argPos))
+            //check if the correct prefix is used for the specific guild
+            //try casting channel to guild channel to aquire guild id
+            if(message.Channel is SocketGuildChannel guildChannel)
+            {
+                ulong guildId = guildChannel.Guild.Id;
+                if (!IdPrefixCollection.ContainsKey(guildId))
+                {
+                    //if dictonary doesn't contain guildid, create a new entry with "$" as default
+                    IdPrefixCollection.TryAdd(guildId, '$');
+                    
+                }
+                //get custom prefix from dictronary
+                newPrefix = IdPrefixCollection[guildId];
+            }
+            else
+            {
+                newPrefix = '$';
+            }
+
+            if (message.HasCharPrefix(newPrefix, ref argPos))
             {
                 return new Input { Type = InputType.Command, Message = message, ArgumentPosition = argPos };
             }

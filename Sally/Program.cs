@@ -70,6 +70,7 @@ namespace Sally
             private set;
         }
         private static int startValue;
+        private static Dictionary<ulong, char> prefixDictionary;
 
         public static void Main(string[] args)
         {
@@ -110,6 +111,21 @@ namespace Sally
             BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("configuration.json"));
             DatabaseAccess.Initialize(BotConfiguration.db_user, BotConfiguration.db_password, BotConfiguration.db_database);
 
+            if (!Directory.Exists("meta"))
+            {
+                Directory.CreateDirectory("meta");
+            }
+            if (!File.Exists("meta/prefix.json"))
+            {
+                File.Create("meta/prefix.json").Dispose();
+            }
+            prefixDictionary = new Dictionary<ulong, char>();
+            prefixDictionary = JsonConvert.DeserializeObject<Dictionary<ulong, char>>(File.ReadAllText("meta/prefix.json"));
+            if(prefixDictionary == null)
+            {
+                prefixDictionary = new Dictionary<ulong, char>();
+            }
+
             RequestCounter = Int32.Parse(File.ReadAllText("ApiRequests.txt"));
 
             Client = new DiscordSocketClient();
@@ -125,7 +141,7 @@ namespace Sally
             MoodDictionary.InitializeMoodDictionary(Client, BotConfiguration);
             WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration);
             RoleManagerService.InitializeHandler(BotConfiguration);
-            await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses);
+            await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary);
             await CacheService.InitializeHandler();
             Client.Ready += Client_Ready;
 
