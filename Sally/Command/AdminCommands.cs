@@ -21,23 +21,26 @@ namespace Sally.Command
             [Command("whois")]
             public async Task WhoIs(ulong userId)
             {
-                if(Context.Guild == null)
+                if (Context.Message.Channel is SocketGuildChannel guildChannel)
                 {
-                    await Context.Message.Channel.SendMessageAsync("This command can't be used here.");
-                    return;
+                    //check if the user, which has written the message, has admin rights or is server owner
+                    if (!isAuthorized())
+                    {
+                        await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you dont have the permissions to do this!");
+                        return;
+                    }
+                    if (Program.MyGuild.Users.ToList().Find(u => u.Id == userId) == null)
+                    {
+                        await Context.Message.Channel.SendMessageAsync("User couldn't be found.");
+                        return;
+                    }
+                    //user has admin rights
+                    await Context.Message.Channel.SendMessageAsync($"{userId} => {Program.MyGuild.Users.ToList().Find(u => u.Id == userId)}");
                 }
-                //check if the user, which has written the message, has admin rights or is server owner
-                if (isAuthorized())
+                else
                 {
-                    await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you dont have the permissions to do this!");
-                    return;
+                    
                 }
-                if(Program.MyGuild.Users.ToList().Find(u => u.Id == userId) == null)
-                {
-                    await Context.Message.Channel.SendMessageAsync("User couldn't be found.");
-                }
-                //user has admin rights
-                await Context.Message.Channel.SendMessageAsync($"{userId} => {Program.MyGuild.Users.ToList().Find(u => u.Id == userId)}");
             }
             [Command("reverse")]
             public async Task ReverseUsernames()
@@ -48,7 +51,7 @@ namespace Sally.Command
                     return;
                 }
                 //check if the user, which has written the message, has admin rights
-                if (isAuthorized())
+                if (!isAuthorized())
                 {
                     await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you dont have the permissions to do this!");
                     return;
@@ -58,12 +61,12 @@ namespace Sally.Command
                     //"remove" owner
                     if (guildUser.Id == Program.MyGuild.OwnerId)
                         continue;
-                    await guildUser.ModifyAsync(u => u.Nickname = new String((guildUser.Nickname != null ? guildUser.Nickname : guildUser.Username).Reverse().ToArray())); 
+                    await guildUser.ModifyAsync(u => u.Nickname = new String((guildUser.Nickname != null ? guildUser.Nickname : guildUser.Username).Reverse().ToArray()));
                 }
-            } 
+            }
             private bool isAuthorized()
             {
-                if((Context.Message.Author as SocketGuildUser)?.Roles.ToList().FindAll(r => r.Permissions.Administrator) == null || Context.Message.Author.Id != Context.Guild?.OwnerId)
+                if ((Context.Message.Author as SocketGuildUser)?.Roles.ToList().FindAll(r => r.Permissions.Administrator) == null)
                 {
                     return false;
                 }
@@ -77,7 +80,7 @@ namespace Sally.Command
                 {
                     //check if this user is an admin of the specific guild
                     SocketGuildUser user = guildChannel.Guild.Users.ToList().Find(u => u.Id == Context.Message.Author.Id);
-                    if (user.Roles.ToList().Find(r => r.Permissions.Administrator) != null)
+                    if (isAuthorized())
                     {
                         CommandHandlerService.IdPrefixCollection[guildChannel.Guild.Id] = prefix;
                         File.WriteAllText("meta/prefix.json", JsonConvert.SerializeObject(CommandHandlerService.IdPrefixCollection));
@@ -93,6 +96,133 @@ namespace Sally.Command
                     //channel isn't a guild channel
                     await Context.Message.Channel.SendMessageAsync("This command has no effect here. Try using it on a guild.");
                 }
+            }
+
+            [Command("addrole")]
+            public async Task AddRankRole(int index, ulong roleId)
+            {
+                if (Context.Message.Channel is SocketGuildChannel guildChannel)
+                {
+                    if (!isAuthorized())
+                    {
+                        await Context.Message.Channel.SendMessageAsync("You have no permission for this command.");
+                        return;
+                    }
+                    ulong guildId = guildChannel.Guild.Id;
+                    SocketGuild guild = guildChannel.Guild;
+                    Dictionary<int, ulong> guildRankRoleCollection = new Dictionary<int, ulong>();
+                    guildRankRoleCollection = RoleManagerService.RankRoleCollection[guildId];
+                    if (index > 500)
+                    {
+                        await Context.Message.Channel.SendMessageAsync("Desired level is too high.");
+                        return;
+                    }
+                    if (guild.Roles.ToList().Find(r => r.Id == roleId) == null)
+                    {
+                        await Context.Message.Channel.SendMessageAsync("There is no role with this id on this guild.");
+                        return;
+                    }
+                    if (guildRankRoleCollection.Count >= 20)
+                    {
+                        await Context.Message.Channel.SendMessageAsync("You can't add anymore roles.");
+                        return;
+                    }
+                    if (guildRankRoleCollection.Values.ToList().Contains(roleId))
+                    {
+                        await Context.Message.Channel.SendMessageAsync("You have already added this role.");
+                        return;
+                    }
+                    if (!guildRankRoleCollection.ContainsKey(index))
+                    {
+                        guildRankRoleCollection.Add(index, roleId);
+                    }
+                    guildRankRoleCollection[index] = roleId;
+                    RoleManagerService.RankRoleCollection[guildId] = guildRankRoleCollection;
+                    RoleManagerService.SaveRankRoleCollection();
+                    await Context.Message.Channel.SendMessageAsync($"{guild.Roles.ToList().Find(r => r.Id == roleId).Name} was added with Level {index}.");
+                }
+                else
+                {
+                    await Context.Message.Channel.SendMessageAsync("You can only perfom this command on a server.");
+                }
+            }
+
+            [Command("rmrole")]
+            public async Task RemoveRankRole(int index)
+            {
+                if (Context.Message.Channel is SocketGuildChannel guildChannel)
+                {
+                    //check if user has admin priviliges
+                    if (!isAuthorized())
+                    {
+                        await Context.Message.Channel.SendMessageAsync("You cant do this.");
+                        return;
+                    }
+                    ulong guildId = guildChannel.Guild.Id;
+                    SocketGuild guild = guildChannel.Guild;
+                    Dictionary<int, ulong> guildRankRoleCollection = new Dictionary<int, ulong>();
+                    guildRankRoleCollection = RoleManagerService.RankRoleCollection[guildId];
+                    if (guildRankRoleCollection == null)
+                    {
+                        await Context.Message.Channel.SendMessageAsync("There are no roles to remove.");
+                        return;
+                    }
+                    //if (guild.Roles.ToList().Find(r => r.Id == roleId) == null)
+                    //{
+                    //    await Context.Message.Channel.SendMessageAsync("This role dont exist on this server.");
+                    //    return;
+                    //}
+                    //if (guildRankRoleCollection.Values.ToList().Contains(roleId))
+                    //{
+                    //    await Context.Message.Channel.SendMessageAsync("You cant remove this role, because it was never added.");
+                    //    return;
+                    //}
+                    if (!guildRankRoleCollection.ContainsKey(index))
+                    {
+                        await Context.Message.Channel.SendMessageAsync("The current index is not in your role collection.");
+                        return;
+                    }
+                    guildRankRoleCollection.Remove(index);
+                    RoleManagerService.SaveRankRoleCollection();
+                    await Context.Message.Channel.SendMessageAsync("Role successfully removed.");
+                }
+                else
+                {
+                    await Context.Message.Channel.SendMessageAsync("This is a server command only.");
+                }
+            }
+        }
+
+        [Command("showroles")]
+        public async Task ShowRankRoles()
+        {
+            if (Context.Message.Channel is SocketGuildChannel guildChannel)
+            {
+                ulong guildId = guildChannel.Guild.Id;
+                SocketGuild guild = guildChannel.Guild;
+                Dictionary<int, ulong> guildRankRoleCollection = new Dictionary<int, ulong>();
+                guildRankRoleCollection = RoleManagerService.RankRoleCollection[guildId];
+                if (guildRankRoleCollection.Count == 0)
+                {
+                    await Context.Message.Channel.SendMessageAsync("You didnt added rank roles yet.");
+                    return;
+                }
+                EmbedBuilder embed = new EmbedBuilder()
+                    .WithTitle("Current Rank Roles")
+                    .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)
+                    .WithTimestamp(DateTime.Now);
+
+                foreach (KeyValuePair<int, ulong> entry in guildRankRoleCollection)
+                {
+                    SocketRole rankRole = guild.Roles.ToList().Find(r => r.Id == entry.Value);
+                    embed.AddField(entry.Key.ToString(), rankRole.Name);
+                }
+
+                await Context.Message.Channel.SendMessageAsync(embed: embed.Build());
+            }
+            else
+            {
+                await Context.Message.Channel.SendMessageAsync("You can only perfom this command on a server.");
             }
         }
 

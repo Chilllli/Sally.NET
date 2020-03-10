@@ -31,14 +31,15 @@ namespace Sally.NET.Service
             {
                 return;
             }
-            User currentUser = DatabaseAccess.Instance.users.Find(u => u.Id == disUser.Id);
+            User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == disUser.Id);
+            GuildUser guildUser = currentUser.GuildSpecificUser[voiceStateOld.VoiceChannel.Guild.Id];
             if (!currentUser.HasMuted && (DateTime.Now - currentUser.LastFarewell).TotalHours > 12)
             {
                 //send private message
                 await disUser.SendMessageAsync(MoodDictionary.getMoodMessage("Bye"));//Bye
                 currentUser.LastFarewell = DateTime.Now;
             }
-            stopTrackingVoiceChannel(DatabaseAccess.Instance.users.Find(u => u.Id == disUser.Id));
+            stopTrackingVoiceChannel(guildUser);
         }
 
         private static async Task voiceChannelJoined(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
@@ -48,26 +49,28 @@ namespace Sally.NET.Service
             {
                 return;
             }
-            User currentUser = DatabaseAccess.Instance.users.Find(u => u.Id == disUser.Id);
+            User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == disUser.Id);
+            GuildUser guildUser = currentUser.GuildSpecificUser[voiceStateNew.VoiceChannel.Guild.Id];
             if (!currentUser.HasMuted && (DateTime.Now - currentUser.LastGreeting).TotalHours > 12)
             {
                 //send private message
                 await disUser.SendMessageAsync(String.Format(MoodDictionary.getMoodMessage("Hello"), disUser.Username));//Hello
                 currentUser.LastGreeting = DateTime.Now;
             }
-            StartTrackingVoiceChannel(currentUser);
+            StartTrackingVoiceChannel(guildUser);
         }
 
-        public static void StartTrackingVoiceChannel(User user)
+        public static void StartTrackingVoiceChannel(GuildUser guildUser)
         {
-            user.LastXpTime = DateTime.Now;
-            user.XpTimer = new Timer(credentials.xpTimerInMin * 1000 * 60);
-            user.XpTimer.Elapsed += (s, e) => trackVoiceChannel(user);
+            guildUser.LastXpTime = DateTime.Now;
+            guildUser.XpTimer = new Timer(credentials.xpTimerInMin * 1000 * 60);
+            guildUser.XpTimer.Start();
+            guildUser.XpTimer.Elapsed += (s, e) => trackVoiceChannel(guildUser);
         }
 
-        private static void trackVoiceChannel(User user)
+        private static void trackVoiceChannel(GuildUser guildUser)
         {
-            SocketGuildUser trackedUser = (client.Guilds.Where(g => g.Id == credentials.guildId).First()).Users.ToList().Find(u => u.Id == user.Id);
+            SocketGuildUser trackedUser = client.GetGuild(guildUser.GuildId).Users.ToList().Find(u => u.Id == guildUser.Id);
             if (trackedUser == null)
             {
                 return;
@@ -76,14 +79,14 @@ namespace Sally.NET.Service
             {
                 return;
             }
-            user.Xp += credentials.gainedXp;
-            user.LastXpTime = DateTime.Now;
+            guildUser.Xp += credentials.gainedXp;
+            guildUser.LastXpTime = DateTime.Now;
         }
 
-        private static void stopTrackingVoiceChannel(User user)
+        private static void stopTrackingVoiceChannel(GuildUser guildUser)
         {
-            user.XpTimer.Stop();
-            user.Xp += (int)Math.Round(((DateTime.Now - user.LastXpTime).TotalMilliseconds / (credentials.xpTimerInMin * 1000 * 60)) * credentials.gainedXp);
+            guildUser.XpTimer.Stop();
+            guildUser.Xp += (int)Math.Round(((DateTime.Now - guildUser.LastXpTime).TotalMilliseconds / (credentials.xpTimerInMin * 1000 * 60)) * credentials.gainedXp);
         }
     }
 }

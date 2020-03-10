@@ -27,7 +27,7 @@ namespace Sally.Command
                 return;
             }
 
-            User currentUser = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+            User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
             currentUser.WeatherLocation = location;
             currentUser.NotifierTime = notiferTime;
             await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author}, you successfully subbed to weather notifications.");
@@ -35,7 +35,7 @@ namespace Sally.Command
         [Command("unsub2weather")]
         public async Task UnSubToService()
         {
-            User currentUser = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+            User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
             currentUser.WeatherLocation = null;
             currentUser.NotifierTime = null;
             await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author}, you successfully unsubbed to weather notifications.");

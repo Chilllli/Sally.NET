@@ -59,7 +59,7 @@ namespace Sally
                 File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
             }
         }
-        public static string GenericFooter 
+        public static string GenericFooter
         {
             get;
             private set;
@@ -90,6 +90,7 @@ namespace Sally
 
         public async Task MainAsync()
         {
+            LoggerService.Initialize();
             StartTime = DateTime.Now;
             string[] moods = { "Sad", "Meh", "Happy", "Extatic" };
             if (!Directory.Exists("mood"))
@@ -121,7 +122,7 @@ namespace Sally
             }
             prefixDictionary = new Dictionary<ulong, char>();
             prefixDictionary = JsonConvert.DeserializeObject<Dictionary<ulong, char>>(File.ReadAllText("meta/prefix.json"));
-            if(prefixDictionary == null)
+            if (prefixDictionary == null)
             {
                 prefixDictionary = new Dictionary<ulong, char>();
             }
@@ -134,17 +135,16 @@ namespace Sally
                     .Assembly.GetTypes()
                     .Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList();
 
-            LoggerService.Initialize();
             ApiRequestService.Initialize(BotConfiguration);
             VoiceRewardService.InitializeHandler(Client, BotConfiguration);
             UserManagerService.InitializeHandler(Client);
             MoodDictionary.InitializeMoodDictionary(Client, BotConfiguration);
             WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration);
-            RoleManagerService.InitializeHandler(BotConfiguration);
             await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary);
             await CacheService.InitializeHandler();
-            Client.Ready += Client_Ready;
 
+            Client.Connected += Client_Connected;
+            Client.Ready += Client_Ready;
             Client.Log += Log;
 
             await Client.LoginAsync(TokenType.Bot, BotConfiguration.token);
@@ -154,6 +154,44 @@ namespace Sally
             await Task.Delay(-1);
         }
 
+        private Task Client_Connected()
+        {
+           
+            return Task.CompletedTask;
+        }
+        private void checkNewUserEntries()
+        {
+            List<SocketGuild> guilds = Client.Guilds.ToList();
+            foreach (SocketGuild guild in guilds)
+            {
+                List<SocketGuildUser> guildUsers = guild.Users.ToList();
+                foreach (SocketGuildUser guildUser in guildUsers)
+                {
+                    if (guildUser.Id == BotConfiguration.meId)
+                    {
+                        Me = guildUser as SocketUser;
+                    }
+                    //check if user exist in global instance
+                    User myUser = DatabaseAccess.Instance.Users.Find(u => u.Id == guildUser.Id);
+                    if (myUser == null)
+                    {
+                        DatabaseAccess.Instance.InsertUser(new User(guildUser.Id, true));
+                    }
+                    myUser = DatabaseAccess.Instance.Users.Find(u => u.Id == guildUser.Id);
+                    //check if guilduser exist in guild instance
+                    if (!myUser.GuildSpecificUser.ContainsKey(guild.Id))
+                    {
+                        DatabaseAccess.Instance.InsertGuildUser(guild.Id, new GuildUser(guildUser.Id, guild.Id, 500));
+                    }
+                    //check if user is already in a voice channel
+                    if (guildUser.VoiceChannel != null)
+                    {
+                        //start tracking if user detected
+                        VoiceRewardService.StartTrackingVoiceChannel(myUser.GuildSpecificUser[guild.Id]);
+                    }
+                }
+            }
+        }
         private Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
@@ -165,26 +203,10 @@ namespace Sally
             GenericFooter = "Provided by Sally, your friendly and helpful Discordbot!";
             GenericThumbnailUrl = "https://static-cdn.jtvnw.net/emoticons/v1/279825/3.0";
 
-            MyGuild = Client.Guilds.Where(g => g.Id == BotConfiguration.guildId).First();
-            foreach (SocketGuildUser user in MyGuild.Users)
-            {
-                if (DatabaseAccess.Instance.users.Find(u => u.Id == user.Id) == null)
-                {
-                    DatabaseAccess.Instance.InsertUser(new User(user.Id, 10, false));
-                }
-                //check if user is already in a voice channel
-                if (user.VoiceChannel != null)
-                {
-                    //start tracking if user detected
-                    VoiceRewardService.StartTrackingVoiceChannel(DatabaseAccess.Instance.users.Find(u => u.Id == user.Id));
-                }
-                if (user.Id == BotConfiguration.meId)
-                {
-                    Me = user as SocketUser;
-                }
-            }
+            checkNewUserEntries();
             StatusNotifierService.InitializeService(Me);
             MusicCommands.Initialize(Client);
+            RoleManagerService.InitializeHandler(Client, BotConfiguration);
             switch (startValue)
             {
                 case 0:
@@ -203,7 +225,7 @@ namespace Sally
                     break;
             }
             await MoodHandlerService.InitializeHandler(Client, BotConfiguration);
-            
+
         }
     }
 }

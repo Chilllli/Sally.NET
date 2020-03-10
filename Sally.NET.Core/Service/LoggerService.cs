@@ -11,9 +11,9 @@ namespace Sally.NET.Service
 {
     public static class LoggerService
     {
-        private static readonly string commandFile = @".\log\command";
-        private static readonly string moodFile = @".\log\mood";
-        private static readonly string levelUpFile = @".\log\levelUp";
+        private static readonly string commandFile = "./log/command.txt";
+        private static readonly string moodFile = "./log/mood.txt";
+        private static readonly string levelUpFile = "./log/levelUp.txt";
         public static Logger commandLogger;
         public static Logger moodLogger;
         public static Logger levelUpLogger;

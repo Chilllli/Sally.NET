@@ -233,7 +233,7 @@ namespace Sally.NET.Service
                 return;
             }
 
-            messageAuthor = DatabaseAccess.Instance.users.Find(u => u.Id == message.Author.Id);
+            messageAuthor = DatabaseAccess.Instance.Users.Find(u => u.Id == message.Author.Id);
 
             //await MessageHandlerService.DeleteStartMessages(message);
             Input input = ClassifyAs(message);

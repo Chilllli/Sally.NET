@@ -17,7 +17,6 @@ namespace Sally.NET.Service
     {
         private static DiscordSocketClient client;
         private static BotCredentials credentials;
-        private static SocketGuild myGuild;
         private static double dailyPoints;
         private static float pointsSum;
         private static List<DateTime> messageList = new List<DateTime>();
@@ -28,7 +27,6 @@ namespace Sally.NET.Service
         {
             MoodHandlerService.client = client;
             MoodHandlerService.credentials = credentials;
-            myGuild = client.Guilds.Where(g => g.Id == credentials.guildId).First();
             //set start to true
             onStart = true;
             //Initialize Timer
@@ -89,7 +87,7 @@ namespace Sally.NET.Service
             //clouds.all 10%,
             pointsSum += calculateWeatherPoints(50f, 10f, 0.1f, (float)temperature.clouds.all);
             //rain.1h 0.2 10%,
-            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.rain != null ? (float)temperature.rain["1h"] : 0f);
+            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, 0f);//temperature.rain != null ? (float)temperature.rain["1h"] : 0f);
             //pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, 0.5f);
             //snow.1h 0.1 10% 
             pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.snow != null ? (float)temperature.snow["1h"] : 0f);
@@ -147,7 +145,42 @@ namespace Sally.NET.Service
             //  how many users are currently logged in
             //  if there are users in voice channels
             // how many messages were send to sally
-            return (dailyPoints + pointsSum + (myGuild.Users.ToList().Count(u => u.Status != Discord.UserStatus.Offline) / (double)myGuild.Users.Count) + (myGuild.Users.ToList().Find(u => u.VoiceChannel != null) != null ? 1 : 0) + (1 - 1 / (1 + messageCounter()))) / (onStart ? 3.0f : 5.0f);
+            return (dailyPoints + pointsSum + (getAllOnlineUser() / getAllUser()) + (voiceChannelWatcher() ? 1 : 0) + (1 - 1 / (1 + messageCounter()))) / (onStart ? 3.0f : 5.0f);
+        }
+
+        private static double getAllOnlineUser()
+        {
+            List<SocketGuild> guilds = client.Guilds.ToList();
+            double totalOnlineUser = 0.0;
+            foreach (SocketGuild guild in guilds)
+            {
+                totalOnlineUser += (double)guild.Users.ToList().Count(u => u.Status != UserStatus.Offline);
+            }
+            return totalOnlineUser;
+        }
+
+        private static double getAllUser()
+        {
+            List<SocketGuild> guilds = client.Guilds.ToList();
+            double totalUser = 0.0;
+            foreach (SocketGuild guild in guilds)
+            {
+                totalUser += (double)guild.Users.Count();
+            }
+            return totalUser;
+        }
+
+        private static bool voiceChannelWatcher()
+        {
+            List<SocketGuild> guilds = client.Guilds.ToList();
+            foreach (SocketGuild guild in guilds)
+            {
+                if(guild.Users.ToList().Find(u => u.VoiceChannel != null) != null)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

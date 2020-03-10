@@ -10,43 +10,6 @@ namespace Sally.NET.Core
     public class User
     {
         public ulong Id { get; private set; }
-        private int xp;
-        public int Xp
-        {
-            get
-            {
-                return xp;
-            }
-            set
-            {
-                if (value < 0)
-                {
-                    value = 0;
-                }
-                if (Level < getLevelFromXp(value))
-                {
-                    xp = value;
-                    OnLevelUp?.Invoke(this);
-                    LoggerService.levelUpLogger.Log($"{this.Id} has reached Level {this.Level}");
-                }
-                xp = value;
-                Update(this);
-            }
-        }
-        public Timer XpTimer;
-        public DateTime LastXpTime;
-
-        public int Level
-        {
-            get
-            {
-                return getLevelFromXp(Xp);
-            }
-        }
-        public delegate void LevelUp(User user);
-
-        //why is this event static?
-        public static event LevelUp OnLevelUp;
         private bool hasMuted;
         public bool HasMuted
         {
@@ -105,18 +68,15 @@ namespace Sally.NET.Core
             }
         }
 
-        public User(ulong id, int xp, bool mute, string weatherLocation = null, TimeSpan? notifierTime = null, string embedColor = null)
+        public Dictionary<ulong, GuildUser> GuildSpecificUser = new Dictionary<ulong, GuildUser>();
+
+        public User(ulong id, bool mute, string weatherLocation = null, TimeSpan? notifierTime = null, string embedColor = null)
         {
             Id = id;
-            this.xp = xp;
             hasMuted = mute;
             this.weatherLocation = weatherLocation;
             this.notifierTime = notifierTime;
             this.embedColor = embedColor;
-        }
-        public static int getLevelFromXp(int xp)
-        {
-            return (int)Math.Floor(Math.Sqrt((xp - 200) / (double)300) + Math.Sqrt((xp - 200) / (double)500));
         }
 
         private void Update(User user)

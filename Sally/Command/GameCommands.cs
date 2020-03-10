@@ -61,22 +61,30 @@ namespace Sally.Command
             [Command("setRank")]
             public async Task setPlayerRank(Rank rank, int level = 0)
             {
-                if (level != 0 && rank == Rank.GrandChampion)
+                if (Context.Message.Channel is SocketGuildChannel guildChannel)
                 {
-                    await Context.Message.Channel.SendMessageAsync("invalid operation");
-                    return;
-                }
-                if (level > 3 || level < 1)
-                {
-                    await Context.Message.Channel.SendMessageAsync("invalid rank level");
-                    return;
-                }
-                Type enumType = typeof(Rank);
-                MemberInfo[] memInfo = enumType.GetMember(rank.ToString());
-                Object[] attributes = memInfo[0].GetCustomAttributes(typeof(RankAttribute), false);
-                Color color = ((RankAttribute)attributes[0]).color;
+                    if (level != 0 && rank == Rank.GrandChampion)
+                    {
+                        await Context.Message.Channel.SendMessageAsync("invalid operation");
+                        return;
+                    }
+                    if (level > 3 || level < 1)
+                    {
+                        await Context.Message.Channel.SendMessageAsync("invalid rank level");
+                        return;
+                    }
+                    Type enumType = typeof(Rank);
+                    MemberInfo[] memInfo = enumType.GetMember(rank.ToString());
+                    Object[] attributes = memInfo[0].GetCustomAttributes(typeof(RankAttribute), false);
+                    Color color = ((RankAttribute)attributes[0]).color;
 
-                RoleManagerService.CreateOrAddRole(rank != Rank.GrandChampion ? $"{rank} {level}" : rank.ToString(), Context.Message.Author.Id, Enum.GetNames(typeof(Rank)), color);
+                    RoleManagerService.CreateOrAddRole(guildChannel.Guild, rank != Rank.GrandChampion ? $"{rank} {level}" : rank.ToString(), Context.Message.Author.Id, Enum.GetNames(typeof(Rank)), color);
+                }
+                else
+                {
+                    await Context.Message.Channel.SendMessageAsync("This is a server command only.");
+                }
+
             }
         }
 

@@ -16,7 +16,7 @@ namespace Sally.Command
         [Command("mute")]
         public async Task MuteBot()
         {
-            User user = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+            User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
             user.HasMuted = true;
             await Context.Message.Channel.SendMessageAsync("The bot is muted now");
         }
@@ -24,7 +24,7 @@ namespace Sally.Command
         [Command("unmute")]
         public async Task UnmuteBot()
         {
-            User user = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+            User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
             user.HasMuted = false;
             await Context.Message.Channel.SendMessageAsync("The bot is unmuted now");
         }
@@ -43,8 +43,16 @@ namespace Sally.Command
             {
                 return;
             }
-            User user = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
-            user.Xp += 10000;
+            User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
+            if (Context.Message.Channel is SocketGuildChannel guildChannel)
+            {
+                GuildUser guildUser = user.GuildSpecificUser[guildChannel.Guild.Id];
+                guildUser.Xp += 10000;
+            }
+            else
+            {
+                return;
+            }
         }
 #endif
         //Math.Floor(-50 * (15 * Math.Sprt(15) * Math.Pow(y, 2) - 60 * Math.Pow(y, 2) - 4))
@@ -52,16 +60,38 @@ namespace Sally.Command
         public async Task LevelOverview()
         {
             User myUser = CommandHandlerService.messageAuthor;
-            EmbedBuilder lvlEmbed = new EmbedBuilder()
-                .WithAuthor($"To {Context.Message.Author}")
-                .WithTimestamp(DateTime.Now)
-                .WithTitle("Personal Level/Exp Overview")
-                .WithDescription("Check how much xp you miss for the next level up.")
-                .AddField("Current Level", myUser.Level)
-                .AddField("Xp needed until level up", (Math.Floor(-50 * (15 * Math.Sqrt(15) * Math.Pow(myUser.Level + 1, 2) - 60 * Math.Pow(myUser.Level + 1, 2) - 4))) - myUser.Xp)
-                .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
+            if (Context.Message.Channel is SocketGuildChannel guildChannel)
+            {
+                //message from guild
+                EmbedBuilder lvlEmbed = new EmbedBuilder()
+                    .WithAuthor($"To {Context.Message.Author}")
+                    .WithTimestamp(DateTime.Now)
+                    .WithTitle("Personal Level/Exp Overview")
+                    .WithDescription("Check how much xp you miss for the next level up.")
+                    .WithThumbnailUrl(Context.Message.Author.GetAvatarUrl())
+                    .AddField("Current Global Level", myUser.GuildSpecificUser.Sum(x => x.Value.Level) / myUser.GuildSpecificUser.Count)
+                    .AddField($"Current \"{guildChannel.Guild.Name}\" Level", myUser.GuildSpecificUser[guildChannel.Guild.Id].Level)
+                .AddField("Xp needed until level up", (Math.Floor(-50 * (15 * Math.Sqrt(15) * Math.Pow(myUser.GuildSpecificUser[guildChannel.Guild.Id].Level + 1, 2) - 60 * Math.Pow(myUser.GuildSpecificUser[guildChannel.Guild.Id].Level + 1, 2) - 4))) - myUser.GuildSpecificUser[guildChannel.Guild.Id].Xp)
+                    .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
                 .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
-            await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
+                await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
+                return;
+            }
+            else
+            {
+                //message from dm channel
+                EmbedBuilder lvlEmbed = new EmbedBuilder()
+                    .WithAuthor($"To {Context.Message.Author}")
+                    .WithTimestamp(DateTime.Now)
+                    .WithTitle("Personal Level/Exp Overview")
+                    .WithDescription("Check how much xp you miss for the next level up.")
+                    .WithThumbnailUrl(Context.Message.Author.GetAvatarUrl())
+                    .AddField("Current Global Level", myUser.GuildSpecificUser.Sum(x => x.Value.Level) / myUser.GuildSpecificUser.Count)
+                    .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
+                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
+                await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
+                return;
+            }
         }
 
         //[Command("start")]
@@ -103,7 +133,7 @@ namespace Sally.Command
             [Command("isMuted")]
             public async Task ShowMuteStatus()
             {
-                User user = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+                User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
                 if(user.HasMuted)
                 {
                     await Context.Message.Channel.SendMessageAsync($"The bot is currently muted for you.");
@@ -125,7 +155,7 @@ namespace Sally.Command
                 if (hexColor < 16777216 && hexColor >= 0)
                 {
                     //hex value is in range
-                    User user = DatabaseAccess.Instance.users.Find(u => u.Id == Context.Message.Author.Id);
+                    User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
                     user.EmbedColor = result;
                     await Context.Message.Channel.SendMessageAsync("you have sucessfully set your color");
                 }

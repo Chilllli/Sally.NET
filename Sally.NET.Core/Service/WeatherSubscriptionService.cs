@@ -29,7 +29,7 @@ namespace Sally.NET.Service
 
         private static async void CheckWeather_Elapsed(object sender, ElapsedEventArgs e)
         {
-            foreach (User user in DatabaseAccess.Instance.users)
+            foreach (User user in DatabaseAccess.Instance.Users)
             {
                 if (user.NotifierTime == null || user.WeatherLocation == null)
                     continue;
