@@ -28,17 +28,17 @@ namespace Sally.NET.Service
         private static IServiceProvider services;
         public static User messageAuthor { get; set; }
         private static int requestCounter;
-        public static int RequestCounter 
-        { 
-            get 
+        public static int RequestCounter
+        {
+            get
             {
                 return requestCounter;
-            } 
-            set 
+            }
+            set
             {
                 requestCounter = value;
                 File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
-            } 
+            }
         }
 
         public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses, Dictionary<ulong, char> collection)
@@ -53,7 +53,13 @@ namespace Sally.NET.Service
               .AddSingleton<InteractiveService>()
               .BuildServiceProvider();
             client.MessageReceived += CommandHandler;
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+            AppDomain appDomain = AppDomain.CurrentDomain;
+            Assembly[] assemblies = appDomain.GetAssemblies();
+            foreach (Assembly assembly in assemblies)
+            {
+                await commands.AddModulesAsync(assembly, services);
+            }
+
         }
 
         /// <summary>
@@ -68,14 +74,14 @@ namespace Sally.NET.Service
 
             //check if the correct prefix is used for the specific guild
             //try casting channel to guild channel to aquire guild id
-            if(message.Channel is SocketGuildChannel guildChannel)
+            if (message.Channel is SocketGuildChannel guildChannel)
             {
                 ulong guildId = guildChannel.Guild.Id;
                 if (!IdPrefixCollection.ContainsKey(guildId))
                 {
                     //if dictonary doesn't contain guildid, create a new entry with "$" as default
                     IdPrefixCollection.TryAdd(guildId, '$');
-                    
+
                 }
                 //get custom prefix from dictronary
                 newPrefix = IdPrefixCollection[guildId];

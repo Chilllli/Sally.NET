@@ -16,12 +16,12 @@ namespace Sally.NET.Service
     public static class WeatherSubscriptionService
     {
         public static DiscordSocketClient client { get; set; }
-        public static BotCredentials credentials { get; set; }
+        //public static BotCredentials credentials { get; set; }
 
         public static void InitializeWeatherSub(DiscordSocketClient client, BotCredentials credentials)
         {
             WeatherSubscriptionService.client = client;
-            WeatherSubscriptionService.credentials = credentials;
+            //WeatherSubscriptionService.credentials = credentials;
             Timer checkWeather = new Timer(60 * 1000);
             checkWeather.Start();
             checkWeather.Elapsed += CheckWeather_Elapsed;
@@ -35,7 +35,7 @@ namespace Sally.NET.Service
                     continue;
                 if (!(DateTime.Now.Hour == user.NotifierTime.Value.Hours && DateTime.Now.Minute == user.NotifierTime.Value.Minutes))
                     continue;
-                SocketUser disUser = (client.Guilds.Where(g => g.Id == credentials.guildId).First()).Users.ToList().Find(u => u.Id == user.Id) as SocketUser;
+                SocketUser disUser = client.GetUser(user.Id);
                 if (disUser == null)
                     continue;
 

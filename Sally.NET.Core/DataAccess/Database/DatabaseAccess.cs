@@ -31,7 +31,7 @@ namespace Sally.NET.DataAccess.Database
             databaseWriter.Start();
         }
 
-        private static void databaseQueueLoop()
+        private static async void databaseQueueLoop()
         {
             while (true)
             {
@@ -41,7 +41,7 @@ namespace Sally.NET.DataAccess.Database
                 }
                 else
                 {
-                    Task.Delay(100);
+                    await Task.Delay(100);
                 }
             }
         }

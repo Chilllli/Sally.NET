@@ -13,6 +13,7 @@ using Sally.NET.Service;
 using System.Collections.Generic;
 using Discord.Commands;
 using Sally.NET.Core;
+using System.Reflection;
 
 namespace Sally
 {
@@ -90,13 +91,11 @@ namespace Sally
 
         public async Task MainAsync()
         {
+            InitializeDirectories();
             LoggerService.Initialize();
             StartTime = DateTime.Now;
             string[] moods = { "Sad", "Meh", "Happy", "Extatic" };
-            if (!Directory.Exists("mood"))
-            {
-                Directory.CreateDirectory("mood");
-            }
+            
             //download content
             using (var client = new WebClient())
             {
@@ -111,15 +110,12 @@ namespace Sally
 
             BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("configuration.json"));
             DatabaseAccess.Initialize(BotConfiguration.db_user, BotConfiguration.db_password, BotConfiguration.db_database);
-
-            if (!Directory.Exists("meta"))
-            {
-                Directory.CreateDirectory("meta");
-            }
+            
             if (!File.Exists("meta/prefix.json"))
             {
                 File.Create("meta/prefix.json").Dispose();
             }
+            //store in database
             prefixDictionary = new Dictionary<ulong, char>();
             prefixDictionary = JsonConvert.DeserializeObject<Dictionary<ulong, char>>(File.ReadAllText("meta/prefix.json"));
             if (prefixDictionary == null)
@@ -131,17 +127,7 @@ namespace Sally
 
             Client = new DiscordSocketClient();
 
-            List<Type> commandClasses = typeof(GeneralCommands)
-                    .Assembly.GetTypes()
-                    .Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList();
-
-            ApiRequestService.Initialize(BotConfiguration);
             VoiceRewardService.InitializeHandler(Client, BotConfiguration);
-            UserManagerService.InitializeHandler(Client);
-            MoodDictionary.InitializeMoodDictionary(Client, BotConfiguration);
-            WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration);
-            await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary);
-            await CacheService.InitializeHandler();
 
             Client.Connected += Client_Connected;
             Client.Ready += Client_Ready;
@@ -200,6 +186,14 @@ namespace Sally
 
         private async Task Client_Ready()
         {
+            AddonLoader.Load(Client);
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            List<Type> commandClasses = new List<Type>();
+
+            foreach (Assembly assembly in assemblies)
+            {
+                commandClasses.AddRange(assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList());
+            }
             GenericFooter = "Provided by Sally, your friendly and helpful Discordbot!";
             GenericThumbnailUrl = "https://static-cdn.jtvnw.net/emoticons/v1/279825/3.0";
 
@@ -207,6 +201,12 @@ namespace Sally
             StatusNotifierService.InitializeService(Me);
             MusicCommands.Initialize(Client);
             RoleManagerService.InitializeHandler(Client, BotConfiguration);
+            ApiRequestService.Initialize(BotConfiguration);
+            UserManagerService.InitializeHandler(Client);
+            MoodDictionary.InitializeMoodDictionary(Client, BotConfiguration);
+            WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration);
+            await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary);
+            await CacheService.InitializeHandler();
             switch (startValue)
             {
                 case 0:
@@ -225,7 +225,24 @@ namespace Sally
                     break;
             }
             await MoodHandlerService.InitializeHandler(Client, BotConfiguration);
+        }
 
+        private void InitializeDirectories()
+        {
+            string[] directories = {
+                "mood",
+                "meta",
+                "addons",
+                "cached"
+            };
+
+            foreach (string directory in directories)
+            {
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+            }
         }
     }
 }
