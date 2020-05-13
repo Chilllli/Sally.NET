@@ -7,12 +7,12 @@ Sally is a friendly multipurpose discordbot. She provides many game integrations
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/made-with-c-sharp.svg)](https://forthebadge.com) [![ForTheBadge powered-by-electricity](http://ForTheBadge.com/images/badges/powered-by-electricity.svg)](http://ForTheBadge.com)
 
 # Overview
-* [Commands](##Commands)
-* [Features](##Features)
+* [Commands](#commands)
+* [Features](#features)
 	* Integrations
 	* Build-In Feature
-* [Self-hosting](##Self-hosting)
-* [Support](##Support)
+* [Self-hosting](#self-hosting)
+* [Support](#support)
 ## Commands
 All Commands can be found on the webpage: https://its-sally.net/commands
 It will be updated regularly. 
