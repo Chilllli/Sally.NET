@@ -218,10 +218,6 @@ namespace Sally.NET.Service
             string formattedTagString = tagUrl.Replace("%20", " ");
             formattedTagString = formattedTagString.Remove(formattedTagString.Length - 1);
             const string tagJsonPath = "meta/tagPopularity.json";
-            if (!Directory.Exists("meta"))
-            {
-                Directory.CreateDirectory("meta");
-            }
             //check if json file exists
             if (!File.Exists(tagJsonPath))
             {
@@ -254,10 +250,6 @@ namespace Sally.NET.Service
         private static void saveJsonToFile(List<KonachanApi> json, string tagString)
         {
             string cachePath = $"cached/{tagString}.json";
-            if (!Directory.Exists("cached"))
-            {
-                Directory.CreateDirectory("cached");
-            }
             //check if json file exists
             if (!File.Exists(cachePath))
             {
