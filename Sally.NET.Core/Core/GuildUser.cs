@@ -29,18 +29,21 @@ namespace Sally.NET.Core
                 {
                     xp = value;
                     OnLevelUp?.Invoke(this);
-                    if(!onInit)
+                    if (!onInit)
                     {
-                        LoggerService.levelUpLogger.Log($"{this.Id} has reached Level {this.Level}");
+                        if (LoggerService.levelUpLogger != null)
+                        {
+                            LoggerService.levelUpLogger.Log($"{this.Id} has reached Level {this.Level}");
+                        }
                     }
                 }
                 xp = value;
                 Update(this);
             }
         }
-        public int Level 
-        { 
-            get 
+        public int Level
+        {
+            get
             {
                 return GetLevelFromXp(this.Xp);
             }

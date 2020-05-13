@@ -230,10 +230,10 @@ namespace Sally.NET.Service
                 return;
             }
 
-            if ((client.Guilds.Where(g => g.Id == credentials.guildId).First()).Users.ToList().Find(u => u.Id == message.Author.Id) == null)
-            {
-                return;
-            }
+            //if ((client.Guilds.Where(g => g.Id == credentials.guildId).First()).Users.ToList().Find(u => u.Id == message.Author.Id) == null)
+            //{
+            //    return;
+            //}
             if (arg.Author.IsBot)
             {
                 return;

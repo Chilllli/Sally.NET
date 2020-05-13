@@ -227,7 +227,7 @@ namespace Sally
             await MoodHandlerService.InitializeHandler(Client, BotConfiguration);
         }
 
-        private void InitializeDirectories()
+        private static void InitializeDirectories()
         {
             string[] directories = {
                 "mood",
