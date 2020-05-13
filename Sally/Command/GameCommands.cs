@@ -13,6 +13,7 @@ using System.Net;
 using Sally.NET.Core.Enum;
 using Sally.NET.Module;
 using Sally.NET.Service;
+using Sally.NET.Core.Attr;
 
 namespace Sally.Command
 {

@@ -131,7 +131,7 @@ namespace Sally.NET.Service
 
             await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
 #endif
-            await client.SetActivityAsync(new Game(mood.ToString()));
+            await client.SetGameAsync(mood.ToString(), type: ActivityType.Playing);
             LoggerService.moodLogger.Log($"Mood Changed: {oldMood} -> {newMood}");
         }
 

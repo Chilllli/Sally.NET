@@ -1,108 +1,48 @@
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/made-with-c-sharp.svg)](https://forthebadge.com)
 
-[![Build Status](https://travis-ci.com/Chilllli/Sally.NET.svg?token=e9oxuon9Djni1ERDenE9&branch=master)](https://travis-ci.com/Chilllli/Sally.NET)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3dce132ba96d4ba69cb0de2479196363)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Chilllli/Sally.NET&amp;utm_campaign=Badge_Grade)
+# Welcome to Sally
+Sally is a friendly multipurpose discordbot. She provides many game integrations and interesting APIs. It is possible to customize Sally with self made plugins. The plugins need to be written in C#.
 
-# Welcome to Sally .NET
+[![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE) [![Build Status](https://travis-ci.com/Chilllli/Sally.NET.svg?token=e9oxuon9Djni1ERDenE9&branch=master)](https://travis-ci.com/Chilllli/Sally.NET) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3dce132ba96d4ba69cb0de2479196363)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Chilllli/Sally.NET&amp;utm_campaign=Badge_Grade) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/made-with-c-sharp.svg)](https://forthebadge.com) [![ForTheBadge powered-by-electricity](http://ForTheBadge.com/images/badges/powered-by-electricity.svg)](http://ForTheBadge.com)
 
-Hey! Sally, your friendly Discord-Bot. She is a multipurpose bot with many request options and just waiting for you. ^~^
-
-## Overview
-
-* **Feature**:
-	* command prediction
-	* subscription service
-	* leveling system
-	* command service
-	* live chat replies
-
-The following list shows the available commands at the moment. If you want to use commands you need a "$" as prefix.
-
-  * [Game Commands](#game-commands)  
-  * [Random Commands](#random-commands) 
-  * [User Commands](#user-commands) 
-  * [Trivia Commands](#trivia-commands)
-  * [Weather Commands](#weather-commands) 
-
-
-# Commands
-
-## Game Commands
-
-### Terraria-related:
-Commands in this section need the prefix: **terraria**
-
-- **mods**: shows all active mods on the terraria server
-
-	*Example*: $terraria mods 
-
-
-### Rocket League-related:
-Commands in this section need the prefix: **rl**
-
-- **setRank**: set a role with a given rocket league matchmaking rank
-
-	*Available Parameters*:
+# Overview
+* [Commands](##Commands)
+* [Features](##Features)
+	* Integrations
+	* Build-In Feature
+* [Self-hosting](##Self-hosting)
+* [Support](##Support)
+## Commands
+All Commands can be found on the webpage: https://its-sally.net/commands
+It will be updated regularly. 
+## Features
+### Integrations - Games
+* Rocket League
+* Terraria
+* Oldschool Runescape
+* Osu! (planned)
+* League of Legends (planned)
+### Integrations - APIs
+* Wikipedia
+* OpenWeather
+* Konachan
+* Cleverbot
+* more planned
+### Build-In
+* Command suggestion
+* YouTube music player
+* Mood system
+* Level and rankup system
+* Livechat replies
+* Service subscription
+## Self-hosting
+* Prerequisite:
+	* MySQL or (planned sqlite)
+	* Dotnet 3.0 or newer
 	
-	- a rank as string
-	- a devision as number
+Currently tested on an Ubuntu 18.04 Server.
+## Support
+You can directly support Sally and me via Patreon: https://patreon.com/sallydev
 
-	*Example*: 
-	
-	- $rl setRank Gold 3
 
-## Random Commands
-
-- **ping**: make a ping with process duration in ms
-
-	*Example*: $ping
-	
-## User Commands
-
-- **mute**: mute bot. there are no greeting/bye messages anymore
-	
-	*Example*: $mute
-
-- **unmute**: unmute bot. you will receive greeting/bye messages again
-
-	*Example*: $unmute
-
-- **myxp**: shows your current level with exp needed to the next level
-
-	*Example*: $myxp
-
-## Trivia Commands
-
-- **ask**: return a search result from wikipedia with the given paramater
-
-	*Example*: $ask Rainbow
-
-## Weather Commands
-
-- **sub2weather**: subs to the weather service. you will get a daily notification of the current weather.
-
-	*Available Parameters*:
-
-	- location as string
-	- time
-		Allowed Format: h m
-
-	*Example* : $sub2weather Paris 9h30m
-	This will set the timer to 9:30 and location to paris.
-	
-- **unsub2weather**: remove the current weather subscription
-
-	*Example*: $unsub2weather
-
-- **currentWeather**: show the current weather of given location
-
-	*Available Parameters*:
-	
-	- location as string
-
-	*Example*: $currentWeather Paris
-	
-	
-	
-[![forthebadge](https://forthebadge.com/images/badges/its-not-a-lie-if-you-believe-it.svg)](https://forthebadge.com)
+**Thanks for tuning in!**

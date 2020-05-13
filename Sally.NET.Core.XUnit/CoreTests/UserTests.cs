@@ -12,7 +12,7 @@ namespace Sally.NET.XUnit.CoreTests
         [Fact]
         public void User_ShouldAddValidXpAmount()
         {
-            User testUser = new User(00000001, 0, false);
+            GuildUser testUser = new GuildUser(00000001, 000000001, 0);
             
             int exp = 1000;
 
@@ -28,7 +28,7 @@ namespace Sally.NET.XUnit.CoreTests
         [Fact]
         public void User_ShouldAddInvalidXpAmount()
         {
-            User testUser = new User(00000001, 0, false);
+            GuildUser testUser = new GuildUser(00000001, 000000001, 0);
 
             int exp = -1000;
 
@@ -47,7 +47,7 @@ namespace Sally.NET.XUnit.CoreTests
         [InlineData(859944, 95)]
         public void User_ShouldHaveCorrectLevel(int exp, int lvl)
         {
-            User testUser = new User(00000001, 0, false);
+            GuildUser testUser = new GuildUser(00000001, 000000001, 0);
 
             int expect = lvl;
 
