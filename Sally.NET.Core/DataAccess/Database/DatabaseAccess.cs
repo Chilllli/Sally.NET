@@ -108,7 +108,7 @@ namespace Sally.NET.DataAccess.Database
         public void saveMood(Mood mood)
         {
             MySqlCommand command = new MySqlCommand("INSERT INTO moodtable(mood) VALUES (@mood)", connection);
-            command.Parameters.Add("@mood", mood.ToString());
+            command.Parameters.Add("@mood", MySqlDbType.VarString).Value = mood.ToString();
             command.Prepare();
             command.ExecuteNonQuery();
         }
