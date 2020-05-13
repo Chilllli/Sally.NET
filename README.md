@@ -3,6 +3,7 @@
 Sally is a friendly multipurpose discordbot. She provides many game integrations and interesting APIs. It is possible to customize Sally with self made plugins. The plugins need to be written in C#.
 
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE) [![Build Status](https://travis-ci.com/Chilllli/Sally.NET.svg?token=e9oxuon9Djni1ERDenE9&branch=master)](https://travis-ci.com/Chilllli/Sally.NET) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3dce132ba96d4ba69cb0de2479196363)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Chilllli/Sally.NET&amp;utm_campaign=Badge_Grade) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/made-with-c-sharp.svg)](https://forthebadge.com) [![ForTheBadge powered-by-electricity](http://ForTheBadge.com/images/badges/powered-by-electricity.svg)](http://ForTheBadge.com)
 
 # Overview
