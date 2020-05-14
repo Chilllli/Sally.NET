@@ -107,7 +107,7 @@ namespace Sally
                     }
                     if (!File.Exists($"mood/{item}.json"))
                     {
-                        client.DownloadFile($"https://cdn.its-sally.net/content/{item}.png", $"mood/{item}.json");
+                        client.DownloadFile($"https://cdn.its-sally.net/content/{item}.json", $"mood/{item}.json");
                     }
                 }
             }

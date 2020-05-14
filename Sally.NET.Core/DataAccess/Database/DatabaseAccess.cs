@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI;
 using Sally.NET.Core;
 using Sally.NET.Core.Enum;
 using System;
@@ -64,9 +65,54 @@ namespace Sally.NET.DataAccess.Database
             }
 
             //Initilaze database connection
-            LoadUsers();
-            LoadGuildSettings();
-            LoadGuildUser();
+            try
+            {
+                LoadUsers();
+            }
+            catch (MySqlException e)
+            {
+                MySqlCommand createTable = new MySqlCommand(@"CREATE TABLE `User` (
+                                                            `id` bigint(20) unsigned NOT NULL,
+                                                            `isMuted` int(11) DEFAULT '1',
+                                                            `embedColor` varchar(16) DEFAULT 'ffcc00',
+                                                            `weatherLocation` varchar(64) DEFAULT NULL,
+                                                            `notifierTime` time DEFAULT NULL,
+                                                             PRIMARY KEY (`id`)
+                                                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;", connection);
+                createTable.ExecuteNonQuery();
+            }
+
+            try
+            {
+                LoadGuildSettings();
+            }
+            catch (MySqlException e)
+            {
+                MySqlCommand createTable = new MySqlCommand(@"CREATE TABLE `Guildsettings` (
+                                                            `id` bigint(20) unsigned NOT NULL,
+                                                            `owner` bigint(20) unsigned DEFAULT NULL,
+                                                            `levelbackground` blob,
+                                                            PRIMARY KEY (`id`)
+                                                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;", connection);
+                createTable.ExecuteNonQuery();
+            }
+
+            try
+            {
+                LoadGuildUser();
+            }
+            catch (MySqlException e)
+            {
+                MySqlCommand createTable = new MySqlCommand(@"CREATE TABLE `GuildUser` (
+                                                            `id` bigint(20) unsigned NOT NULL,
+                                                            `guildid` bigint(20) NOT NULL,
+                                                            `xp` int(10) unsigned DEFAULT '0',
+                                                            PRIMARY KEY (`id`,`guildid`),
+                                                            CONSTRAINT `id` FOREIGN KEY (`id`) REFERENCES `User` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+                                                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;", connection);
+                createTable.ExecuteNonQuery();
+            }
+
         }
 
 
@@ -110,7 +156,19 @@ namespace Sally.NET.DataAccess.Database
             MySqlCommand command = new MySqlCommand("INSERT INTO moodtable(mood) VALUES (@mood)", connection);
             command.Parameters.Add("@mood", MySqlDbType.VarString).Value = mood.ToString();
             command.Prepare();
-            command.ExecuteNonQuery();
+            try
+            {
+                command.ExecuteNonQuery();
+            }
+            catch (MySqlException e)
+            {
+                MySqlCommand createTable = new MySqlCommand(@"CREATE TABLE `moodtable` (
+                                                                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                                                `mood` varchar(10) DEFAULT NULL
+                                                                ) ENGINE=InnoDB DEFAULT CHARSET=latin1;", connection);
+                createTable.ExecuteNonQuery();
+            }
+
         }
 #endif
 
