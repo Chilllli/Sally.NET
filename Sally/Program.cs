@@ -105,6 +105,10 @@ namespace Sally
                     {
                         client.DownloadFile($"https://cdn.its-sally.net/content/{item}.png", $"mood/{item}.png");
                     }
+                    if (!File.Exists($"mood/{item}.json"))
+                    {
+                        client.DownloadFile($"https://cdn.its-sally.net/content/{item}.png", $"mood/{item}.json");
+                    }
                 }
             }
 
@@ -123,6 +127,15 @@ namespace Sally
                 prefixDictionary = new Dictionary<ulong, char>();
             }
 
+            if (!File.Exists("ApiRequests.txt"))
+            {
+                // Create a file to write to.
+                using (StreamWriter sw = File.CreateText("ApiRequests.txt"))
+                {
+                    sw.WriteLine("0");
+                    sw.Close();
+                }
+            }
             RequestCounter = Int32.Parse(File.ReadAllText("ApiRequests.txt"));
 
             Client = new DiscordSocketClient();
