@@ -6,6 +6,17 @@ Sally is a friendly multipurpose discordbot. She provides many game integrations
 
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/made-with-c-sharp.svg)](https://forthebadge.com) [![ForTheBadge powered-by-electricity](http://ForTheBadge.com/images/badges/powered-by-electricity.svg)](http://ForTheBadge.com)
 
+### Quick Links
+
+**Homepage**: <br>
+<https://its-sally.net>
+
+**Sally Invite Link**: <br>
+<https://discordapp.com/oauth2/authorize?client_id=403316935288160275&scope=bot&permissions=506686584>
+
+**Join the Discord server, if you are looking for support or just wanna hang out!** <br>
+<https://discord.gg/hjPRKyY>
+
 ## Overview
 * [Commands](#commands)
 * [Features](#features)
