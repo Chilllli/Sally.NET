@@ -12,7 +12,7 @@ Sally is a friendly multipurpose discordbot. She provides many game integrations
 <https://its-sally.net>
 
 **Sally Invite Link**: <br>
-<https://discordapp.com/oauth2/authorize?client_id=403316935288160275&scope=bot&permissions=506686584>
+<https://invite.its-sally.net>
 
 **Join the Discord server, if you are looking for support or just wanna hang out!** <br>
 <https://discord.gg/hjPRKyY>
