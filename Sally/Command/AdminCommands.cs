@@ -204,12 +204,12 @@ namespace Sally.Command
                 guildRankRoleCollection = RoleManagerService.RankRoleCollection[guildId];
                 if (guildRankRoleCollection.Count == 0)
                 {
-                    await Context.Message.Channel.SendMessageAsync("You didnt added rank roles yet.");
+                    await Context.Message.Channel.SendMessageAsync("You didn't added rank roles yet.");
                     return;
                 }
                 EmbedBuilder embed = new EmbedBuilder()
                     .WithTitle("Current Rank Roles")
-                    .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)
+                    .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
                     .WithTimestamp(DateTime.Now);
 
                 foreach (KeyValuePair<int, ulong> entry in guildRankRoleCollection)

@@ -26,11 +26,23 @@ namespace Sally.NET.Service
 #endif
         private static BotCredentials credentials;
 
+        /// <summary>
+        /// initialize and create service
+        /// </summary>
+        /// <param name="credentials"></param>
         public static void Initialize(BotCredentials credentials)
         {
             ApiRequestService.credentials = credentials;
         }
 
+        /// <summary>
+        /// create a call to weather api <br />
+        /// parameter can be optinal 
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns>
+        /// returns a task with a string
+        /// </returns>
         public static async Task<string> request2weatherAsync(string location = null)
         {
             if (location == null)
@@ -46,12 +58,24 @@ namespace Sally.NET.Service
             }
         }
 
+        /// <summary>
+        /// creates an api call to the cleverbot api <br />
+        /// parameter is a dm, which was received by the bot
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public static async Task<string> request2cleverapiAsync(SocketUserMessage message)
         {
             string stringResult = await (CreateHttpRequest("https://www.cleverbot.com", $"/getreply?key={credentials.CleverApi}&input={message.Content}").Result).Content.ReadAsStringAsync();
             return stringResult;
         }
 
+        /// <summary>
+        /// creates an api call to the wikipedia api <br />
+        /// parameter is the term, which shall be looked up
+        /// </summary>
+        /// <param name="term"></param>
+        /// <returns></returns>
         public static async Task<string> request2wikiAsync(string term)
         {
             string stringResult = await (CreateHttpRequest("https://en.wikipedia.org", $"/w/api.php?action=opensearch&format=json&search={term}&namespace=0&limit=5&utf8=1").Result).Content.ReadAsStringAsync();
@@ -66,6 +90,12 @@ namespace Sally.NET.Service
             return responseMessage;
         }
 
+        /// <summary>
+        /// creates a generic api call to the konachan api <br />
+        /// returns an image url from a generic json result <br />
+        /// <b>tags</b> and <b>ratings</b> are ignored
+        /// </summary>
+        /// <returns></returns>
         public static async Task<string> request2konachanAsync()
         {
             string response = await (CreateHttpRequest("https://konachan.com", "/post.json?limit=100").Result).Content.ReadAsStringAsync();
@@ -78,6 +108,14 @@ namespace Sally.NET.Service
             int randImage = rng.Next(imageCollection.Count());
             return imageCollection[randImage].ImageUrl;
         }
+
+        /// <summary>
+        /// create an api call to the konachan api <br />
+        /// parameter is a list of tags for image search <br />
+        /// <b>rating</b> is ignored
+        /// </summary>
+        /// <param name="tags"></param>
+        /// <returns></returns>
         public static async Task<string> request2konachanAsync(string[] tags)
         {
 
@@ -138,6 +176,14 @@ namespace Sally.NET.Service
             return imageCollection[randImage].ImageUrl;
         }
 
+        /// <summary>
+        /// create an api call to konachan api <br />
+        /// <b>tags</b> are for a specific image search <br />
+        /// <b>rating</b> is for image filtering
+        /// </summary>
+        /// <param name="tags"></param>
+        /// <param name="rating"></param>
+        /// <returns></returns>
         public static async Task<string> request2konachanAsync(string[] tags, Rating rating)
         {
             int pageCounter = 0;

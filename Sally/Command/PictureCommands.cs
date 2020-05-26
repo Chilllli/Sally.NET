@@ -60,7 +60,7 @@ namespace Sally.Command
                 .WithDescription($"[Result]({response})")
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
-                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
+                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
         }
 
@@ -75,7 +75,7 @@ namespace Sally.Command
                 .WithDescription($"Tags: [{tagUrl}]({response})")
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
-                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
+                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
         }
     }

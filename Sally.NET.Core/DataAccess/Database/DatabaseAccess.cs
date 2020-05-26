@@ -22,6 +22,12 @@ namespace Sally.NET.DataAccess.Database
         private static Task databaseWriter;
         private static ConcurrentQueue<MySqlCommand> databaseQueue = new ConcurrentQueue<MySqlCommand>();
 
+        /// <summary>
+        /// create and initialize service
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="password"></param>
+        /// <param name="database"></param>
         public static void Initialize(string user, string password, string database)
         {
             if (Instance == null)
@@ -115,7 +121,10 @@ namespace Sally.NET.DataAccess.Database
 
         }
 
-
+        /// <summary>
+        /// insert user into database and user list
+        /// </summary>
+        /// <param name="user"></param>
         public void InsertUser(User user)
         {
             MySqlCommand command = new MySqlCommand("INSERT INTO User(id,isMuted) VALUES (@id,@mute)", connection);
@@ -126,6 +135,10 @@ namespace Sally.NET.DataAccess.Database
             Users.Add(user);
         }
 
+        /// <summary>
+        /// update existing user from database
+        /// </summary>
+        /// <param name="user"></param>
         public void UpdateUser(User user)
         {
             MySqlCommand command = new MySqlCommand("UPDATE User SET isMuted = @mute, weatherLocation = @weatherLocation, notifierTime = @notifierTime, embedColor = @embedColor WHERE id = @id", connection);
@@ -138,6 +151,9 @@ namespace Sally.NET.DataAccess.Database
             databaseQueue.Enqueue(command);
         }
 
+        /// <summary>
+        /// load all user from database into a list
+        /// </summary>
         public void LoadUsers()
         {
             MySqlCommand command = new MySqlCommand("SELECT id,isMuted,weatherLocation,notifierTime,embedColor FROM User", connection);
@@ -172,6 +188,10 @@ namespace Sally.NET.DataAccess.Database
         }
 #endif
 
+        /// <summary>
+        /// insert new guild settings into database and list
+        /// </summary>
+        /// <param name="settings"></param>
         public void InsertGuildSettings(GuildSettings settings)
         {
             MySqlCommand command = new MySqlCommand("INSERT INTO Guildsettings(id,owner,levelbackground) VALUES (@id,@owner,@levelbackground)", connection);
@@ -183,6 +203,10 @@ namespace Sally.NET.DataAccess.Database
             guildSettings.Add(settings);
         }
 
+        /// <summary>
+        /// update existing guild settings in database
+        /// </summary>
+        /// <param name="settings"></param>
         public void UpdateGuildSettings(GuildSettings settings)
         {
             MySqlCommand command = new MySqlCommand("UPDATE Guildsettings SET owner=@owner,levelbackground=@levelbackground WHERE id = @id", connection);
@@ -192,6 +216,10 @@ namespace Sally.NET.DataAccess.Database
             command.Prepare();
             command.ExecuteNonQuery();
         }
+
+        /// <summary>
+        /// load all guild settings from database into list
+        /// </summary>
         public void LoadGuildSettings()
         {
             MySqlCommand command = new MySqlCommand("SELECT id,owner,levelbackground FROM Guildsettings", connection);
@@ -202,6 +230,12 @@ namespace Sally.NET.DataAccess.Database
             }
             reader.Close();
         }
+
+        /// <summary>
+        /// insert new guild user into database with a corresponding guild id
+        /// </summary>
+        /// <param name="guildid"></param>
+        /// <param name="guildUser"></param>
         public void InsertGuildUser(ulong guildid, GuildUser guildUser)
         {
             MySqlCommand command = new MySqlCommand("INSERT INTO GuildUser(id,guildid,xp) VALUES (@id,@guildid,@xp)", connection);
@@ -212,6 +246,11 @@ namespace Sally.NET.DataAccess.Database
             databaseQueue.Enqueue(command);
             Users.Find(u => u.Id == guildUser.Id).GuildSpecificUser.Add(guildid, guildUser);
         }
+
+        /// <summary>
+        /// update existing guild user in database
+        /// </summary>
+        /// <param name="guildUser"></param>
         public void UpdateGuildUser(GuildUser guildUser)
         {
             MySqlCommand command = new MySqlCommand("UPDATE GuildUser SET xp=@xp WHERE id = @id and guildid=@guildid", connection);
@@ -221,6 +260,10 @@ namespace Sally.NET.DataAccess.Database
             command.Prepare();
             databaseQueue.Enqueue(command);
         }
+
+        /// <summary>
+        /// load all guild user into list
+        /// </summary>
         public void LoadGuildUser()
         {
             MySqlCommand command = new MySqlCommand("SELECT id,guildid,xp FROM GuildUser", connection);
@@ -234,6 +277,10 @@ namespace Sally.NET.DataAccess.Database
             }
             reader.Close();
         }
+
+        /// <summary>
+        /// dispose the current database connection
+        /// </summary>
         public void Dispose()
         {
             if (connection.State == System.Data.ConnectionState.Open)

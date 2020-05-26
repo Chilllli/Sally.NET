@@ -73,7 +73,7 @@ namespace Sally.Command
                     .AddField($"Current \"{guildChannel.Guild.Name}\" Level", myUser.GuildSpecificUser[guildChannel.Guild.Id].Level)
                 .AddField("Xp needed until level up", (Math.Floor(-50 * (15 * Math.Sqrt(15) * Math.Pow(myUser.GuildSpecificUser[guildChannel.Guild.Id].Level + 1, 2) - 60 * Math.Pow(myUser.GuildSpecificUser[guildChannel.Guild.Id].Level + 1, 2) - 4))) - myUser.GuildSpecificUser[guildChannel.Guild.Id].Xp)
                     .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
-                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
+                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
                 await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
                 return;
             }
@@ -88,7 +88,7 @@ namespace Sally.Command
                     .WithThumbnailUrl(Context.Message.Author.GetAvatarUrl())
                     .AddField("Current Global Level", myUser.GuildSpecificUser.Sum(x => x.Value.Level) / myUser.GuildSpecificUser.Count)
                     .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
-                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
+                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
                 await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
                 return;
             }

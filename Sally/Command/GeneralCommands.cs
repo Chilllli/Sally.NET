@@ -1,5 +1,7 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Sally.NET.Module;
+using Sally.NET.Service;
 using System;
 using System.Threading.Tasks;
 
@@ -31,7 +33,33 @@ namespace Sally.Command
         public async Task CalculateUptime()
         {
             TimeSpan uptime = DateTime.Now - Program.StartTime;
-            await Context.Message.Channel.SendMessageAsync($"My current uptime is{GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime.ToString()} .");
+            await Context.Message.Channel.SendMessageAsync($"My current uptime is {GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
+        }
+
+        [Command("support")]
+        public async Task ShowSupportLinks()
+        {
+            EmbedBuilder embed = new EmbedBuilder()
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithCurrentTimestamp()
+                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
+                .WithTitle("Thanks for considering to support us! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
+                .AddField("Patreon", "<https://patreon.com/sallydev>")
+                .AddField("PayPal", "Coming soon");
+            await Context.Message.Channel.SendMessageAsync(embed: embed.Build());
+        }
+
+        [Alias("inv")]
+        [Command("invite")]
+        public async Task ShowInviteLink()
+        {
+            EmbedBuilder embed = new EmbedBuilder()
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithCurrentTimestamp()
+                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
+                .WithTitle("If you want to have Sally on your server, you came to the right place! (▰˘◡˘▰)")
+                .AddField("Invite Link", "https://invite.its.sally.net");
+            await Context.Message.Channel.SendMessageAsync(embed: embed.Build());
         }
     }
 }

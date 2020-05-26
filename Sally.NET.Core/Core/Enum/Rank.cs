@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Sally.NET.Core.Enum
 {
+    /// <summary>
+    /// rank enum wih a corresponding color
+    /// </summary>
     public enum Rank
     {
         [Rank(0x77391a)] Wood,

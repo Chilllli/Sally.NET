@@ -18,6 +18,7 @@ namespace Sally.NET.Service
         public static Logger moodLogger;
         public static Logger levelUpLogger;
 
+
         public static void Initialize()
         {
             commandLogger = new Logger(commandFile);

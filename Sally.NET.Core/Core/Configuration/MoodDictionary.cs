@@ -15,6 +15,11 @@ namespace Sally.NET.Core.Configuration
         private static DiscordSocketClient client;
         private static BotCredentials credentials;
 
+        /// <summary>
+        /// create and initialize service
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="credentials"></param>
         public static void InitializeMoodDictionary(DiscordSocketClient client, BotCredentials credentials)
         {
             MoodDictionary.client = client;
@@ -25,9 +30,15 @@ namespace Sally.NET.Core.Configuration
             }
         }
 
+
+        /// <summary>
+        /// get a message to the corresponding mood
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public static string getMoodMessage(string message)
         {
-            return moodDictionary[client.Activity != null ? System.Enum.Parse<Mood>(client.Activity?.Name) : MoodHandlerService.getMood()][message];
+            return moodDictionary[MoodHandlerService.GetMood()][message];
         }
     }
 }

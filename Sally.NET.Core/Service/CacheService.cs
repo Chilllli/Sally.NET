@@ -9,6 +9,11 @@ namespace Sally.NET.Service
 {
     public static class CacheService
     {
+
+        /// <summary>
+        /// crate and initialize service
+        /// </summary>
+        /// <returns></returns>
         public static async Task InitializeHandler()
         {
             Timer deleteCache = new Timer(60 * 60 * 1000);

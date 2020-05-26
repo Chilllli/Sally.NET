@@ -60,16 +60,6 @@ namespace Sally
                 File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
             }
         }
-        public static string GenericFooter
-        {
-            get;
-            private set;
-        }
-        public static string GenericThumbnailUrl
-        {
-            get;
-            private set;
-        }
         private static int startValue;
         private static Dictionary<ulong, char> prefixDictionary;
 
@@ -207,8 +197,6 @@ namespace Sally
             {
                 commandClasses.AddRange(assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList());
             }
-            GenericFooter = "Provided by Sally, your friendly and helpful Discordbot!";
-            GenericThumbnailUrl = "https://static-cdn.jtvnw.net/emoticons/v1/279825/3.0";
 
             checkNewUserEntries();
             StatusNotifierService.InitializeService(Me);

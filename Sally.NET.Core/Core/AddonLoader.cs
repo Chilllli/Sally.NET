@@ -13,6 +13,11 @@ namespace Sally.NET.Core
     public static class AddonLoader
     {
         private static Dictionary<string, object> assemblyConfigPairs = new Dictionary<string, object>();
+
+        /// <summary>
+        /// load all plugins from dll's
+        /// </summary>
+        /// <param name="client"></param>
         public static void Load(DiscordSocketClient client)
         {
             loadAssemblies();

@@ -17,7 +17,7 @@ namespace Sally.Command
             EmbedBuilder searchEmbed = new EmbedBuilder()
                 .WithTitle($"What is \"{searchTerm}\"?")
                 .WithDescription($"Results for {searchTerm}")
-                .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl)
+                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
                 .WithTimestamp(DateTime.Now)
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)));
                 for (int i = 0; i < 5; i++)

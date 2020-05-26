@@ -58,7 +58,7 @@ namespace Sally.Command
                     .AddField("Current Weather Condition", (string)temperature.weather[0].main)
                     .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
                     .WithTimestamp(DateTime.Now)
-                    .WithFooter(Program.GenericFooter, Program.GenericThumbnailUrl);
+                    .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: weatherEmbed.Build()).ConfigureAwait(false);
         }
     }

@@ -23,6 +23,15 @@ namespace Sally.NET.Service
         private static bool onStart;
         private static Mood oldMood;
         private static Mood newMood;
+
+        /// <summary>
+        /// initialize and create service
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="credentials"></param>
+        /// <returns>
+        /// return an async task, which can be awaited
+        /// </returns>
         public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials)
         {
             MoodHandlerService.client = client;
@@ -45,7 +54,7 @@ namespace Sally.NET.Service
             //get start values
             DailyTimer_Elapsed(null, null);
             await checkWeather();
-            newMood = getMood();
+            newMood = GetMood();
             await setMood(newMood).ConfigureAwait(false);
             onStart = false;
             client.MessageReceived += Client_MessageReceived;
@@ -54,7 +63,7 @@ namespace Sally.NET.Service
         private static async void ChangeMoodTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             oldMood = newMood;
-            newMood = getMood();
+            newMood = GetMood();
             await setMood(newMood);
         }
 
@@ -100,7 +109,13 @@ namespace Sally.NET.Service
             return messageList.Count(m => m > DateTime.Now.Subtract(new TimeSpan(0, 1, 0)));
         }
 
-        public static Mood getMood()
+        /// <summary>
+        /// Method will return a mood enum, which is corresponding to the calculated values
+        /// </summary>
+        /// <returns>
+        /// calculated Mood enum from values
+        /// </returns>
+        public static Mood GetMood()
         {
             double currentMood = getMoodPoints();
             if (currentMood >= 0 && currentMood <= 0.25)
@@ -131,7 +146,7 @@ namespace Sally.NET.Service
 
             await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
 #endif
-            await client.SetGameAsync(mood.ToString(), type: ActivityType.Playing);
+            await client.SetGameAsync($"{mood} | $help", type: ActivityType.Playing);
             LoggerService.moodLogger.Log($"Mood Changed: {oldMood} -> {newMood}");
         }
 
