@@ -102,7 +102,7 @@ namespace Sally
                 }
             }
 
-            BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("configuration.json"));
+            BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("config/configuration.json"));
             DatabaseAccess.Initialize(BotConfiguration.db_user, BotConfiguration.db_password, BotConfiguration.db_database);
             
             if (!File.Exists("meta/prefix.json"))

@@ -1,10 +1,14 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Newtonsoft.Json;
 using Sally.NET.Core;
 using Sally.NET.DataAccess.Database;
 using Sally.NET.Service;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -72,7 +76,7 @@ namespace Sally.Command
                     .AddField("Current Global Level", myUser.GuildSpecificUser.Sum(x => x.Value.Level) / myUser.GuildSpecificUser.Count)
                     .AddField($"Current \"{guildChannel.Guild.Name}\" Level", myUser.GuildSpecificUser[guildChannel.Guild.Id].Level)
                 .AddField("Xp needed until level up", (Math.Floor(-50 * (15 * Math.Sqrt(15) * Math.Pow(myUser.GuildSpecificUser[guildChannel.Guild.Id].Level + 1, 2) - 60 * Math.Pow(myUser.GuildSpecificUser[guildChannel.Guild.Id].Level + 1, 2) - 4))) - myUser.GuildSpecificUser[guildChannel.Guild.Id].Xp)
-                    .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
+                    .WithColor(new Discord.Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
                 await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
                 return;
@@ -87,7 +91,7 @@ namespace Sally.Command
                     .WithDescription("Check how much xp you miss for the next level up.")
                     .WithThumbnailUrl(Context.Message.Author.GetAvatarUrl())
                     .AddField("Current Global Level", myUser.GuildSpecificUser.Sum(x => x.Value.Level) / myUser.GuildSpecificUser.Count)
-                    .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
+                    .WithColor(new Discord.Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
                 await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
                 return;
@@ -148,12 +152,20 @@ namespace Sally.Command
         [Command("setColor")]
         public async Task SetEmbedColor(string color)
         {
+            //todo: set answer as an embed with the new color as a preview on the left side
+            //create dictionary from json file
+            //make new json file and only care about hexcode and color so it is easier to deserialize
             int hexColor;
             if(Int32.TryParse(color, System.Globalization.NumberStyles.HexNumber, null, out hexColor))
             {
                 string result = "0x" + color.PadRight(6, '0');
                 if (hexColor < 16777216 && hexColor >= 0)
                 {
+                    List<Dictionary<string, string>> colornames = new List<Dictionary<string, string>>();
+                    colornames = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(File.ReadAllText("colornames.json"));
+                    Dictionary<string, string> colorname = colornames.FirstOrDefault().Where(x => x.Value == color).ToDictionary<string, string>();
+
+                    //return name.Equals("0") ? "Unknown" : name;
                     //hex value is in range
                     User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
                     user.EmbedColor = result;
@@ -170,6 +182,8 @@ namespace Sally.Command
                 await Context.Message.Channel.SendMessageAsync("Something went wrong");
             }
         }
+
+
         private bool isAuthorized()
         {
             if ((Context.Message.Author as SocketGuildUser)?.Roles.ToList().FindAll(r => r.Permissions.Administrator) == null || Context.Message.Author.Id != Context.Guild?.OwnerId)
