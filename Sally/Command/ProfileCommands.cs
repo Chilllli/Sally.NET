@@ -161,11 +161,6 @@ namespace Sally.Command
                 string result = "0x" + color.PadRight(6, '0');
                 if (hexColor < 16777216 && hexColor >= 0)
                 {
-                    List<Dictionary<string, string>> colornames = new List<Dictionary<string, string>>();
-                    colornames = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(File.ReadAllText("colornames.json"));
-                    Dictionary<string, string> colorname = colornames.FirstOrDefault().Where(x => x.Value == color).ToDictionary<string, string>();
-
-                    //return name.Equals("0") ? "Unknown" : name;
                     //hex value is in range
                     User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
                     user.EmbedColor = result;
