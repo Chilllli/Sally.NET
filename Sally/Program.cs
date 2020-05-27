@@ -234,7 +234,8 @@ namespace Sally
                 "mood",
                 "meta",
                 "addons",
-                "cached"
+                "cached",
+                "config"
             };
 
             foreach (string directory in directories)
