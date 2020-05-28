@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -301,6 +302,28 @@ namespace Sally.NET.Service
             {
                 //file doesnt exists
                 File.WriteAllText(cachePath, JsonConvert.SerializeObject(json));
+            }
+        }
+
+        /// <summary>
+        /// creates an api request to the colornames.org web api <br />
+        /// return json with name and hex color code
+        /// </summary>
+        /// <param name="hexcode"></param>
+        /// <returns></returns>
+        public static async Task<string> request2ColorNamesApi(string hexcode)
+        {
+            hexcode = hexcode.ToUpper();
+            string response = await (CreateHttpRequest("https://colornames.org", $"/search/json/?hex={hexcode}").Result).Content.ReadAsStringAsync();
+            dynamic jsonData = JsonConvert.DeserializeObject<dynamic>(response);
+            //check if name value exists
+            if (jsonData["name"] == null)
+            {
+                return null;
+            }
+            else
+            {
+                return jsonData["name"];
             }
         }
     }
