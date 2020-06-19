@@ -23,15 +23,16 @@
 
   <ItemGroup>
     <PackageReference Include="Discord.Addons.Interactive" Version="1.0.1" />
-    <PackageReference Include="Discord.Net" Version="2.1.1" />
-    <PackageReference Include="Discord.Net.Commands" Version="2.1.1" />
-    <PackageReference Include="MySql.Data" Version="8.0.19" />
+    <PackageReference Include="Discord.Net" Version="2.2.0" />
+    <PackageReference Include="Discord.Net.Commands" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.4" />
+    <PackageReference Include="MySql.Data" Version="8.0.20" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="YoutubeExplode" Version="5.0.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sally.NET.Core\Sally.NET.csproj" />
-    <ProjectReference Include="..\YoutubeExplodeCore\YoutubeExplodeCore.csproj" />
+    <ProjectReference Include="..\Sally.NET\Sally.NET.csproj" />
   </ItemGroup>
 
   <ItemGroup>

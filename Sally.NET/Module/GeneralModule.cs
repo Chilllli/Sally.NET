@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Discord.WebSocket;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Sally.NET.Module
@@ -32,6 +34,17 @@ namespace Sally.NET.Module
                 result = uptime.Seconds == 1 ? result + $" {uptime.Seconds} Second" : result + $" {uptime.Seconds} Seconds";
             }
             return result;
+        }
+
+        /// <summary>
+        /// get specific user from guild as a guild user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="guild"></param>
+        /// <returns></returns>
+        public static SocketGuildUser GetGuildUserFromGuild(SocketUser user, SocketGuild guild)
+        {
+            return guild.Users.ToList().Find(u => u.Id == user.Id);
         }
     }
 }

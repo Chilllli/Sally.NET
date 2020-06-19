@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Sally.NET.Core;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
-using Sally.NET;
-using Sally.NET.Core;
 
 namespace Sally.NET.XUnit.CoreTests
 {

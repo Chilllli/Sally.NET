@@ -1,7 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
 using Sally.NET.Core;
-using Sally.NET.Core.Enum;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -94,12 +93,14 @@ namespace Sally.NET.DataAccess.Database
             }
             catch (MySqlException e)
             {
+                //todo: add new table column - music channel
                 MySqlCommand createTable = new MySqlCommand(@"CREATE TABLE `Guildsettings` (
-                                                            `id` bigint(20) unsigned NOT NULL,
-                                                            `owner` bigint(20) unsigned DEFAULT NULL,
-                                                            `levelbackground` blob,
-                                                            PRIMARY KEY (`id`)
-                                                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;", connection);
+                                                                `id` bigint(20) unsigned NOT NULL,
+                                                                `owner` bigint(20) unsigned DEFAULT NULL,
+                                                                `levelbackground` blob,
+                                                                `musicchannelid` bigint(20) unsigned DEFAULT NULL,
+                                                                PRIMARY KEY (`id`)
+                                                                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;", connection);
                 createTable.ExecuteNonQuery();
             }
 
@@ -114,7 +115,7 @@ namespace Sally.NET.DataAccess.Database
                                                             `guildid` bigint(20) NOT NULL,
                                                             `xp` int(10) unsigned DEFAULT '0',
                                                             PRIMARY KEY (`id`,`guildid`),
-                                                            CONSTRAINT `id` FOREIGN KEY (`id`) REFERENCES `User` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+                                                            CONSTRAINT `id` FOREIGN KEY (`id`) REFERENCES `User` (`id`) ON DELETE NO ACTION ON UPDATE NO                            ACTION
                                                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;", connection);
                 createTable.ExecuteNonQuery();
             }
@@ -226,7 +227,7 @@ namespace Sally.NET.DataAccess.Database
             MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                guildSettings.Add(new GuildSettings((ulong)reader["id"], (ulong)reader["owner"], (byte[])reader["levelbackground"]));
+                guildSettings.Add(new GuildSettings((ulong)reader["id"], (ulong)reader["owner"], (byte[])reader["levelbackground"], (ulong)reader["musicchannelid"]));
             }
             reader.Close();
         }

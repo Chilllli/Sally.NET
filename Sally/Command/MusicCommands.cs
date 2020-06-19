@@ -9,12 +9,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using YoutubeExplode;
-using YoutubeExplode.Models;
-using YoutubeExplode.Models.MediaStreams;
-
+using YoutubeExplode.Videos;
+using YoutubeExplode.Videos.Streams;
 
 namespace Sally.Command
 {
@@ -35,10 +35,10 @@ namespace Sally.Command
             this.Path = path;
             this.Duration = video.Duration;
             this.LowResUrl = video.Thumbnails.LowResUrl;
-            this.Url = video.GetUrl();
+            this.Url = video.Url;
             this.SongTitle = video.Title;
             this.Author = video.Author;
-            this.Views = video.Statistics.ViewCount;
+            this.Views = video.Engagement.ViewCount;
         }
         public string Interpret
         {
@@ -65,7 +65,7 @@ namespace Sally.Command
 
         public bool Equals(VideoInfo other)
         {
-            throw new NotImplementedException();
+            return this.Id == other.Id;
         }
     }
     public static class TimeSpanExtension
@@ -87,9 +87,18 @@ namespace Sally.Command
             if (File.Exists("songQueue.json"))
             {
                 audioQueue = JsonConvert.DeserializeObject<List<VideoInfo>>(File.ReadAllText("songQueue.json"));
+                if (audioQueue == null)
+                {
+                    audioQueue = new List<VideoInfo>();
+                    File.WriteAllText("songQueue.json", JsonConvert.SerializeObject(audioQueue));
+                }
             }
-
-
+            else
+            {
+                audioQueue = new List<VideoInfo>();
+                File.Create("songQueue.json");
+                File.WriteAllText("songQueue.json", JsonConvert.SerializeObject(audioQueue));
+            }
             MusicCommands.client = client;
         }
 
@@ -154,14 +163,14 @@ namespace Sally.Command
 
             //alle nachrichten löschen
             ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.BotConfiguration.radioControlChannel) as SocketTextChannel;
-            List<IMessage> userMessages = await (textChannel.GetMessagesAsync().Flatten()).ToList();
+            List<IMessage> userMessages = await (textChannel.GetMessagesAsync().Flatten()).ToListAsync();
             foreach (IMessage message in userMessages)
             {
                 await message.DeleteAsync();
             }
 
 
-            oneMessage = await textChannel.SendMessageAsync("♪♫♪ Media Player ♫♪♫", embed: audioInfoEmbed());
+            oneMessage = await textChannel.SendMessageAsync(embed: audioInfoEmbed());
             Id = oneMessage.Id;
             await Context.Message.DeleteAsync();
         }
@@ -182,8 +191,8 @@ namespace Sally.Command
             while (true)
             {
                 await Task.Delay(1000);
-                if (Id == 0) 
-                { 
+                if (Id == 0)
+                {
                     continue;
                 }
                 SocketTextChannel textChannel = client.Guilds.First(g => g.GetChannel(Program.BotConfiguration.radioControlChannel) != null).GetChannel(Program.BotConfiguration.radioControlChannel) as SocketTextChannel;
@@ -277,6 +286,7 @@ namespace Sally.Command
         [Command("add", RunMode = RunMode.Async)]
         public async Task AddTitle(string url)
         {
+            YoutubeClient tubeClient = new YoutubeClient();
             Uri uri;
             if (!(Uri.TryCreate(url, UriKind.Absolute, out uri) && uri.Scheme == Uri.UriSchemeHttps))
             {
@@ -297,21 +307,19 @@ namespace Sally.Command
             {
                 lastStatus = "Begin download and convert";
             }
-            string id = YoutubeClient.ParseVideoId(uri.ToString());
-            YoutubeClient tubeClient = new YoutubeClient();
-            Video video = tubeClient.GetVideoAsync(id).GetAwaiter().GetResult();
-            MediaStreamInfoSet streamInfoSet = await tubeClient.GetVideoMediaStreamInfosAsync(id);
-            AudioStreamInfo streamInfo = streamInfoSet.Audio.WithHighestBitrate();
-
-            string path = Path.Combine(Path.GetTempPath(), id + "." + streamInfo.Container.GetFileExtension());
-            string taskPath = Path.Combine(Path.GetTempPath(), $"{id}.pcm");
+            string videoId = extractVideoIdFromUri(uri);
+            Video video = await tubeClient.Videos.GetAsync(uri.ToString());
+            StreamManifest streamingManifest = await tubeClient.Videos.Streams.GetManifestAsync(videoId);
+            IStreamInfo streamInfo = streamingManifest.GetAudioOnly().WithHighestBitrate();
+            string path = Path.Combine(Path.GetTempPath(), videoId + "." + streamInfo.Container.Name);
+            string taskPath = Path.Combine(Path.GetTempPath(), $"{videoId}.pcm");
             if (!File.Exists(path))
             {
                 using (MemoryStream outputStream = new MemoryStream())
                 {
                     try
                     {
-                        await tubeClient.DownloadMediaStreamAsync(streamInfo, path);
+                        await tubeClient.Videos.Streams.DownloadAsync(streamInfo, path);
                     }
                     catch (Exception e)
                     {
@@ -344,7 +352,7 @@ namespace Sally.Command
                 Process.Start(new ProcessStartInfo()
                 {
                     FileName = "ffmpeg",
-                    Arguments = $"-xerror -i \"{path}\" -ac 2 -y -filter:a \"volume = 0.01337\" -loglevel panic -f s16le -ar 48000 \"{taskPath}\"",
+                    Arguments = $"-xerror -i \"{path}\" -ac 2 -y -filter:a \"volume = 0.02100\" -loglevel panic -f s16le -ar 48000 \"{taskPath}\"",
                     UseShellExecute = false,    //TODO: true or false?
                     RedirectStandardOutput = false
                 }).WaitForExit();
@@ -541,9 +549,10 @@ namespace Sally.Command
             if (currentVideoInfo.Path == null)
             {
                 dynamicEmbed
+                .WithDescription("Use `$add url` to add music to the queue")
                 .WithAuthor("Welcome to the music player")
                 .WithColor(Color.DarkBlue)
-                .WithTitle("Use `$add url` to add music to the queue")
+                .WithTitle("♪♫♪ Media Player ♫♪♫")
                 .WithFooter(f => f.Text = "stop \u23EF, skip \u23ED, previous \u23EE, repeat \U0001F502")
                 .Build();
             }
@@ -582,20 +591,40 @@ namespace Sally.Command
             return dynamicEmbed.Build();
         }
 
-        [Command("load", RunMode = RunMode.Async)]
-        public async Task Load()
+        [Command("setMusicChannel")]
+        public async Task SetMusicChannelForGuild(ulong channelId)
         {
-
-            await Join(Context.Guild.VoiceChannels.First(e => e.Id == 316621565305421826));
-            await AddTitle("https://www.youtube.com/watch?v=8-gpAw17vhc");
-            await AddTitle("https://www.youtube.com/watch?v=_p5exp2TZeM");
-            await AddTitle("https://www.youtube.com/watch?v=cIseaPTGCRU");
-            await AddTitle("https://www.youtube.com/watch?v=6Z0lWw4Jw9c");
-            await AddTitle("https://www.youtube.com/watch?v=LbLfg5m3tns");
-            await AddTitle("https://www.youtube.com/watch?v=k1uUIJPD0Nk");
-            await AddTitle("https://www.youtube.com/watch?v=hbw1pGUhG7Q");
-            await AddTitle("https://www.youtube.com/watch?v=ZwcN8E3I04k");
+            //change guildsetting class
+            //add musicChannelId property
+            
+            await Task.CompletedTask;
         }
 
+
+        private string extractVideoIdFromUri(Uri uri)
+        {
+            const string YoutubeLinkRegex = "(?:.+?)?(?:\\/v\\/|watch\\/|\\?v=|\\&v=|youtu\\.be\\/|\\/v=|^youtu\\.be\\/)([a-zA-Z0-9_-]{11})+";
+            Regex regexExtractId = new Regex(YoutubeLinkRegex, RegexOptions.Compiled);
+            string[] validAuthorities = { "youtube.com", "www.youtube.com", "youtu.be", "www.youtu.be" };
+            try
+            {
+                string authority = new UriBuilder(uri).Uri.Authority.ToLower();
+
+                //check if the url is a youtube url
+                if (validAuthorities.Contains(authority))
+                {
+                    //and extract the id
+                    var regRes = regexExtractId.Match(uri.ToString());
+                    if (regRes.Success)
+                    {
+                        return regRes.Groups[1].Value;
+                    }
+                }
+            }
+            catch { }
+
+
+            return null;
+        }
     }
 }

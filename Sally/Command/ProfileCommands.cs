@@ -163,7 +163,15 @@ namespace Sally.Command
                 if (hexColor < 16777216 && hexColor >= 0)
                 {
                     string previousColorCode = CommandHandlerService.messageAuthor.EmbedColor;
-                    string previousColor = previousColorCode.Substring(2, previousColorCode.Length - 2);
+                    string previousColor;
+                    if(previousColorCode.Length != 6)
+                    {
+                        previousColor = previousColorCode.Substring(2, previousColorCode.Length - 2);
+                    }
+                    else
+                    {
+                        previousColor = previousColorCode;
+                    }
                     string oldColorName = await ApiRequestService.request2ColorNamesApi(previousColor);
                     if (oldColorName == null)
                         oldColorName = "Color has no name yet.";
