@@ -7,7 +7,7 @@ namespace Sally.NET.Core.Attr
 {
     public class RankAttribute : Attribute
     {
-        public uint HexColor;
+        public uint HexColor { get; set; }
         public Color color
         {
             get

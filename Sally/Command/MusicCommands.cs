@@ -323,7 +323,7 @@ namespace Sally.Command
                     }
                     catch (Exception e)
                     {
-
+                        Console.WriteLine("cant download video");
                     }
 
 
@@ -337,7 +337,7 @@ namespace Sally.Command
                             }
                             catch (Exception e)
                             {
-
+                                Console.WriteLine("cant write to file");
                             }
 
                         }

@@ -242,8 +242,7 @@ namespace Sally.NET.Service
             Object[] attributes = memInfo[0].GetCustomAttributes(typeof(RatingShortCutAttribute), false);
             char attributeValue = ((RatingShortCutAttribute)attributes[0]).ShortCut;
             //search through response
-            List<KonachanApi> imageRatingResults = new List<KonachanApi>();
-            imageRatingResults = imageCollection.FindAll(i => i.Rating == attributeValue);
+            List<KonachanApi> imageRatingResults = imageCollection.FindAll(i => i.Rating == attributeValue);
             //check for added results
             if (imageRatingResults.Count == 0)
             {

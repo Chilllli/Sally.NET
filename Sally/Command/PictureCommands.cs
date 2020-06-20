@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Sally.Command
 {
+    /// <summary>
+    /// co0mmand group for all related to pictures
+    /// </summary>
     public class PictureCommands : ModuleBase
     {
         [Command("konachan")]
@@ -18,6 +21,7 @@ namespace Sally.Command
             string response = await ApiRequestService.request2konachanAsync();
             await generateImageEmbed(response);
         }
+
         [Command("konachan")]
         [Alias("k")]
         public async Task SendPicture(params String[] tags)
@@ -53,7 +57,11 @@ namespace Sally.Command
             }
         }
 
-        //helper method for generate discord embed
+        /// <summary>
+        /// helper method for generating discord embeds
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
         private async Task generateImageEmbed(string response)
         {
             EmbedBuilder embedBuilder = new EmbedBuilder()
@@ -64,6 +72,12 @@ namespace Sally.Command
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
         }
 
+        /// <summary>
+        /// helper method for generating discord embeds
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="tagUrl"></param>
+        /// <returns></returns>
         private async Task generateImageEmbed(string response, string tagUrl)
         {
             if (response.Length == 0)

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Sally.Command
 {
+    /// <summary>
+    /// command group for everything related to trivia
+    /// </summary>
     public class TriviaCommands : ModuleBase
     {
         [Command("ask")]

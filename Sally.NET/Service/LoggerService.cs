@@ -16,7 +16,7 @@ namespace Sally.NET.Service
         private static readonly string levelUpFile = "./log/levelUp.txt";
         public static Logger commandLogger;
         public static Logger moodLogger;
-        public static Logger levelUpLogger;
+        public static Logger levelUpLogger { get; set; }
 
 
         public static void Initialize()

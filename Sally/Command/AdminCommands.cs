@@ -43,7 +43,7 @@ namespace Sally.Command
                 }
                 else
                 {
-
+                    await Context.Message.Channel.SendMessageAsync("This command only works on a guild.");
                 }
             }
             [Command("reverse")]
@@ -80,6 +80,7 @@ namespace Sally.Command
         public class OwnerCommands : ModuleBase
         {
             [Command("apiRequests")]
+            [RequireOwner]
             public async Task ShowCurrentApiRequests()
             {
                 if (Context.Message.Author.Id != Program.BotConfiguration.meId)
@@ -91,6 +92,7 @@ namespace Sally.Command
             }
 
             [Command("shutdown")]
+            [RequireOwner]
             public async Task ShutdownBot()
             {
                 if (Context.Message.Author.Id != Program.BotConfiguration.meId)
@@ -103,6 +105,7 @@ namespace Sally.Command
             }
 
             [Command("restart")]
+            [RequireOwner]
             public async Task RestartBot()
             {
                 if (Context.Message.Author.Id != Program.BotConfiguration.meId)
@@ -115,6 +118,7 @@ namespace Sally.Command
             }
 
             [Command("update")]
+            [RequireOwner]
             public async Task PerformUpdate()
             {
                 if (Context.Message.Author.Id != Program.BotConfiguration.meId)

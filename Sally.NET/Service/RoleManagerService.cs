@@ -52,8 +52,7 @@ namespace Sally.NET.Service
             if (RankRoleCollection.ContainsKey(myGuildUser.GuildId))
             {
                 SocketGuild guild = client.GetGuild(myGuildUser.GuildId);
-                Dictionary<int, ulong> SpecificRoleCollection = new Dictionary<int, ulong>();
-                SpecificRoleCollection = RankRoleCollection[guildId];
+                Dictionary<int, ulong> SpecificRoleCollection = RankRoleCollection[guildId];
                 //check if user level is a key
                 if (SpecificRoleCollection.ContainsKey((int)myGuildUser.Level))
                 {

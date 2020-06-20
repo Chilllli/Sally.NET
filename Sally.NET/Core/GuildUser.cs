@@ -48,8 +48,8 @@ namespace Sally.NET.Core
                 return GetLevelFromXp(this.Xp);
             }
         }
-        public Timer XpTimer;
-        public DateTime LastXpTime;
+        public Timer XpTimer { get; set; }
+        public DateTime LastXpTime { get; set; }
         public static int GetLevelFromXp(int xp)
         {
             return (int)Math.Floor(Math.Sqrt((xp - 200) / (double)300) + Math.Sqrt((xp - 200) / (double)500));

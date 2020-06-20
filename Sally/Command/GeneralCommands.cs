@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Sally.Command
 {
+    /// <summary>
+    /// general purpose commands
+    /// </summary>
     public class GeneralCommands : ModuleBase
     {
         public static readonly string PongMessage = "pong";

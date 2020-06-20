@@ -163,8 +163,7 @@ namespace Sally_NET.Command
                     }
                     ulong guildId = guildChannel.Guild.Id;
                     SocketGuild guild = guildChannel.Guild;
-                    Dictionary<int, ulong> guildRankRoleCollection = new Dictionary<int, ulong>();
-                    guildRankRoleCollection = RoleManagerService.RankRoleCollection[guildId];
+                    Dictionary<int, ulong> guildRankRoleCollection = RoleManagerService.RankRoleCollection[guildId];
                     if (guildRankRoleCollection == null)
                     {
                         await Context.Message.Channel.SendMessageAsync("There are no roles to remove.");
@@ -226,7 +225,6 @@ namespace Sally_NET.Command
                         SocketRole rankRole = guild.Roles.ToList().Find(r => r.Id == entry.Value);
                         embed.AddField(entry.Key.ToString(), rankRole.Name);
                     }
-
                     await Context.Message.Channel.SendMessageAsync(embed: embed.Build());
                 }
                 else
