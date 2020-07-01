@@ -32,33 +32,7 @@ namespace Sally.Command
             user.HasMuted = false;
             await Context.Message.Channel.SendMessageAsync("The bot is unmuted now");
         }
-#if DEBUG
-        [Command("getrich")]
-        public async Task QuickExp()
-        {
-            //check if user has the specific role
-            SocketGuildUser myGuildUser = Context.Message.Author as SocketGuildUser;
-            //check if private message
-            if (myGuildUser == null)
-            {
-                return;
-            }
-            if (!isAuthorized())
-            {
-                return;
-            }
-            User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
-            if (Context.Message.Channel is SocketGuildChannel guildChannel)
-            {
-                GuildUser guildUser = user.GuildSpecificUser[guildChannel.Guild.Id];
-                guildUser.Xp += 10000;
-            }
-            else
-            {
-                return;
-            }
-        }
-#endif
+
         //Math.Floor(-50 * (15 * Math.Sprt(15) * Math.Pow(y, 2) - 60 * Math.Pow(y, 2) - 4))
         [Command("myxp")]
         public async Task LevelOverview()
@@ -147,15 +121,6 @@ namespace Sally.Command
                     await Context.Message.Channel.SendMessageAsync($"The bot is currently not muted for you.");
                 }
             }
-        }
-
-        private bool isAuthorized()
-        {
-            if ((Context.Message.Author as SocketGuildUser)?.Roles.ToList().FindAll(r => r.Permissions.Administrator) == null || Context.Message.Author.Id != Context.Guild?.OwnerId)
-            {
-                return false;
-            }
-            return true;
         }
     }
 }

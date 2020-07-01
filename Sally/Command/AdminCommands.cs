@@ -46,31 +46,6 @@ namespace Sally.Command
                     await Context.Message.Channel.SendMessageAsync("This command only works on a guild.");
                 }
             }
-            [Command("reverse")]
-            public async Task ReverseUsernames()
-            {
-                if (Context.Message.Channel is SocketGuildChannel guildChannel)
-                {
-                    //check if the user, which has written the message, has admin rights
-                    if (AdminModule.IsAuthorized(GeneralModule.GetGuildUserFromGuild(Context.Message.Author as SocketUser, guildChannel.Guild)))
-                    {
-                        await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you dont have the permissions to do this!");
-                        return;
-                    }
-                    foreach (SocketGuildUser guildUser in Program.MyGuild.Users)
-                    {
-                        //"remove" owner
-                        if (guildUser.Id == Program.MyGuild.OwnerId)
-                            continue;
-                        await guildUser.ModifyAsync(u => u.Nickname = new String((guildUser.Nickname != null ? guildUser.Nickname : guildUser.Username).Reverse().ToArray()));
-                    }
-                }
-                else
-                {
-                    await Context.Message.Channel.SendMessageAsync("This command can't be used here.");
-                    return;
-                }
-            }
         }
 
         /// <summary>
