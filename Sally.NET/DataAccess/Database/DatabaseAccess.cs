@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
 using Sally.NET.Core;
+using Sally.NET.Core.Enum;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
