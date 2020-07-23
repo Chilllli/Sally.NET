@@ -159,7 +159,6 @@ namespace Sally.Command
                 await audioClient.StopAsync();
             }
             audioClient = await voiceChannel.ConnectAsync();
-            audioClient.SpeakingUpdated += AudioClient_SpeakingUpdated;
 
             //alle nachrichten löschen
             ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.BotConfiguration.radioControlChannel) as SocketTextChannel;
@@ -175,10 +174,6 @@ namespace Sally.Command
             await Context.Message.DeleteAsync();
         }
 
-        private async Task AudioClient_SpeakingUpdated(ulong arg1, bool arg2)
-        {
-            //is speaking
-        }
 
         private static int lastPause = 0;
         private static int lastPrevious = 0;
@@ -321,7 +316,7 @@ namespace Sally.Command
                     {
                         await tubeClient.Videos.Streams.DownloadAsync(streamInfo, path);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         Console.WriteLine("cant download video");
                     }
@@ -335,7 +330,7 @@ namespace Sally.Command
                             {
                                 await outputStream.CopyToAsync(fileStream);
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
                                 Console.WriteLine("cant write to file");
                             }
@@ -343,7 +338,7 @@ namespace Sally.Command
                         }
 
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
 
                     }

@@ -6,6 +6,7 @@ using Sally.NET.Core.Enum;
 using Sally.NET.DataAccess.Database;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +43,7 @@ namespace Sally.NET.Service
             Timer dailyTimer = new Timer(24 * 60 * 60 * 1000);
             Timer weatherTimer = new Timer(8 * 60 * 60 * 1000);
             //question: does this timer even run? because its not started anywhere.
-            Timer changeMoodTimer = new Timer(60 * 1000);
+            Timer changeMoodTimer = new Timer(2 * 60 * 1000);
             //hook timer events
             dailyTimer.Elapsed += DailyTimer_Elapsed;
             weatherTimer.Elapsed += WeatherTimer_Elapsed;
@@ -133,20 +134,20 @@ namespace Sally.NET.Service
             return Mood.Extatic;
         }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
         private static async Task setMood(Mood mood)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             if (client.Activity?.Name == mood.ToString())
             {
                 return;
             }
-#if RELEASE
             DatabaseAccess.Instance.saveMood(mood);
-
-            await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
-#endif
-            await client.SetGameAsync($"{mood} | $help", type: ActivityType.Playing);
+            //temporarily disbaled because its throwing http 400 for reasons which i dont understand
+            //if (validateBotData(client, mood))
+            //{
+            //    await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
+            //}
+            await client.SetGameAsync($"{mood} | $help", type: ActivityType.Watching);
             LoggerService.moodLogger.Log($"Mood Changed: {oldMood} -> {newMood}");
         }
 
@@ -190,12 +191,35 @@ namespace Sally.NET.Service
             List<SocketGuild> guilds = client.Guilds.ToList();
             foreach (SocketGuild guild in guilds)
             {
-                if(guild.Users.ToList().Find(u => u.VoiceChannel != null) != null)
+                if (guild.Users.ToList().Find(u => u.VoiceChannel != null) != null)
                 {
                     return true;
                 }
             }
             return false;
+        }
+
+        private static bool validateBotData(DiscordSocketClient client, Mood? mood)
+        {
+            //validate image
+            if (!File.Exists($"./mood/{mood}.png"))
+                return false;
+            if (!new Image($"./mood/{mood}.png").Stream.CanRead)
+                return false;
+
+            //validate bot connection
+            if (client.ConnectionState != ConnectionState.Connected)
+                return false;
+
+            //validate mood
+            //check if mood is null
+            if (mood == null)
+                return false;
+            //check if enum contain mood
+            if (!Enum.GetNames(typeof(Mood)).ToList().Contains(mood.ToString()))
+                return false;
+
+            return true;
         }
     }
 }

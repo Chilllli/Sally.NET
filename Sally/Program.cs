@@ -207,7 +207,7 @@ namespace Sally
             MoodDictionary.InitializeMoodDictionary(Client, BotConfiguration);
             WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration);
             await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary);
-            await CacheService.InitializeHandler();
+            CacheService.InitializeHandler();
             switch (startValue)
             {
                 case 0:

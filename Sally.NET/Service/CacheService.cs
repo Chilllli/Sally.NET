@@ -14,7 +14,7 @@ namespace Sally.NET.Service
         /// crate and initialize service
         /// </summary>
         /// <returns></returns>
-        public static async Task InitializeHandler()
+        public static void InitializeHandler()
         {
             Timer deleteCache = new Timer(60 * 60 * 1000);
             deleteCache.Start();

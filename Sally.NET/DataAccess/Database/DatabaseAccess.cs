@@ -75,7 +75,7 @@ namespace Sally.NET.DataAccess.Database
             {
                 LoadUsers();
             }
-            catch (MySqlException e)
+            catch (MySqlException)
             {
                 MySqlCommand createTable = new MySqlCommand(@"CREATE TABLE `User` (
                                                             `id` bigint(20) unsigned NOT NULL,
@@ -92,7 +92,7 @@ namespace Sally.NET.DataAccess.Database
             {
                 LoadGuildSettings();
             }
-            catch (MySqlException e)
+            catch (MySqlException)
             {
                 //todo: add new table column - music channel
                 MySqlCommand createTable = new MySqlCommand(@"CREATE TABLE `Guildsettings` (
@@ -109,7 +109,7 @@ namespace Sally.NET.DataAccess.Database
             {
                 LoadGuildUser();
             }
-            catch (MySqlException e)
+            catch (MySqlException)
             {
                 MySqlCommand createTable = new MySqlCommand(@"CREATE TABLE `GuildUser` (
                                                             `id` bigint(20) unsigned NOT NULL,
@@ -168,9 +168,10 @@ namespace Sally.NET.DataAccess.Database
             //Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    All Users loaded");
         }
 
-#if RELEASE
+
         public void saveMood(Mood mood)
         {
+#if RELEASE
             MySqlCommand command = new MySqlCommand("INSERT INTO moodtable(mood) VALUES (@mood)", connection);
             command.Parameters.Add("@mood", MySqlDbType.VarString).Value = mood.ToString();
             command.Prepare();
@@ -186,9 +187,9 @@ namespace Sally.NET.DataAccess.Database
                                                                 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;", connection);
                 createTable.ExecuteNonQuery();
             }
-
-        }
 #endif
+        }
+
 
         /// <summary>
         /// insert new guild settings into database and list
