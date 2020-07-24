@@ -65,7 +65,7 @@ namespace Sally
         }
         private static int startValue;
         private static Dictionary<ulong, char> prefixDictionary;
-        public static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public static readonly ILog Logging = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
 
         public static void Main(string[] args)
@@ -76,9 +76,6 @@ namespace Sally
             }
             Console.CancelKeyPress += Console_CancelKeyPress;
             new Program().MainAsync().GetAwaiter().GetResult();
-
-
-
         }
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
