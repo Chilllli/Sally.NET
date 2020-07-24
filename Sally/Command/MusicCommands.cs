@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -306,7 +307,7 @@ namespace Sally.Command
             Video video = await tubeClient.Videos.GetAsync(uri.ToString());
             StreamManifest streamingManifest = await tubeClient.Videos.Streams.GetManifestAsync(videoId);
             IStreamInfo streamInfo = streamingManifest.GetAudioOnly().WithHighestBitrate();
-            string path = Path.Combine(Path.GetTempPath(), videoId + "." + streamInfo.Container.Name);
+            string path = Path.Combine(Path.GetTempPath(), new StringBuilder(videoId).Append(".").Append(streamInfo.Container.Name).ToString());
             string taskPath = Path.Combine(Path.GetTempPath(), $"{videoId}.pcm");
             if (!File.Exists(path))
             {

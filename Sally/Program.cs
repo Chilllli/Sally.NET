@@ -14,6 +14,9 @@ using System.Collections.Generic;
 using Discord.Commands;
 using Sally.NET.Core;
 using System.Reflection;
+using log4net;
+using log4net.Config;
+using log4net.Repository;
 
 namespace Sally
 {
@@ -62,6 +65,8 @@ namespace Sally
         }
         private static int startValue;
         private static Dictionary<ulong, char> prefixDictionary;
+        public static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
 
         public static void Main(string[] args)
         {
@@ -71,6 +76,9 @@ namespace Sally
             }
             Console.CancelKeyPress += Console_CancelKeyPress;
             new Program().MainAsync().GetAwaiter().GetResult();
+
+
+
         }
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
@@ -81,11 +89,13 @@ namespace Sally
 
         public async Task MainAsync()
         {
+            ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
             InitializeDirectories();
             LoggerService.Initialize();
             StartTime = DateTime.Now;
             string[] moods = { "Sad", "Meh", "Happy", "Extatic" };
-            
+
             //download content
             using (var client = new WebClient())
             {
@@ -104,7 +114,7 @@ namespace Sally
 
             BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("config/configuration.json"));
             DatabaseAccess.Initialize(BotConfiguration.db_user, BotConfiguration.db_password, BotConfiguration.db_database);
-            
+
             if (!File.Exists("meta/prefix.json"))
             {
                 File.Create("meta/prefix.json").Dispose();
@@ -131,8 +141,6 @@ namespace Sally
             Client = new DiscordSocketClient();
 
             VoiceRewardService.InitializeHandler(Client, BotConfiguration);
-
-            Client.Connected += Client_Connected;
             Client.Ready += Client_Ready;
             Client.Log += Log;
 
@@ -143,11 +151,6 @@ namespace Sally
             await Task.Delay(-1);
         }
 
-        private Task Client_Connected()
-        {
-           
-            return Task.CompletedTask;
-        }
         private void checkNewUserEntries()
         {
             List<SocketGuild> guilds = Client.Guilds.ToList();
