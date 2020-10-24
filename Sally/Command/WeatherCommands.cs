@@ -14,6 +14,10 @@ namespace Sally.Command
         [Command("sub2weather")]
         public async Task SubToService(string location, TimeSpan notiferTime)
         {
+            if (Program.CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
+            {
+                return;
+            }
             if (notiferTime >= new TimeSpan(24, 0, 0))
             {
                 await Context.Message.Channel.SendMessageAsync("TimeSpan need to be between 00:00 and 23:59");
@@ -35,6 +39,10 @@ namespace Sally.Command
         [Command("unsub2weather")]
         public async Task UnSubToService()
         {
+            if (Program.CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
+            {
+                return;
+            }
             User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
             currentUser.WeatherLocation = null;
             currentUser.NotifierTime = null;
@@ -43,6 +51,10 @@ namespace Sally.Command
         [Command("currentWeather")]
         public async Task CheckCurrentWeather(string location)
         {
+            if (Program.CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
+            {
+                return;
+            }
             dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.Request2WeatherApiAsync(location));
             if (temperature.cod != 200)
             {

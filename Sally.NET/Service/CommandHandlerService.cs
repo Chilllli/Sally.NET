@@ -44,13 +44,15 @@ namespace Sally.NET.Service
                 File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
             }
         }
+        private static bool HasCleverbotApiKey;
 
-        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses, Dictionary<ulong, char> collection)
+        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses, Dictionary<ulong, char> collection, bool hasCleverbotApiKey)
         {
             CommandHandlerService.client = client;
             CommandHandlerService.credentials = credentials;
             CommandHandlerService.commandClasses = commandClasses;
             CommandHandlerService.IdPrefixCollection = collection;
+            HasCleverbotApiKey = hasCleverbotApiKey;
             commands = new CommandService();
             services = new ServiceCollection()
               .AddSingleton(client)
@@ -217,7 +219,7 @@ namespace Sally.NET.Service
         {
             SocketUserMessage message = input.Message;
 
-            if ((message.Channel as SocketDMChannel) != null)
+            if ((message.Channel as SocketDMChannel) != null && HasCleverbotApiKey)
             {
                 //dm channel
                 if (message.Author.Id == client.CurrentUser.Id)

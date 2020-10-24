@@ -66,6 +66,7 @@ namespace Sally
         private static int startValue;
         private static Dictionary<ulong, char> prefixDictionary;
         public static readonly ILog Logging = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public static ConfigManager CredentialManager;
 
 
         public static void Main(string[] args)
@@ -110,7 +111,9 @@ namespace Sally
             }
 
             BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("config/configuration.json"));
-            DatabaseAccess.Initialize(BotConfiguration.db_user, BotConfiguration.db_password, BotConfiguration.db_database);
+            DatabaseAccess.Initialize(BotConfiguration.db_user, BotConfiguration.db_password, BotConfiguration.db_database, BotConfiguration.db_host);
+            CredentialManager = new ConfigManager(BotConfiguration);
+
 
             if (!File.Exists("meta/prefix.json"))
             {
@@ -137,7 +140,7 @@ namespace Sally
 
             Client = new DiscordSocketClient();
 
-            VoiceRewardService.InitializeHandler(Client, BotConfiguration);
+
             Client.Ready += Client_Ready;
             Client.Log += Log;
 
@@ -204,10 +207,9 @@ namespace Sally
             RoleManagerService.InitializeHandler(Client, BotConfiguration);
             ApiRequestService.Initialize(BotConfiguration);
             UserManagerService.InitializeHandler(Client);
-            MoodDictionary.InitializeMoodDictionary(Client, BotConfiguration);
-            WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration);
-            await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary);
+            await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary, !CredentialManager.OptionalSettings.Contains("CleverApi"));
             CacheService.InitializeHandler();
+            VoiceRewardService.InitializeHandler(Client, BotConfiguration, !CredentialManager.OptionalSettings.Contains("CleverApi"));
             switch (startValue)
             {
                 case 0:
@@ -225,7 +227,15 @@ namespace Sally
                 default:
                     break;
             }
-            await MoodHandlerService.InitializeHandler(Client, BotConfiguration);
+            if (!CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
+            {
+                if (!CredentialManager.OptionalSettings.Contains("WeatherPlace"))
+                {
+                    MoodDictionary.InitializeMoodDictionary(Client, BotConfiguration);
+                    await MoodHandlerService.InitializeHandler(Client, BotConfiguration);
+                }
+                WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration);
+            }
         }
 
         private static void InitializeDirectories()

@@ -16,11 +16,13 @@ namespace Sally.NET.Service
     {
         private static DiscordSocketClient client;
         private static BotCredentials credentials;
+        private static bool hasCleverbotApiKey;
 
-        public static void InitializeHandler(DiscordSocketClient client, BotCredentials credentials)
+        public static void InitializeHandler(DiscordSocketClient client, BotCredentials credentials, bool hasCleverBotKey)
         {
             VoiceRewardService.client = client;
             VoiceRewardService.credentials = credentials;
+            hasCleverbotApiKey = hasCleverBotKey;
             client.UserVoiceStateUpdated += voiceChannelJoined;
             client.UserVoiceStateUpdated += voiceChannelLeft;
         }
@@ -33,7 +35,7 @@ namespace Sally.NET.Service
             }
             User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == disUser.Id);
             GuildUser guildUser = currentUser.GuildSpecificUser[voiceStateOld.VoiceChannel.Guild.Id];
-            if (!currentUser.HasMuted && (DateTime.Now - currentUser.LastFarewell).TotalHours > 12)
+            if ((!currentUser.HasMuted && (DateTime.Now - currentUser.LastFarewell).TotalHours > 12) && hasCleverbotApiKey)
             {
                 //send private message
                 await disUser.SendMessageAsync(MoodDictionary.getMoodMessage("Bye"));//Bye
@@ -51,7 +53,7 @@ namespace Sally.NET.Service
             }
             User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == disUser.Id);
             GuildUser guildUser = currentUser.GuildSpecificUser[voiceStateNew.VoiceChannel.Guild.Id];
-            if (!currentUser.HasMuted && (DateTime.Now - currentUser.LastGreeting).TotalHours > 12)
+            if ((!currentUser.HasMuted && (DateTime.Now - currentUser.LastGreeting).TotalHours > 12) && hasCleverbotApiKey)
             {
                 //send private message
                 await disUser.SendMessageAsync(String.Format(MoodDictionary.getMoodMessage("Hello"), disUser.Username));//Hello

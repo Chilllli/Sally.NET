@@ -10,10 +10,10 @@ namespace Sally.NET.XUnit.DataAccessTests.DatabaseTests
     public class DatabaseAccessTests
     {
         [Theory]
-        [InlineData("root", "root", "test")]
-        public void Initialize_ShouldThrowMySqlException(string user, string password, string database)
+        [InlineData("root", "root", "test", "localhost")]
+        public void Initialize_ShouldThrowMySqlException(string user, string password, string database, string host)
         {
-            Assert.Throws<MySqlException>(() => DatabaseAccess.Initialize(user, password, database));
+            Assert.Throws<MySqlException>(() => DatabaseAccess.Initialize(user, password, database, host));
         }
     }
 }

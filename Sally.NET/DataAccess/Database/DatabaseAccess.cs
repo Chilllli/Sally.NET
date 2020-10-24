@@ -28,11 +28,11 @@ namespace Sally.NET.DataAccess.Database
         /// <param name="user"></param>
         /// <param name="password"></param>
         /// <param name="database"></param>
-        public static void Initialize(string user, string password, string database)
+        public static void Initialize(string user, string password, string database, string host)
         {
             if (Instance == null)
             {
-                Instance = new DatabaseAccess(user, password, database);
+                Instance = new DatabaseAccess(user, password, database, host);
             }
             databaseWriter = new Task(databaseQueueLoop);
             databaseWriter.Start();
@@ -53,10 +53,10 @@ namespace Sally.NET.DataAccess.Database
             }
         }
 
-        private DatabaseAccess(string user, string password, string database)
+        private DatabaseAccess(string user, string password, string database, string host)
         {
             string connectionString = String.Format("server={0};port={1};user id={2}; password={3}; database={4}; SslMode=none",
-                          "localhost", 3306, user, password, database);
+                          host, 3306, user, password, database);
             connection = new MySqlConnection(connectionString);
 
             try
