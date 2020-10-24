@@ -19,43 +19,6 @@ namespace Sally.Command
 {
     public class GameCommands : ModuleBase
     {
-        [Group("terraria")]
-        public class TerrariaServer : ModuleBase
-        {
-            [Command("mods")]
-            public async Task GetEnabledMods()
-            {
-                SocketGuildUser guildUser = Context.Message.Author as SocketGuildUser;
-                if (guildUser == null || guildUser.Roles.ToList().Find(r => r.Id == Program.BotConfiguration.TerrariaId) == null)
-                {
-                    return;
-                }
-#if DEBUG
-                string[] mods = GameModule.GetTerrariaMods("debug.json");
-#else
-                string[] mods = GameModule.GetTerrariaMods("/srv/terraria/.local/share/Terraria/ModLoader/Mods/enabled.json");
-#endif
-                await Context.Message.Channel.SendMessageAsync(null, embed: modInfoEmbed(mods)).ConfigureAwait(false);
-            }
-        }
-        private static Embed modInfoEmbed(string[] mods)
-        {
-            EmbedBuilder dynamicEmbed = new EmbedBuilder()
-                .WithTitle("Terraria Server")
-                .WithDescription("Mods, which are currently running on the server")
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
-                .WithTimestamp(DateTime.Now)
-                .WithFooter(footer =>
-                {
-                    footer
-                    .WithText($"There are currently {mods.Length} mods.");
-                });
-            foreach (string mod in mods)
-            {
-                dynamicEmbed.AddField(mod, "\u2705", true);
-            }
-            return dynamicEmbed.Build();
-        }
         [Group("rl")]
         public class RocketLeagueCommands : ModuleBase
         {
@@ -149,7 +112,7 @@ namespace Sally.Command
                                 rsEmbed
                                 .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                                 .WithDescription("Check current prices of items in the grand exchange")
-                                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                                 .WithTimestamp(DateTime.Now)
                                 .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
                                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
@@ -165,7 +128,7 @@ namespace Sally.Command
                                 rsEmbed
                                 .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                                 .WithDescription("Check current prices of items in the grand exchange")
-                                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                                 .WithTimestamp(DateTime.Now)
                                 .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
                                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)

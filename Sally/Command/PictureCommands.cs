@@ -18,7 +18,7 @@ namespace Sally.Command
         public async Task SendPicture()
         {
             //search for image without tags and rating
-            string response = await ApiRequestService.request2konachanAsync();
+            string response = await ApiRequestService.Request2KonachanApiAsync();
             await generateImageEmbed(response);
         }
 
@@ -42,7 +42,7 @@ namespace Sally.Command
                 {
                     tagUrl = tagUrl + $"{tag} ";
                 }
-                string response = await ApiRequestService.request2konachanAsync(tagCollection, rating);
+                string response = await ApiRequestService.Request2KonachanApiAsync(tagCollection, rating);
                 await generateImageEmbed(response, tagUrl);
             }
             else
@@ -52,7 +52,7 @@ namespace Sally.Command
                 {
                     tagUrl = tagUrl + $"{tag} ";
                 }
-                string response = await ApiRequestService.request2konachanAsync(lowerTags);
+                string response = await ApiRequestService.Request2KonachanApiAsync(lowerTags);
                 await generateImageEmbed(response, tagUrl);
             }
         }
@@ -66,7 +66,7 @@ namespace Sally.Command
         {
             EmbedBuilder embedBuilder = new EmbedBuilder()
                 .WithDescription($"[Result]({response})")
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
@@ -87,7 +87,7 @@ namespace Sally.Command
             }
             EmbedBuilder embedBuilder = new EmbedBuilder()
                 .WithDescription($"Tags: [{tagUrl}]({response})")
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());

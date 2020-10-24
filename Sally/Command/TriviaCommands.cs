@@ -15,14 +15,14 @@ namespace Sally.Command
         [Command("ask")]
         public async Task AskWikipedia(string searchTerm)
         {
-            dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.request2wikiAsync(searchTerm));
+            dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.Request2WikipediaApiAsync(searchTerm));
 
             EmbedBuilder searchEmbed = new EmbedBuilder()
                 .WithTitle($"What is \"{searchTerm}\"?")
                 .WithDescription($"Results for {searchTerm}")
                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
                 .WithTimestamp(DateTime.Now)
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)));
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)));
                 for (int i = 0; i < 5; i++)
                 {
                     if (searchResult[1][i] == null || searchResult[2][i] == null)

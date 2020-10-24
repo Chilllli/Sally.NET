@@ -31,7 +31,7 @@ namespace Sally_NET.Command
                     string result = "0x" + color.PadRight(6, '0');
                     if (hexColor < 16777216 && hexColor >= 0)
                     {
-                        string previousColorCode = CommandHandlerService.messageAuthor.EmbedColor;
+                        string previousColorCode = CommandHandlerService.MessageAuthor.EmbedColor;
                         string previousColor;
                         if (previousColorCode.Length != 6)
                         {
@@ -41,11 +41,11 @@ namespace Sally_NET.Command
                         {
                             previousColor = previousColorCode;
                         }
-                        string oldColorName = await ApiRequestService.request2ColorNamesApi(previousColor);
+                        string oldColorName = await ApiRequestService.Request2ColorNamesApiAsync(previousColor);
                         if (oldColorName == null)
                             oldColorName = "Color has no name yet.";
 
-                        string newColorName = await ApiRequestService.request2ColorNamesApi(color);
+                        string newColorName = await ApiRequestService.Request2ColorNamesApiAsync(color);
                         if (newColorName == null)
                             newColorName = "Color has no name yet.";
 

@@ -19,6 +19,9 @@ using System.Threading.Tasks;
 
 namespace Sally.NET.Service
 {
+    /// <summary>
+    /// This class handles all command-related content.
+    /// </summary>
     public static class CommandHandlerService
     {
         private static DiscordSocketClient client;
@@ -27,7 +30,7 @@ namespace Sally.NET.Service
         public static Dictionary<ulong, char> IdPrefixCollection = new Dictionary<ulong, char>();
         private static List<Type> commandClasses;
         private static IServiceProvider services;
-        public static User messageAuthor { get; set; }
+        public static User MessageAuthor { get; set; }
         private static int requestCounter;
         public static int RequestCounter
         {
@@ -193,7 +196,7 @@ namespace Sally.NET.Service
                 commandResult = String.Join(Environment.NewLine, messageCompareValues.Where(d => d.Value == minValue).Select(k => k.Key));
                 //await context.Channel.SendMessageAsync($"Sorry, I dont know what you are saying ¯\\_(ツ)_/¯, but did you mean: {commandResult}");
                 EmbedBuilder embed = new EmbedBuilder()
-                    .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                    .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                     .WithCurrentTimestamp()
                     .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
                     .WithThumbnailUrl("https://sallynet.blob.core.windows.net/content/question.png")
@@ -223,7 +226,7 @@ namespace Sally.NET.Service
                 RequestCounter++;
 
 
-                CleverApi messageOutput = JsonConvert.DeserializeObject<CleverApi>(await ApiRequestService.request2cleverapiAsync(message));
+                CleverApi messageOutput = JsonConvert.DeserializeObject<CleverApi>(await ApiRequestService.Request2CleverBotApiAsync(message));
                 await message.Channel.SendMessageAsync(messageOutput.Answer);
             }
         }
@@ -248,7 +251,7 @@ namespace Sally.NET.Service
                 return;
             }
 
-            messageAuthor = DatabaseAccess.Instance.Users.Find(u => u.Id == message.Author.Id);
+            MessageAuthor = DatabaseAccess.Instance.Users.Find(u => u.Id == message.Author.Id);
 
             //await MessageHandlerService.DeleteStartMessages(message);
             Input input = ClassifyAs(message);
@@ -256,11 +259,16 @@ namespace Sally.NET.Service
         }
 
         /// <summary>
-        /// calculate the difference between two input strings
+        /// The Levenstein algorithm is used to calculate the similarities between two strings. 
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// The more two strings have in common, the smaller will be the returned value.
+        /// </remarks>
+        /// <param name="a">first compared string</param>
+        /// <param name="b">second compared string</param>
+        /// <returns>
+        /// The returned value is an int with the calculated differences of the two strings.
+        /// </returns>
         public static int CalcLevenshteinDistance(string a, string b)
         {
             if (String.IsNullOrEmpty(a) && String.IsNullOrEmpty(b))

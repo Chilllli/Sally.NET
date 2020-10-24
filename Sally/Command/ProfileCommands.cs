@@ -37,7 +37,7 @@ namespace Sally.Command
         [Command("myxp")]
         public async Task LevelOverview()
         {
-            User myUser = CommandHandlerService.messageAuthor;
+            User myUser = CommandHandlerService.MessageAuthor;
             if (Context.Message.Channel is SocketGuildChannel guildChannel)
             {
                 //message from guild

@@ -20,7 +20,7 @@ namespace Sally.Command
                 return;
             }
 
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.request2weatherAsync(location));
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.Request2WeatherApiAsync(location));
             if(temperature.cod != 200)
             {
                 await Context.Message.Channel.SendMessageAsync((string)temperature.message);
@@ -43,7 +43,7 @@ namespace Sally.Command
         [Command("currentWeather")]
         public async Task CheckCurrentWeather(string location)
         {
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.request2weatherAsync(location));
+            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.Request2WeatherApiAsync(location));
             if (temperature.cod != 200)
             {
                 await Context.Message.Channel.SendMessageAsync((string)temperature.message);
@@ -56,7 +56,7 @@ namespace Sally.Command
                     .AddField("Current Max. Temp", $"{temperature.main.temp_max} °C")
                     .AddField("Current Min. Temp", $"{temperature.main.temp_min} °C")
                     .AddField("Current Weather Condition", (string)temperature.weather[0].main)
-                    .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                    .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                     .WithTimestamp(DateTime.Now)
                     .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: weatherEmbed.Build()).ConfigureAwait(false);

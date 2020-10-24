@@ -17,6 +17,9 @@ using System.Web;
 
 namespace Sally.NET.Service
 {
+    /// <summary>
+    /// The <c>ApiRequestService</c> class handles all api requests to other web apis.
+    /// </summary>
     public static class ApiRequestService
     {
 #if RELEASE
@@ -28,23 +31,61 @@ namespace Sally.NET.Service
         private static BotCredentials credentials;
 
         /// <summary>
-        /// initialize and create service
+        /// The <c>Initialize</c> method initialize this service with specific bot credentials.
         /// </summary>
-        /// <param name="credentials"></param>
+        /// <param name="credentials">
+        /// Botcredentials with set values
+        /// </param>
+        /// <returns></returns>
         public static void Initialize(BotCredentials credentials)
         {
             ApiRequestService.credentials = credentials;
         }
 
         /// <summary>
-        /// create a call to weather api <br />
-        /// parameter can be optinal 
+        /// The <c>Request2WeatherApiAsync</c> method creates an api call to the weather api.<br />
+        /// The parameter can be optional.
         /// </summary>
-        /// <param name="location"></param>
+        /// <param name="Location">Determine location of the request. </param>
         /// <returns>
-        /// returns a task with a string
+        /// Returns a string with the resulting json
         /// </returns>
-        public static async Task<string> request2weatherAsync(string location = null)
+        /// <remarks>If the weather api key is not set in the config file, then this method won't work.</remarks>
+        /// <example>
+        /// <code>
+        /// ApiRequestService.Request2WeatherApiAsync("Berlin");
+        /// 
+        /// Result:
+        /// 
+        /// "coord":
+        /// {
+        ///     "lon":13.41,
+        ///     "lat":52.52
+        /// },
+        /// "weather":
+        /// [
+        ///     {
+        ///         "id":800,
+        ///         "main":"Clear",
+        ///         "description":"clear sky",
+        ///         "icon":"01n"
+        ///     }
+        /// ],
+        /// "base":"stations",
+        /// "main":
+        /// {
+        ///     "temp":14.67,
+        ///     "feels_like":13.01,
+        ///     "temp_min":13.33,
+        ///     "temp_max":16.11,
+        ///     "pressure":1012,
+        ///     "humidity":82
+        /// },
+        /// etc...
+        /// 
+        /// </code>
+        /// </example>
+        public static async Task<string> Request2WeatherApiAsync(string location = null)
         {
             if (location == null)
             {
@@ -60,29 +101,28 @@ namespace Sally.NET.Service
         }
 
         /// <summary>
-        /// creates an api call to the cleverbot api <br />
-        /// parameter is a dm, which was received by the bot
+        /// The <c>Request2CleverBotApiASync</c> method creates an api call to the cleverbot api.
         /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public static async Task<string> request2cleverapiAsync(SocketUserMessage message)
+        /// <param name="message">Direct message from a user</param>
+        /// <returns>Returns json data strong from the api call</returns>
+        /// <remarks><b>If the cleverbot api key is not set in the config file, then this method won't work.</b></remarks>
+        public static async Task<string> Request2CleverBotApiAsync(SocketUserMessage message)
         {
             string stringResult = await (CreateHttpRequest("https://www.cleverbot.com", $"/getreply?key={credentials.CleverApi}&input={message.Content}").Result).Content.ReadAsStringAsync();
             return stringResult;
         }
 
         /// <summary>
-        /// creates an api call to the wikipedia api <br />
-        /// parameter is the term, which shall be looked up
+        /// The <c>Request2WikipediaApiAsync</c> method creates a api call to the wikipedia api.
         /// </summary>
-        /// <param name="term"></param>
-        /// <returns></returns>
-        public static async Task<string> request2wikiAsync(string term)
+        /// <param name="term">A term, which is looked up in wikipedia.</param>
+        /// <returns>Returns a json string result from the api call.</returns>
+        public static async Task<string> Request2WikipediaApiAsync(string term)
         {
             string stringResult = await (CreateHttpRequest("https://en.wikipedia.org", $"/w/api.php?action=opensearch&format=json&search={term}&namespace=0&limit=5&utf8=1").Result).Content.ReadAsStringAsync();
             return stringResult;
         }
-
+        
         private static async Task<HttpResponseMessage> CreateHttpRequest(string url, string urlExtension)
         {
             HttpClient client = new HttpClient();
@@ -92,12 +132,30 @@ namespace Sally.NET.Service
         }
 
         /// <summary>
-        /// creates a generic api call to the konachan api <br />
-        /// returns an image url from a generic json result <br />
-        /// <b>tags</b> and <b>ratings</b> are ignored
+        /// The <c>Request2KonachanApiAsync</c> method creates a generic konachan web api request.
         /// </summary>
-        /// <returns></returns>
-        public static async Task<string> request2konachanAsync()
+        /// <remarks>
+        /// <b>Tags</b> and <paramref name="Rating"/> are ignored. <br />
+        /// See <see cref="Request2KonachanApiAsync(string[])"/> to submit image tags to the image search. <br />
+        /// See <see cref="Request2KonachanApiAsync(string[], Rating)"/> to add tags with a specific rating to the image search.
+        /// </remarks>
+        /// <returns>Returns string image url of a random selected image.</returns>
+        /// <example>
+        /// <code>
+        /// ApiRequestService.Request2KonachanApiAsync()
+        /// 
+        /// Result:
+        /// 
+        /// {
+        ///     "id":317653,
+        ///     "tags":"aoi_tori aqua_eyes brown_hair chaamii maid umino_akari",
+        ///     "created_at":1603482940,
+        ///     "creator_id":140316,
+        ///     ...
+        /// }
+        /// </code>
+        /// </example>
+        public static async Task<string> Request2KonachanApiAsync()
         {
             string response = await (CreateHttpRequest("https://konachan.com", "/post.json?limit=100").Result).Content.ReadAsStringAsync();
             if (response == "[]")
@@ -111,15 +169,16 @@ namespace Sally.NET.Service
         }
 
         /// <summary>
-        /// create an api call to the konachan api <br />
-        /// parameter is a list of tags for image search <br />
-        /// <b>rating</b> is ignored
+        /// The <c>Request2KonachanApiAsync</c> method creates a konachan api call with certain tags. <br />
+        /// <paramref name="Rating"/> is ignored.
         /// </summary>
-        /// <param name="tags"></param>
-        /// <returns></returns>
-        public static async Task<string> request2konachanAsync(string[] tags)
+        /// <param name="tags">The parameter is a array of strings (tags) for a filtered immage search.</param>
+        /// <returns>Returns a filtered json string result from the api.</returns>
+        /// <example>
+        /// <see cref="Request2KonachanApiAsync()"/>
+        /// </example>
+        public static async Task<string> Request2KonachanApiAsync(string[] tags)
         {
-
             string tagUrl = "";
             JObject parsedResponse = new JObject();
             int pageCounter = 0;
@@ -139,7 +198,6 @@ namespace Sally.NET.Service
             List<KonachanApi> imageCollection = new List<KonachanApi>();
             if (File.Exists($"cached/{formattedTagString}.json"))
             {
-
 
                 // read JSON directly from a file
                 using (StreamReader file = File.OpenText($"cached/{formattedTagString}.json"))
@@ -178,14 +236,15 @@ namespace Sally.NET.Service
         }
 
         /// <summary>
-        /// create an api call to konachan api <br />
-        /// <b>tags</b> are for a specific image search <br />
-        /// <b>rating</b> is for image filtering
+        /// The <c>Request2KonachanApiAsync</c> method creates a konachan api call with certain tags and a specific rating.
         /// </summary>
-        /// <param name="tags"></param>
-        /// <param name="rating"></param>
-        /// <returns></returns>
-        public static async Task<string> request2konachanAsync(string[] tags, Rating rating)
+        /// <param name="tags">The parameter is a array of strings (tags) for a filtered immage search.</param>
+        /// <param name="rating">The parameter meter is an enum of aspecific rating. </param>
+        /// <returns>Returns a filtered json string result from the api.</returns>
+        /// <example>
+        /// <see cref="Request2KonachanApiAsync()"/>
+        /// </example>
+        public static async Task<string> Request2KonachanApiAsync(string[] tags, Rating rating)
         {
             int pageCounter = 0;
             const int limit = 90;
@@ -305,12 +364,23 @@ namespace Sally.NET.Service
         }
 
         /// <summary>
-        /// creates an api request to the colornames.org web api <br />
-        /// return json with name and hex color code
+        /// The <c>Request2ColorNamesApiAsync</c> method creates a api call to the color names api.
         /// </summary>
-        /// <param name="hexcode"></param>
-        /// <returns></returns>
-        public static async Task<string> request2ColorNamesApi(string hexcode)
+        /// <param name="hexcode">The parameter is a hexcode string.</param>
+        /// <returns>Returns a json string result of color name and hexcode.</returns>
+        /// <example>
+        /// <code>
+        /// ApiReuqestService.Request2ColorNamesApiAsync("FFFFFF")
+        /// 
+        /// Result:
+        /// 
+        /// {
+        ///     "hexCode":"ffffff",
+        ///     "name":"White"
+        /// }
+        /// </code>
+        /// </example>
+        public static async Task<string> Request2ColorNamesApiAsync(string hexcode)
         {
             hexcode = hexcode.ToUpper();
             string response = await (CreateHttpRequest("https://colornames.org", $"/search/json/?hex={hexcode}").Result).Content.ReadAsStringAsync();

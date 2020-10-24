@@ -43,7 +43,7 @@ namespace Sally.Command
         public async Task ShowSupportLinks()
         {
             EmbedBuilder embed = new EmbedBuilder()
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithCurrentTimestamp()
                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
                 .WithTitle("Thanks for considering to support us! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
@@ -57,7 +57,7 @@ namespace Sally.Command
         public async Task ShowInviteLink()
         {
             EmbedBuilder embed = new EmbedBuilder()
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.messageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithCurrentTimestamp()
                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
                 .WithTitle("If you want to have Sally on your server, you came to the right place! (▰˘◡˘▰)")
