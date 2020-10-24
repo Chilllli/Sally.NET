@@ -10,8 +10,6 @@ Sally is a friendly multipurpose discordbot. She provides many game integrations
 
 ## Quick Links
 
----
-
 **Homepage**:  
 <https://its-sally.net>
 
@@ -22,8 +20,6 @@ Sally is a friendly multipurpose discordbot. She provides many game integrations
 <https://discord.gg/hjPRKyY>
 
 ## Overview
-
----
 
 * [Commands](#commands)
 * [Features](#features)
@@ -36,14 +32,10 @@ Sally is a friendly multipurpose discordbot. She provides many game integrations
 
 ## Commands
 
----
-
 All Commands can be found on the webpage: <https://its-sally.net/commands>.
 It will be updated regularly.
 
 ## Features
-
----
 
 ### Integrations - Games
 
@@ -71,8 +63,6 @@ It will be updated regularly.
 * Service subscription
 
 ## Self-hosting
-
----
 
 * Prerequisite:
   * MySQL or (planned sqlite)
@@ -144,8 +134,6 @@ coming soon!
 coming soon!
 
 ## Support
-
----
 
 You can directly support Sally and me via Patreon: <https://patreon.com/sallydev>
 
