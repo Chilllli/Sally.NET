@@ -26,7 +26,7 @@ Sally is a friendly multipurpose discordbot. She provides many game integrations
 * [Self-hosting](#self-hosting)
   * [Windows](#windows)
   * [Linux](#linux)
-  * [Max](#mac)
+  * [Mac](#mac)
   * [Docker](#docker)
 * [Support](#support)
 
@@ -88,7 +88,7 @@ Guide: [How to install .NET Core on Linux 18.04](https://docs.microsoft.com/en-u
 
         cd Sally.NET
 
-5. Complie release build
+5. Compile release build
 
         dotnet build Sally.NET.sln -c Release
 
