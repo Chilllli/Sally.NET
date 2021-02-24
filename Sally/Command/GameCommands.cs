@@ -14,6 +14,7 @@ using Sally.NET.Core.Enum;
 using Sally.NET.Module;
 using Sally.NET.Service;
 using Sally.NET.Core.Attr;
+using Sally.NET.Core;
 
 namespace Sally.Command
 {
@@ -86,7 +87,7 @@ namespace Sally.Command
                         string dataItemName = (string)jsonIdFinder[item.Key]["name"];
                         if (!itemNameComparison.ContainsKey(dataItemName))
                         {
-                            itemNameComparison.Add(dataItemName, CommandHandlerService.CalcLevenshteinDistance(dataItemName, normInput));
+                            itemNameComparison.Add(dataItemName, Helper.CalcLevenshteinDistance(dataItemName, normInput));
                         }
                         //check if the item is equal to the input
                         if (normInput == dataItemName && !hasBreaked)
