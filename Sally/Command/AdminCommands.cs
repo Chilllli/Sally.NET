@@ -58,7 +58,7 @@ namespace Sally.Command
             [RequireOwner]
             public async Task ShowCurrentApiRequests()
             {
-                if (Context.Message.Author.Id != Program.BotConfiguration.meId)
+                if (Context.Message.Author.Id != Program.BotConfiguration.MeId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
@@ -70,7 +70,7 @@ namespace Sally.Command
             [RequireOwner]
             public async Task ShutdownBot()
             {
-                if (Context.Message.Author.Id != Program.BotConfiguration.meId)
+                if (Context.Message.Author.Id != Program.BotConfiguration.MeId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
@@ -83,7 +83,7 @@ namespace Sally.Command
             [RequireOwner]
             public async Task RestartBot()
             {
-                if (Context.Message.Author.Id != Program.BotConfiguration.meId)
+                if (Context.Message.Author.Id != Program.BotConfiguration.MeId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
@@ -96,7 +96,7 @@ namespace Sally.Command
             [RequireOwner]
             public async Task PerformUpdate()
             {
-                if (Context.Message.Author.Id != Program.BotConfiguration.meId)
+                if (Context.Message.Author.Id != Program.BotConfiguration.MeId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;

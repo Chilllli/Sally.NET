@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Sally.NET.Core
 {
+    //change to log4net logging
     public class Logger : IDisposable
     {
         private string filePath = String.Empty;

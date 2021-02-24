@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿
+using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Sally.NET.Core;
@@ -78,7 +79,7 @@ namespace Sally.NET.Service
             SocketRole newRole = guild.Roles.ToList().Find(r => r.Name == role);
             if (newRole == null)
             {
-                await guild.CreateRoleAsync(role, color: color);
+                await guild.CreateRoleAsync(role, color: color, isMentionable: false);
                 while (newRole == null)
                 {
                     newRole = guild.Roles.ToList().Find(r => r.Name == role);

@@ -6,6 +6,6 @@ namespace Sally.NET.Core.Configuration
 {
     interface IConfig
     {
-        void save();
+        void Save();
     }
 }

@@ -3,6 +3,8 @@ using Discord.Commands;
 using Sally.NET.Core.Enum;
 using Sally.NET.Service;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -64,8 +66,15 @@ namespace Sally.Command
         /// <returns></returns>
         private async Task generateImageEmbed(string response)
         {
+            string tagResponse = String.Empty;
+            List<string> tags = getTagsFromKonachanImageUrl(response).ToList();
+            tags.RemoveRange(0, 3);
+            foreach (string tag in tags)
+            {
+                tagResponse += $"[{tag}](https://konachan.com/post?tags={tag}) ";
+            }
             EmbedBuilder embedBuilder = new EmbedBuilder()
-                .WithDescription($"[Result]({response})")
+                .WithDescription($"Tags: {tagResponse.Trim()}")
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
@@ -85,12 +94,22 @@ namespace Sally.Command
                 await Context.Message.Channel.SendMessageAsync("nothing found!");
                 return;
             }
+            string tagResponse = String.Empty;
+            foreach (string tag in tagUrl.Split(" "))
+            {
+                tagResponse += $"[{tag}](https://konachan.com/post?tags={tag}) ";
+            }
             EmbedBuilder embedBuilder = new EmbedBuilder()
-                .WithDescription($"Tags: [{tagUrl}]({response})")
+                .WithDescription($"Tags: {tagResponse.Trim()}")
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
+        }
+
+        private IEnumerable<string> getTagsFromKonachanImageUrl(string imageUrl)
+        {
+            return Path.GetFileNameWithoutExtension(imageUrl).Split("%20");
         }
     }
 }

@@ -7,16 +7,16 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
-using Sally.NET.Core.Configuration;
-using Sally.NET.DataAccess.Database;
-using Sally.NET.Service;
 using System.Collections.Generic;
 using Discord.Commands;
-using Sally.NET.Core;
 using System.Reflection;
 using log4net;
 using log4net.Config;
 using log4net.Repository;
+using Sally.NET.Service;
+using Sally.NET.DataAccess.Database;
+using Sally.NET.Core.Configuration;
+using Sally.NET.Core;
 
 namespace Sally
 {
@@ -67,10 +67,14 @@ namespace Sally
         private static Dictionary<ulong, char> prefixDictionary;
         public static readonly ILog Logging = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static ConfigManager CredentialManager;
+        private static ILog consoleLogger = LogManager.GetLogger("console");
+        private static ILog fileLogger = LogManager.GetLogger("file");
+        private static DateTime startTime { get; set; }
 
 
         public static void Main(string[] args)
         {
+            startTime = DateTime.Now;
             if (args.Length > 0)
             {
                 startValue = Int32.Parse(args[0]);
@@ -111,7 +115,7 @@ namespace Sally
             }
 
             BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("config/configuration.json"));
-            DatabaseAccess.Initialize(BotConfiguration.db_user, BotConfiguration.db_password, BotConfiguration.db_database, BotConfiguration.db_host);
+            DatabaseAccess.Initialize(BotConfiguration.DbUser, BotConfiguration.DbPassword, BotConfiguration.Db, BotConfiguration.DbHost);
             CredentialManager = new ConfigManager(BotConfiguration);
 
 
@@ -144,7 +148,7 @@ namespace Sally
             Client.Ready += Client_Ready;
             Client.Log += Log;
 
-            await Client.LoginAsync(TokenType.Bot, BotConfiguration.token);
+            await Client.LoginAsync(TokenType.Bot, BotConfiguration.Token);
             await Client.StartAsync();
 
             // Block this task until the program is closed.
@@ -159,7 +163,7 @@ namespace Sally
                 List<SocketGuildUser> guildUsers = guild.Users.ToList();
                 foreach (SocketGuildUser guildUser in guildUsers)
                 {
-                    if (guildUser.Id == BotConfiguration.meId)
+                    if (guildUser.Id == BotConfiguration.MeId)
                     {
                         Me = guildUser as SocketUser;
                     }
@@ -186,7 +190,7 @@ namespace Sally
         }
         private Task Log(LogMessage msg)
         {
-            Console.WriteLine(msg.ToString());
+            consoleLogger.Info(msg.ToString());
             return Task.CompletedTask;
         }
 
@@ -200,7 +204,6 @@ namespace Sally
             {
                 commandClasses.AddRange(assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList());
             }
-
             checkNewUserEntries();
             StatusNotifierService.InitializeService(Me);
             MusicCommands.Initialize(Client);
@@ -236,6 +239,10 @@ namespace Sally
                 }
                 WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration);
             }
+            consoleLogger.Info($"Addons loaded: {AddonLoader.LoadedAddonsCount}");
+            consoleLogger.Info($"User loaded: {DatabaseAccess.Instance.Users.Count}");
+            consoleLogger.Info($"Registered guilds: {Client.Guilds.Count}");
+            consoleLogger.Info($"Bot start up time: {(DateTime.Now - startTime).TotalSeconds} s");
         }
 
         private static void InitializeDirectories()

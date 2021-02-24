@@ -65,7 +65,7 @@ namespace Sally.NET.Service
         public static void StartTrackingVoiceChannel(GuildUser guildUser)
         {
             guildUser.LastXpTime = DateTime.Now;
-            guildUser.XpTimer = new Timer(credentials.xpTimerInMin * 1000 * 60);
+            guildUser.XpTimer = new Timer(credentials.XpTimerInMin * 1000 * 60);
             guildUser.XpTimer.Start();
             guildUser.XpTimer.Elapsed += (s, e) => trackVoiceChannel(guildUser);
         }
@@ -81,14 +81,14 @@ namespace Sally.NET.Service
             {
                 return;
             }
-            guildUser.Xp += credentials.gainedXp;
+            guildUser.Xp += credentials.GainedXp;
             guildUser.LastXpTime = DateTime.Now;
         }
 
         private static void stopTrackingVoiceChannel(GuildUser guildUser)
         {
             guildUser.XpTimer.Stop();
-            guildUser.Xp += (int)Math.Round(((DateTime.Now - guildUser.LastXpTime).TotalMilliseconds / (credentials.xpTimerInMin * 1000 * 60)) * credentials.gainedXp);
+            guildUser.Xp += (int)Math.Round(((DateTime.Now - guildUser.LastXpTime).TotalMilliseconds / (credentials.XpTimerInMin * 1000 * 60)) * credentials.GainedXp);
         }
     }
 }

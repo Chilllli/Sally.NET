@@ -12,6 +12,8 @@ namespace Sally.NET.Core
 {
     public static class AddonLoader
     {
+        public static int LoadedAddonsCount { get; set; } = 0;
+
         private static Dictionary<string, object> assemblyConfigPairs = new Dictionary<string, object>();
 
         /// <summary>

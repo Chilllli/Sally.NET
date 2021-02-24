@@ -162,7 +162,7 @@ namespace Sally.Command
             audioClient = await voiceChannel.ConnectAsync();
 
             //alle nachrichten löschen
-            ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.BotConfiguration.radioControlChannel) as SocketTextChannel;
+            ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.BotConfiguration.RadioControlChannel) as SocketTextChannel;
             List<IMessage> userMessages = await (textChannel.GetMessagesAsync().Flatten()).ToListAsync();
             foreach (IMessage message in userMessages)
             {
@@ -191,7 +191,7 @@ namespace Sally.Command
                 {
                     continue;
                 }
-                SocketTextChannel textChannel = client.Guilds.First(g => g.GetChannel(Program.BotConfiguration.radioControlChannel) != null).GetChannel(Program.BotConfiguration.radioControlChannel) as SocketTextChannel;
+                SocketTextChannel textChannel = client.Guilds.First(g => g.GetChannel(Program.BotConfiguration.RadioControlChannel) != null).GetChannel(Program.BotConfiguration.RadioControlChannel) as SocketTextChannel;
                 if (oneMessage == null)
                 {
                     continue;

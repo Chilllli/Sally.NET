@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Sally_NET</RootNamespace>
     <AssemblyName>Sally</AssemblyName>
     <Authors>Chillli_</Authors>
@@ -23,17 +23,13 @@
 
   <ItemGroup>
     <PackageReference Include="Discord.Addons.Interactive" Version="2.0.0" />
-    <PackageReference Include="Discord.Net" Version="2.2.0" />
-    <PackageReference Include="Discord.Net.Commands" Version="2.2.0" />
-    <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
-    <PackageReference Include="MySql.Data" Version="8.0.21" />
+    <PackageReference Include="Discord.Net" Version="2.3.0" />
+    <PackageReference Include="Discord.Net.Commands" Version="2.3.0" />
+    <PackageReference Include="log4net" Version="2.0.12" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="MySql.Data" Version="8.0.23" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="YoutubeExplode" Version="5.1.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Sally.NET\Sally.NET.csproj" />
+    <PackageReference Include="YoutubeExplode" Version="5.1.9" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,6 +68,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sally.NET\Sally.NET.csproj" />
   </ItemGroup>
 
 </Project>
