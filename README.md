@@ -1,4 +1,4 @@
-# Welcome to Sally
+# Welcome to Sally (◕‿◕✿)
 
 ![alt text](https://sallynet.blob.core.windows.net/content/sally_banner.jpg "Sally's mood banner")
 
