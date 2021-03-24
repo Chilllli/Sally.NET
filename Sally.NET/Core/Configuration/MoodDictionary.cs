@@ -26,7 +26,7 @@ namespace Sally.NET.Core.Configuration
             MoodDictionary.credentials = credentials;
             foreach (Mood mood in System.Enum.GetValues(typeof(Mood)))
             {
-                moodDictionary.Add(mood, JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"mood/{mood}.json")));
+                moodDictionary.TryAdd(mood, JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText($"mood/{mood}.json")));
             }
         }
 
