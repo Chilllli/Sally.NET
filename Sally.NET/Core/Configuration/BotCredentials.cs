@@ -18,7 +18,5 @@ namespace Sally.NET.Core.Configuration
         public string WeatherPlace { get; set; } = String.Empty;
         public string WeatherApiKey { get; set; } = String.Empty;
         public string CleverApi { get; set; } = String.Empty;
-        public string RedditClientId { get; set; } = String.Empty;
-        public string RedditApiSecret { get; set; } = String.Empty;
     }
 }

@@ -62,12 +62,10 @@ namespace Sally.NET.DataAccess.Database
             try
             {
                 connection.Open();
-                //Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    Success");
             }
             catch (MySqlException ex)
             {
                 Console.WriteLine(ex.Message);
-                throw ex;
             }
 
             //Initilaze database connection
