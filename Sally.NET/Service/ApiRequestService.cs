@@ -258,7 +258,8 @@ namespace Sally.NET.Service
                 tagUrl = tagUrl + $"{tag}%20";
             }
             string formattedTagString = tagUrl.Replace("%20", " ");
-            formattedTagString = formattedTagString.Remove(formattedTagString.Length - 1);
+            if (!String.IsNullOrEmpty(formattedTagString))
+                formattedTagString = formattedTagString.Remove(formattedTagString.Length - 1);
             //create http request and get result
             if (File.Exists($"cached/{formattedTagString}.json"))
             {
@@ -311,7 +312,8 @@ namespace Sally.NET.Service
             }
             else
             {
-                checkAndSaveTagPopularity(tagUrl);
+                if(!String.IsNullOrEmpty(formattedTagString))
+                    checkAndSaveTagPopularity(tagUrl);
                 //collection of images found
                 //return random item from list
                 return imageRatingResults[rng.Next(imageRatingResults.Count)].ImageUrl;

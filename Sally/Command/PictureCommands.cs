@@ -95,10 +95,21 @@ namespace Sally.Command
                 return;
             }
             string tagResponse = String.Empty;
-            foreach (string tag in tagUrl.Split(" "))
+            if (!String.IsNullOrEmpty(tagUrl))
             {
-                tagResponse += $"[{tag}](https://konachan.com/post?tags={tag}) ";
+                foreach (string tag in tagUrl.Split(" "))
+                {
+                    tagResponse += $"[{tag}](https://konachan.com/post?tags={tag}) ";
+                }
             }
+            else
+            {
+                foreach (string tag in getTagsFromKonachanImageUrl(response))
+                {
+                    tagResponse += $"[{tag}](https://konachan.com/post?tags={tag}) ";
+                }
+            }
+            
             EmbedBuilder embedBuilder = new EmbedBuilder()
                 .WithDescription($"Tags: {tagResponse.Trim()}")
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
