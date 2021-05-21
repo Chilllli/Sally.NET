@@ -34,11 +34,11 @@ namespace Sally.Command
         {
             this.Id = video.Id;
             this.Path = path;
-            this.Duration = video.Duration;
-            this.LowResUrl = video.Thumbnails.LowResUrl;
+            this.Duration = video.Duration.GetValueOrDefault();
+            this.LowResUrl = video.Thumbnails[0].Url;
             this.Url = video.Url;
             this.SongTitle = video.Title;
-            this.Author = video.Author;
+            this.Author = video.Author.Title;
             this.Views = video.Engagement.ViewCount;
         }
         public string Interpret
@@ -306,7 +306,7 @@ namespace Sally.Command
             string videoId = extractVideoIdFromUri(uri);
             Video video = await tubeClient.Videos.GetAsync(uri.ToString());
             StreamManifest streamingManifest = await tubeClient.Videos.Streams.GetManifestAsync(videoId);
-            IStreamInfo streamInfo = streamingManifest.GetAudioOnly().WithHighestBitrate();
+            IStreamInfo streamInfo = streamingManifest.GetAudioOnlyStreams().First();
             string path = Path.Combine(Path.GetTempPath(), new StringBuilder(videoId).Append(".").Append(streamInfo.Container.Name).ToString());
             string taskPath = Path.Combine(Path.GetTempPath(), $"{videoId}.pcm");
             if (!File.Exists(path))
