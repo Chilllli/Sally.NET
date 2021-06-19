@@ -33,34 +33,32 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Libs\ffmpeg.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Libs\ffplay.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Libs\ffprobe.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Libs\libsodium.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="libs\ffmpeg.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="libs\ffplay.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="libs\ffprobe.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="libs\opus.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ContentWithTargetPath Include="libs\libsodium.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>libsodium.dll</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="libs\libsodium.dll" />
+    <ContentWithTargetPath Include="libs\ffmpeg.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>ffmpeg.exe</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="libs\ffmpeg.exe" />
+    <ContentWithTargetPath Include="libs\ffplay.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>ffplay.exe</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="libs\ffplay.exe" />
+    <ContentWithTargetPath Include="libs\ffprobe.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>ffprobe.exe</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="libs\ffprobe.exe" />
+    <ContentWithTargetPath Include="libs\opus.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>opus.dll</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="libs\opus.dll" />
     <None Update="libs\youtube-dl.exe" />
-    <None Update="Libs\opus.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

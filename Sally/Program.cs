@@ -94,7 +94,6 @@ namespace Sally
             ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
             InitializeDirectories();
-            LoggerService.Initialize();
             StartTime = DateTime.Now;
             string[] moods = { "Sad", "Meh", "Happy", "Extatic" };
 
@@ -204,6 +203,8 @@ namespace Sally
             {
                 commandClasses.AddRange(assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList());
             }
+            LoggerService.Initialize();
+            VoiceRewardService.InitializeHandler(Client, BotConfiguration, !CredentialManager.OptionalSettings.Contains("CleverApi"));
             checkNewUserEntries();
             StatusNotifierService.InitializeService(Me);
             MusicCommands.Initialize(Client);
@@ -212,7 +213,6 @@ namespace Sally
             UserManagerService.InitializeHandler(Client);
             await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary, !CredentialManager.OptionalSettings.Contains("CleverApi"));
             CacheService.InitializeHandler();
-            VoiceRewardService.InitializeHandler(Client, BotConfiguration, !CredentialManager.OptionalSettings.Contains("CleverApi"));
             switch (startValue)
             {
                 case 0:
