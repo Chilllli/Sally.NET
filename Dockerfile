@@ -1,4 +1,4 @@
-FROM dotnet/runtime
+FROM dotnet/sdk
 FROM mysql
 
 WORKDIR Sally.NET/
