@@ -58,6 +58,16 @@
       <TargetPath>opus.dll</TargetPath>
     </ContentWithTargetPath>
     <None Include="libs\opus.dll" />
+    <ContentWithTargetPath Include="libs\opus.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>opus.so</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="libs\opus.so" />
+    <ContentWithTargetPath Include="libs\libsodium.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>libsodium.so</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="libs\libsodium.so" />
     <None Update="libs\youtube-dl.exe" />
     <None Update="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

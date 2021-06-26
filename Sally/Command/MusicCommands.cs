@@ -97,7 +97,7 @@ namespace Sally.Command
             else
             {
                 audioQueue = new List<VideoInfo>();
-                File.Create("songQueue.json");
+                File.Create("songQueue.json").Close();
                 File.WriteAllText("songQueue.json", JsonConvert.SerializeObject(audioQueue));
             }
             MusicCommands.client = client;
@@ -147,32 +147,32 @@ namespace Sally.Command
         [Command("join", RunMode = RunMode.Async)]
         public async Task Join(IVoiceChannel voiceChannel = null)
         {
-            voiceChannel = voiceChannel ?? (Context.Message.Author as IGuildUser)?.VoiceChannel;
-            if (voiceChannel == null)
+            await Task.Run(async () =>
             {
-                await Context.Message.Channel.SendMessageAsync("You are not in a voice channel.");
-                return;
-            }
-            SocketVoiceChannel lastVoiceChannel = Context.Client.Guilds.Select(g => g.VoiceChannels.Where(c => c.Users.Count(u => u.Id == Context.Client.CurrentUser.Id) > 0).FirstOrDefault()).Where(c => c != null).FirstOrDefault();
-            if (lastVoiceChannel != null)
-            {
-                audioClient = await lastVoiceChannel.ConnectAsync();
-                await audioClient.StopAsync();
-            }
-            audioClient = await voiceChannel.ConnectAsync();
-
-            //alle nachrichten löschen
-            ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.BotConfiguration.RadioControlChannel) as SocketTextChannel;
-            List<IMessage> userMessages = await (textChannel.GetMessagesAsync().Flatten()).ToListAsync();
-            foreach (IMessage message in userMessages)
-            {
-                await message.DeleteAsync();
-            }
-
-
-            oneMessage = await textChannel.SendMessageAsync(embed: audioInfoEmbed());
-            Id = oneMessage.Id;
-            await Context.Message.DeleteAsync();
+                voiceChannel = voiceChannel ?? (Context.Message.Author as IGuildUser)?.VoiceChannel;
+                if (voiceChannel == null)
+                {
+                    await Context.Message.Channel.SendMessageAsync("You are not in a voice channel.");
+                    return;
+                }
+                SocketVoiceChannel lastVoiceChannel = Context.Client.Guilds.Select(g => g.VoiceChannels.Where(c => c.Users.Count(u => u.Id == Context.Client.CurrentUser.Id) > 0).FirstOrDefault()).Where(c => c != null).FirstOrDefault();
+                if (lastVoiceChannel != null)
+                {
+                    audioClient = await lastVoiceChannel.ConnectAsync();
+                    await audioClient.StopAsync();
+                }
+                audioClient = await voiceChannel.ConnectAsync();
+                //alle nachrichten löschen
+                ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.BotConfiguration.RadioControlChannel) as SocketTextChannel;
+                List<IMessage> userMessages = await (textChannel.GetMessagesAsync().Flatten()).ToListAsync();
+                foreach (IMessage message in userMessages)
+                {
+                    await message.DeleteAsync();
+                }
+                oneMessage = await textChannel.SendMessageAsync(embed: audioInfoEmbed());
+                Id = oneMessage.Id;
+                await Context.Message.DeleteAsync();
+            });
         }
 
 
