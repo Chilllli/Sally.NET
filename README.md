@@ -1,6 +1,6 @@
 # Welcome to Sally (◕‿◕✿)
 
-![alt text](https://sallynet.blob.core.windows.net/content/sally_banner.jpg "Sally's mood banner")
+![alt text](https://sallynet.blob.core.windows.net/content/sallybanner_new.png "Sally's banner")
 
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE) [![Build Status](https://travis-ci.com/Chilllli/Sally.NET.svg?token=e9oxuon9Djni1ERDenE9&branch=master)](https://travis-ci.com/Chilllli/Sally.NET) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3dce132ba96d4ba69cb0de2479196363)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Chilllli/Sally.NET&amp;utm_campaign=Badge_Grade) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 
@@ -21,14 +21,18 @@ Sally is a friendly multipurpose discordbot. She provides many game integrations
 
 ## Overview
 
-* [Commands](#commands)
-* [Features](#features)
-* [Self-hosting](#self-hosting)
-  * [Windows](#windows)
-  * [Linux](#linux)
-  * [Mac](#mac)
-  * [Docker](#docker)
-* [Support](#support)
+  - [Commands](#commands)
+  - [Features](#features)
+    - [Integrations - Games](#integrations---games)
+    - [Integrations - APIs](#integrations---apis)
+    - [Build-In](#build-in)
+  - [Self-hosting](#self-hosting)
+    - [Windows](#windows)
+    - [Linux](#linux)
+    - [Mac](#mac)
+    - [Docker](#docker)
+  - [Support](#support)
+  - [Credits](#credits)
 
 ## Commands
 
@@ -39,8 +43,6 @@ It will be updated regularly.
 
 ### Integrations - Games
 
-* Rocket League
-* Terraria
 * Oldschool Runescape
 * Osu! (planned)
 * League of Legends (planned)
@@ -66,7 +68,7 @@ It will be updated regularly.
 
 * Prerequisite:
   * MySQL or (planned sqlite)
-  * Dotnet 3.0 or newer
+  * .NET 5
 
 ### Windows
 
@@ -75,55 +77,60 @@ coming soon!
 ### Linux
 
 1. Install MySql Server  
-Guide: [How to install a mysql server on Linux 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-18-04)
+Guide: [How to install a mysql server on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-20-04)
 
-2. Install .NET Core  
-Guide: [How to install .NET Core on Linux 18.04](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#1804-)
+1. Install .NET Core  
+Guide: [How to install .NET 5 on Ubuntu 20.04](https://docs.microsoft.com/de-de/dotnet/core/install/linux-ubuntu#2004-)
 
-3. Clone this repository
+1. Clone this repository
 
         git clone https://github.com/Chilllli/Sally.NET.git
 
-4. Move into repo directory
+2. Move into repo directory
 
         cd Sally.NET
 
-5. Compile release build
+3. Compile release build
 
         dotnet build Sally.NET.sln -c Release
 
-6. Start the bot for the first time  
+4. Start the bot for the first time  
 **Note: The bot will crash because the config file is missing!**
 
-        dotnet Sally/bin/Release/netcoreapp3.0/Sally.dll
+        dotnet Sally/bin/Release/net5.0/Sally.dll
 
-7. Create a file named "configuration.json" under `<git repo root>/Sally/bin/Release/netcoreapp3.0/config`  
+7. Create a file named "configuration.json" under `<git repo root>/Sally/bin/Release/net5.0/config`  
 Paste in following structure:
 
         {
-        "token":"",
-        "db_user":"",
-        "db_database":"",
-        "db_password":"",
-        "db_host":"",
-        "radioControlChannel":"",
-        "meId":"",
-        "gainedXp":"",
-        "xpTimerInMin":"",
+        "Token":"",
+        "DbUser":"",
+        "Db":"",
+        "DbPassword":"",
+        "DbHost":"",
+        "RadioControlChannel":"",
+        "MeId":"",
+        "GainedXp":"",
+        "XpTimerInMin":"",
         "WeatherPlace":"",
         "WeatherApiKey":"",
-        "CleverApi":""
+        "CleverApi":"",
+        "StarterChannel":"",
+        "ClientId":""
         }
-   **Note: You need to provied your own values for these properties!**
+   **Note: You need to provide your own values for these properties!**
 
 8. Run the bot again
 
-        dotnet Sally/bin/Release/netcoreapp3.0/Sally.dll
+        dotnet Sally/bin/Release/net5.0/Sally.dll
 
     Now the bot should run just fine. If something not working, you may check your credentials.
 
-   **Note: I recommend using tmux, then the bot can run in the background!**  
-   Guide: [Getting started with tmux](https://linuxhandbook.com/tmux/)
+   **Note: I recommend tmux or systemd to run the bot in the background.**  
+   Guides: 
+     * [Getting started with tmux](https://linuxhandbook.com/tmux/)
+     * [Getting started with systemd service](https://www.linode.com/docs/guides/start-service-at-boot/)
+
 
 ### Mac
 
@@ -135,6 +142,12 @@ coming soon!
 
 ## Support
 
-You can directly support Sally and me via Patreon: <https://patreon.com/sallydev>
+You can support Sally directly with ko-fi or patreon.
+* [Ko-Fi](https://ko-fi.com/sallynet)
+* [Patreon](https://patreon.com/sallynet)
 
-**Thanks for tuning in!** (づ｡◕‿‿◕｡)づ
+## Credits
+
+* avatar/character design: [SakuraAlice33](https://www.deviantart.com/sakuraalice33)
+
+**Thanks for tuning in and have a awesome day!** (づ｡◕‿‿◕｡)づ
