@@ -16,37 +16,19 @@ namespace Sally.Command
 {
     public class AdminCommands : ModuleBase
     {
-        /// <summary>
-        /// command group for admin commands
-        /// </summary>
-        [Group("sudo")]
-        public class SudoCommands : ModuleBase
+
+        [Command("whois")]
+        public async Task WhoIs(ulong userId)
         {
-            [Command("whois")]
-            public async Task WhoIs(ulong userId)
+            SocketUser foundUser = Program.Client.GetUser(userId);
+            if (foundUser == null)
             {
-                if (Context.Message.Channel is SocketGuildChannel guildChannel)
-                {
-                    //check if the user, which has written the message, has admin rights or is server owner
-                    if (AdminModule.IsAuthorized(GeneralModule.GetGuildUserFromGuild(Context.Message.Author as SocketUser, guildChannel.Guild)))
-                    {
-                        await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author.Username}, you dont have the permissions to do this!");
-                        return;
-                    }
-                    if (Program.MyGuild.Users.ToList().Find(u => u.Id == userId) == null)
-                    {
-                        await Context.Message.Channel.SendMessageAsync("User couldn't be found.");
-                        return;
-                    }
-                    //user has admin rights
-                    await Context.Message.Channel.SendMessageAsync($"{userId} => {Program.MyGuild.Users.ToList().Find(u => u.Id == userId)}");
-                }
-                else
-                {
-                    await Context.Message.Channel.SendMessageAsync("This command only works on a guild.");
-                }
+                await Context.Message.Channel.SendMessageAsync("User couldn't be found.");
+                return;
             }
+            await Context.Message.Channel.SendMessageAsync($"{userId} => {foundUser.Username}#{foundUser.Discriminator}");
         }
+
 
         /// <summary>
         /// command group for owner commands

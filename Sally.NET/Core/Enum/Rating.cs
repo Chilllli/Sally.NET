@@ -6,7 +6,7 @@ namespace Sally.NET.Core.Enum
 {
     public class RatingShortCutAttribute : Attribute
     {
-        public char ShortCut;
+        public char ShortCut { get; set; }
         public RatingShortCutAttribute(char shortCut)
         {
             ShortCut = shortCut;

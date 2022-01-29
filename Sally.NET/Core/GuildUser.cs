@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace Sally.NET.Core
 {
@@ -29,13 +30,6 @@ namespace Sally.NET.Core
                 {
                     xp = value;
                     OnLevelUp?.Invoke(this);
-                    if (!onInit)
-                    {
-                        if (LoggerService.levelUpLogger != null)
-                        {
-                            LoggerService.levelUpLogger.Log($"{this.Id} has reached Level {this.Level}");
-                        }
-                    }
                 }
                 xp = value;
                 Update(this);
