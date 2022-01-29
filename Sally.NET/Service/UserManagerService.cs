@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using log4net;
 using Sally.NET.Core;
 using Sally.NET.DataAccess.Database;
 using System;
@@ -12,11 +13,19 @@ namespace Sally.NET.Service
     public static class UserManagerService
     {
         private static DiscordSocketClient client;
-        public static void InitializeHandler(DiscordSocketClient client)
+        private static ILog logger;
+        public static void InitializeHandler(DiscordSocketClient client, ILog logger)
         {
             UserManagerService.client = client;
+            UserManagerService.logger = logger;
             client.UserJoined += Client_UserJoined;
             client.JoinedGuild += Client_JoinedGuild;
+            GuildUser.OnLevelUp += GuildUser_OnLevelUp;
+        }
+
+        private static void GuildUser_OnLevelUp(GuildUser guildUser)
+        {
+            logger.Info($"{guildUser.Id} has reached Level {guildUser.Level}");
         }
 
         private static Task Client_JoinedGuild(SocketGuild arg)
