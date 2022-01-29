@@ -1,9 +1,12 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using log4net;
 using Newtonsoft.Json;
+using Sally.NET.Core.ApiReference;
 using Sally.NET.Core.Configuration;
 using Sally.NET.Core.Enum;
 using Sally.NET.DataAccess.Database;
+using Sally.NET.Handler;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace Sally.NET.Service
 {
@@ -24,6 +28,8 @@ namespace Sally.NET.Service
         private static bool onStart;
         private static Mood oldMood;
         private static Mood newMood;
+        private static WeatherApiHandler weatherApiHandler;
+        private static ILog logger;
 
         /// <summary>
         /// initialize and create service
@@ -33,10 +39,12 @@ namespace Sally.NET.Service
         /// <returns>
         /// return an async task, which can be awaited
         /// </returns>
-        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials)
+        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, WeatherApiHandler weatherApiHandler, ILog logger)
         {
             MoodHandlerService.client = client;
             MoodHandlerService.credentials = credentials;
+            MoodHandlerService.weatherApiHandler = weatherApiHandler;
+            MoodHandlerService.logger = logger;
             //set start to true
             onStart = true;
             //Initialize Timer
@@ -87,20 +95,17 @@ namespace Sally.NET.Service
 
         private static async Task checkWeather()
         {
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.Request2WeatherApiAsync());
-            //main.temp 60%,
-            pointsSum = calculateWeatherPoints(15f, 20f, 0.6f, (float)temperature.main.temp);
+            WeatherApi apiResult = await weatherApiHandler.Request2WeatherApiAsync(credentials.WeatherApiKey, credentials.WeatherPlace);
+            //main.temp 70%,
+            pointsSum = calculateWeatherPoints(15f, 20f, 0.7f, apiResult.Weather.Temperature);
             //main.humidity 5%, 
-            pointsSum += calculateWeatherPoints(10f, 50f, 0.05f, (float)temperature.main.humidity);
+            pointsSum += calculateWeatherPoints(10f, 50f, 0.05f, apiResult.Weather.Humidity);
             //wind.speed 5%,
-            pointsSum += calculateWeatherPoints(10f, 4f, 0.05f, (float)temperature.wind.speed);
+            pointsSum += calculateWeatherPoints(10f, 4f, 0.05f, apiResult.Wind.Speed);
             //clouds.all 10%,
-            pointsSum += calculateWeatherPoints(50f, 10f, 0.1f, (float)temperature.clouds.all);
+            pointsSum += calculateWeatherPoints(50f, 10f, 0.1f, apiResult.Clouds.Density);
             //rain.1h 0.2 10%,
-            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, 0f);//temperature.rain != null ? (float)temperature.rain["1h"] : 0f);
-            //pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, 0.5f);
-            //snow.1h 0.1 10% 
-            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, temperature.snow != null ? (float)temperature.snow["1h"] : 0f);
+            pointsSum += calculateWeatherPoints(2.5f, 0f, 0.1f, 0f);
         }
         private static float calculateWeatherPoints(float width, float optimum, float weigth, float weatherValue)
             => MathF.Max(-(1 / MathF.Pow(width, 2)) * MathF.Pow((weatherValue - optimum), 2) + 1, -1) * weigth;
@@ -148,7 +153,7 @@ namespace Sally.NET.Service
             //    await client.CurrentUser.ModifyAsync(c => c.Avatar = new Image($"./mood/{mood}.png"));
             //}
             await client.SetGameAsync($"{mood} | $help", type: ActivityType.Watching);
-            LoggerService.moodLogger.Log($"Mood Changed: {oldMood} -> {newMood}");
+            logger.Info($"Mood Changed: {oldMood} -> {newMood}");
         }
 
         private static double getMoodPoints()

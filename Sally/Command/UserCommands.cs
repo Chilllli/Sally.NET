@@ -2,6 +2,8 @@
 using Discord.Commands;
 using Sally.NET.Core;
 using Sally.NET.DataAccess.Database;
+using Sally.NET.Handler;
+using Sally.NET.Module;
 using Sally.NET.Service;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,11 @@ namespace Sally_NET.Command
         [Group("set")]
         public class SetUserCommands : ModuleBase
         {
+            private readonly ColornamesApiHandler colornamesApiHandler;
+            public SetUserCommands(ColornamesApiHandler colornamesApiHandler)
+            {
+                this.colornamesApiHandler = colornamesApiHandler;
+            }
             [Command("color")]
             public async Task SetEmbedColor(string color)
             {
@@ -41,11 +48,11 @@ namespace Sally_NET.Command
                         {
                             previousColor = previousColorCode;
                         }
-                        string oldColorName = await ApiRequestService.Request2ColorNamesApiAsync(previousColor);
+                        string oldColorName = colornamesApiHandler.GetColorName(previousColor);
                         if (oldColorName == null)
                             oldColorName = "Color has no name yet.";
 
-                        string newColorName = await ApiRequestService.Request2ColorNamesApiAsync(color);
+                        string newColorName = colornamesApiHandler.GetColorName(color);
                         if (newColorName == null)
                             newColorName = "Color has no name yet.";
 
@@ -78,33 +85,6 @@ namespace Sally_NET.Command
                     await Context.Message.Channel.SendMessageAsync("Something went wrong");
                 }
             }
-        }
-
-        /// <summary>
-        /// command group for adding something user specific
-        /// </summary>
-        [Group("add")]
-        public class AddUserCommands : ModuleBase
-        {
-
-        }
-
-        /// <summary>
-        /// command group for removing something user specific
-        /// </summary>
-        [Group("remove")]
-        public class RemoveUserCommands : ModuleBase
-        {
-
-        }
-
-        /// <summary>
-        /// command group for show something user specific
-        /// </summary>
-        [Group("show")]
-        public class ShowUserCommands : ModuleBase
-        {
-
         }
     }
 }

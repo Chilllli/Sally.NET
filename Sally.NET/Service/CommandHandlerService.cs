@@ -1,7 +1,9 @@
-﻿using Discord;
+﻿using Autofac;
+using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Sally.NET.Core;
@@ -9,6 +11,8 @@ using Sally.NET.Core.ApiReference;
 using Sally.NET.Core.Configuration;
 using Sally.NET.Core.Enum;
 using Sally.NET.DataAccess.Database;
+using Sally.NET.Handler;
+using Sally.NET.Module;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,19 +49,18 @@ namespace Sally.NET.Service
             }
         }
         private static bool HasCleverbotApiKey;
+        private static ILog logger;
 
-        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses, Dictionary<ulong, char> collection, bool hasCleverbotApiKey)
+        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses, Dictionary<ulong, char> collection, bool hasCleverbotApiKey, ILog logger, IServiceProvider services)
         {
             CommandHandlerService.client = client;
             CommandHandlerService.credentials = credentials;
             CommandHandlerService.commandClasses = commandClasses;
             CommandHandlerService.IdPrefixCollection = collection;
             HasCleverbotApiKey = hasCleverbotApiKey;
+            CommandHandlerService.logger = logger;
             commands = new CommandService();
-            services = new ServiceCollection()
-              .AddSingleton(client)
-              .AddSingleton<InteractiveService>()
-              .BuildServiceProvider();
+            CommandHandlerService.services = services;
             client.MessageReceived += CommandHandler;
             AppDomain appDomain = AppDomain.CurrentDomain;
             Assembly[] assemblies = appDomain.GetAssemblies();
@@ -65,7 +68,6 @@ namespace Sally.NET.Service
             {
                 await commands.AddModulesAsync(assembly, services);
             }
-
         }
 
         /// <summary>
@@ -193,9 +195,7 @@ namespace Sally.NET.Service
                         }
                     }
                 }
-
-                int minValue = messageCompareValues.Values.Min();
-                commandResult = String.Join(Environment.NewLine, messageCompareValues.Where(d => d.Value == minValue).Select(k => k.Key));
+                commandResult = String.Join(Environment.NewLine, messageCompareValues.Where(d => d.Value == messageCompareValues.Values.Min()).Select(k => k.Key));
                 //await context.Channel.SendMessageAsync($"Sorry, I dont know what you are saying ¯\\_(ツ)_/¯, but did you mean: {commandResult}");
                 EmbedBuilder embed = new EmbedBuilder()
                     .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
@@ -212,7 +212,7 @@ namespace Sally.NET.Service
             if (!result.IsSuccess)
                 await context.Channel.SendMessageAsync($"{result.ErrorReason} ¯\\_(ツ)_/¯");
 
-            LoggerService.commandLogger.Log($"{context.Message.Content} from {context.Message.Author}");
+            logger.Info($"{context.Message.Content} from {context.Message.Author}");
         }
 
         private static async Task HandleNaturalInput(Input input)
@@ -226,9 +226,7 @@ namespace Sally.NET.Service
                     return;
                 //privat message
                 RequestCounter++;
-
-
-                CleverApi messageOutput = JsonConvert.DeserializeObject<CleverApi>(await ApiRequestService.Request2CleverBotApiAsync(message));
+                CleverApi messageOutput = JsonConvert.DeserializeObject<CleverApi>(await services.GetRequiredService<CleverbotApiHandler>().Request2CleverBotApiAsync(message, credentials.CleverApi));
                 await message.Channel.SendMessageAsync(messageOutput.Answer);
             }
         }
@@ -243,23 +241,13 @@ namespace Sally.NET.Service
             {
                 return;
             }
-
-            //if ((client.Guilds.Where(g => g.Id == credentials.guildId).First()).Users.ToList().Find(u => u.Id == message.Author.Id) == null)
-            //{
-            //    return;
-            //}
             if (arg.Author.IsBot)
             {
                 return;
             }
-
             MessageAuthor = DatabaseAccess.Instance.Users.Find(u => u.Id == message.Author.Id);
-
-            //await MessageHandlerService.DeleteStartMessages(message);
             Input input = ClassifyAs(message);
             await HandleMessage(input);
         }
-
-        
     }
 }

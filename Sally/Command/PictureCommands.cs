@@ -1,6 +1,8 @@
 ﻿using Discord;
 using Discord.Commands;
 using Sally.NET.Core.Enum;
+using Sally.NET.Handler;
+using Sally.NET.Module;
 using Sally.NET.Service;
 using System;
 using System.Collections.Generic;
@@ -11,17 +13,20 @@ using System.Threading.Tasks;
 namespace Sally.Command
 {
     /// <summary>
-    /// co0mmand group for all related to pictures
+    /// command group for all related to pictures
     /// </summary>
     public class PictureCommands : ModuleBase
     {
+        private readonly KonachanApiHandler konachanApiHandler;
+        public PictureCommands(KonachanApiHandler konachanApiHandler)
+        {
+            this.konachanApiHandler = konachanApiHandler;
+        }
         [Command("konachan")]
         [Alias("k")]
         public async Task SendPicture()
         {
-            //search for image without tags and rating
-            string response = await ApiRequestService.Request2KonachanApiAsync();
-            await generateImageEmbed(response);
+            await generateImageEmbed(await konachanApiHandler.GetKonachanPictureUrl());
         }
 
         [Command("konachan")]
@@ -30,32 +35,28 @@ namespace Sally.Command
         {
             string[] lowerTags = tags.Select(s => s.ToLowerInvariant()).ToArray();
             string tagUrl = String.Empty;
-            Rating rating;
             //generalize rating input, so misstyping isnt so bad
             string lowerRating = tags[0].ToLower();
-            string ratingElement = lowerRating.First().ToString().ToUpper() + lowerRating.Substring(1);
             //try to parse as enum
             //check if first tag is equal to a rating
-            if (Enum.TryParse<Rating>(ratingElement, out rating))
+            if (Enum.TryParse(lowerRating.First().ToString().ToUpper() + lowerRating[1..], out Rating rating))
             {
                 //get rest of the tags
                 string[] tagCollection = lowerTags.Skip(1).ToArray();
                 foreach (string tag in tagCollection)
                 {
-                    tagUrl = tagUrl + $"{tag} ";
+                    tagUrl += $"{tag} ";
                 }
-                string response = await ApiRequestService.Request2KonachanApiAsync(tagCollection, rating);
-                await generateImageEmbed(response, tagUrl);
+                await generateImageEmbed(konachanApiHandler.GetKonachanPictureUrl(tagCollection, rating), tagUrl);
             }
             else
             {
                 //first arg isn't an enum
                 foreach (string tag in lowerTags)
                 {
-                    tagUrl = tagUrl + $"{tag} ";
+                    tagUrl += $"{tag} ";
                 }
-                string response = await ApiRequestService.Request2KonachanApiAsync(lowerTags);
-                await generateImageEmbed(response, tagUrl);
+                await generateImageEmbed(konachanApiHandler.GetKonachanPictureUrl(lowerTags), tagUrl);
             }
         }
 

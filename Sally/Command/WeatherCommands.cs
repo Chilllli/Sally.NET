@@ -6,11 +6,20 @@ using System.Threading.Tasks;
 using Sally.NET.DataAccess.Database;
 using Sally.NET.Core;
 using Sally.NET.Service;
+using Sally.NET.Handler;
+using Sally.NET.Module;
+using Sally.NET.Core.ApiReference;
+using System.Linq;
 
 namespace Sally.Command
 {
     public class WeatherCommands : ModuleBase
     {
+        private readonly WeatherApiHandler weatherApiHandler;
+        public WeatherCommands(WeatherApiHandler weatherApiHandler)
+        {
+            this.weatherApiHandler = weatherApiHandler;
+        }
         [Command("sub2weather")]
         public async Task SubToService(string location, TimeSpan notiferTime)
         {
@@ -24,10 +33,9 @@ namespace Sally.Command
                 return;
             }
 
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.Request2WeatherApiAsync(location));
-            if(temperature.cod != 200)
+            if (!weatherApiHandler.TryGetWeatherApi(Program.BotConfiguration.WeatherApiKey, location, out WeatherApi weatherApi))
             {
-                await Context.Message.Channel.SendMessageAsync((string)temperature.message);
+                await Context.Message.Channel.SendMessageAsync("The request returned an error.");
                 return;
             }
 
@@ -55,19 +63,19 @@ namespace Sally.Command
             {
                 return;
             }
-            dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.Request2WeatherApiAsync(location));
-            if (temperature.cod != 200)
+            WeatherApi apiResult = weatherApiHandler.GetWeatherApiResult(Program.BotConfiguration.WeatherApiKey, location);
+            if (apiResult.StatusCode != 200)
             {
-                await Context.Message.Channel.SendMessageAsync((string)temperature.message);
+                await Context.Message.Channel.SendMessageAsync("Warn: can't process request");
                 return;
             }
             EmbedBuilder weatherEmbed = new EmbedBuilder()
                     .WithTitle("Weather Info")
                     .WithDescription("Current Weather Informations")
-                    .AddField(location, $"{temperature.main.temp} °C")
-                    .AddField("Current Max. Temp", $"{temperature.main.temp_max} °C")
-                    .AddField("Current Min. Temp", $"{temperature.main.temp_min} °C")
-                    .AddField("Current Weather Condition", (string)temperature.weather[0].main)
+                    .AddField(location, $"{apiResult.Weather.Temperature} °C")
+                    .AddField("Max. Temp today", $"{apiResult.Weather.MaxTemperature} °C")
+                    .AddField("Min. Temp for today", $"{apiResult.Weather.MinTemperature} °C")
+                    .AddField("Weather Condition", apiResult.WeatherCondition.First().ShortDescription)
                     .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                     .WithTimestamp(DateTime.Now)
                     .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);

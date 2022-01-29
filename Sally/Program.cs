@@ -17,6 +17,9 @@ using Sally.NET.Service;
 using Sally.NET.DataAccess.Database;
 using Sally.NET.Core.Configuration;
 using Sally.NET.Core;
+using Sally.NET.Handler;
+using Microsoft.Extensions.DependencyInjection;
+using Discord.Addons.Interactive;
 
 namespace Sally
 {
@@ -164,7 +167,7 @@ namespace Sally
                 {
                     if (guildUser.Id == BotConfiguration.MeId)
                     {
-                        Me = guildUser as SocketUser;
+                        Me = guildUser;
                     }
                     //check if user exist in global instance
                     User myUser = DatabaseAccess.Instance.Users.Find(u => u.Id == guildUser.Id);
@@ -195,6 +198,15 @@ namespace Sally
 
         private async Task Client_Ready()
         {
+            IServiceProvider services = new ServiceCollection()
+              .AddSingleton(Client)
+              .AddSingleton<InteractiveService>()
+              .AddSingleton<CleverbotApiHandler>()
+              .AddSingleton<ColornamesApiHandler>()
+              .AddSingleton<KonachanApiHandler>()
+              .AddSingleton<WeatherApiHandler>()
+              .AddSingleton<WikipediaApiHandler>()
+              .BuildServiceProvider();
             AddonLoader.Load(Client);
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             List<Type> commandClasses = new List<Type>();
@@ -203,15 +215,13 @@ namespace Sally
             {
                 commandClasses.AddRange(assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList());
             }
-            LoggerService.Initialize();
             VoiceRewardService.InitializeHandler(Client, BotConfiguration, !CredentialManager.OptionalSettings.Contains("CleverApi"));
             checkNewUserEntries();
             StatusNotifierService.InitializeService(Me);
             MusicCommands.Initialize(Client);
             RoleManagerService.InitializeHandler(Client, BotConfiguration);
-            ApiRequestService.Initialize(BotConfiguration);
-            UserManagerService.InitializeHandler(Client);
-            await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary, !CredentialManager.OptionalSettings.Contains("CleverApi"));
+            UserManagerService.InitializeHandler(Client, fileLogger);
+            await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary, !CredentialManager.OptionalSettings.Contains("CleverApi"), fileLogger, services);
             CacheService.InitializeHandler();
             switch (startValue)
             {
@@ -235,9 +245,9 @@ namespace Sally
                 if (!CredentialManager.OptionalSettings.Contains("WeatherPlace"))
                 {
                     MoodDictionary.InitializeMoodDictionary(Client, BotConfiguration);
-                    await MoodHandlerService.InitializeHandler(Client, BotConfiguration);
+                    await MoodHandlerService.InitializeHandler(Client, BotConfiguration, services.GetRequiredService<WeatherApiHandler>(), fileLogger);
                 }
-                WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration);
+                WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration, services.GetRequiredService<WeatherApiHandler>());
             }
             consoleLogger.Info($"Addons loaded: {AddonLoader.LoadedAddonsCount}");
             consoleLogger.Info($"User loaded: {DatabaseAccess.Instance.Users.Count}");

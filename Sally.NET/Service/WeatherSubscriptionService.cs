@@ -2,26 +2,32 @@
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Sally.NET.Core;
+using Sally.NET.Core.ApiReference;
 using Sally.NET.Core.Configuration;
 using Sally.NET.DataAccess.Database;
 using Sally.NET.DataAccess.File;
+using Sally.NET.Handler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Timers;
+using FileAccess = Sally.NET.DataAccess.File.FileAccess;
+using Timer = System.Timers.Timer;
 
 namespace Sally.NET.Service
 {
     public static class WeatherSubscriptionService
     {
-        public static DiscordSocketClient client { get; set; }
-        //public static BotCredentials credentials { get; set; }
+        private static DiscordSocketClient client { get; set; }
+        public static BotCredentials credentials { get; set; }
+        private static WeatherApiHandler weatherApiHandler;
 
-        public static void InitializeWeatherSub(DiscordSocketClient client, BotCredentials credentials)
+        public static void InitializeWeatherSub(DiscordSocketClient client, BotCredentials credentials, WeatherApiHandler weatherApiHandler)
         {
             WeatherSubscriptionService.client = client;
-            //WeatherSubscriptionService.credentials = credentials;
+            WeatherSubscriptionService.weatherApiHandler = weatherApiHandler;
+            WeatherSubscriptionService.credentials = credentials;
             Timer checkWeather = new Timer(60 * 1000);
             checkWeather.Start();
             checkWeather.Elapsed += CheckWeather_Elapsed;
@@ -39,15 +45,15 @@ namespace Sally.NET.Service
                 if (disUser == null)
                     continue;
 
-                dynamic temperature = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.Request2WeatherApiAsync(user.WeatherLocation));
+                WeatherApi apiResult = await weatherApiHandler.Request2WeatherApiAsync(credentials.WeatherApiKey, user.WeatherLocation);
 
                 EmbedBuilder weatherEmbed = new EmbedBuilder()
                     .WithTitle("Weather Info")
                     .WithDescription("Weather Notification for today")
-                    .AddField(user.WeatherLocation, $"{temperature.main.temp} °C")
-                    .AddField("Max. Temp today", $"{temperature.main.temp_max} °C")
-                    .AddField("Min. Temp for today", $"{temperature.main.temp_min} °C")
-                    .AddField("Weather Condition", (string)temperature.weather[0].main)
+                    .AddField(user.WeatherLocation, $"{apiResult.Weather.Temperature} °C")
+                    .AddField("Max. Temp today", $"{apiResult.Weather.MaxTemperature} °C")
+                    .AddField("Min. Temp for today", $"{apiResult.Weather.MinTemperature} °C")
+                    .AddField("Weather Condition", apiResult.WeatherCondition.First().ShortDescription)
                     .WithColor(Color.Blue)
                     .WithTimestamp(DateTime.Now)
                     .WithFooter(FileAccess.GENERIC_FOOTER, FileAccess.GENERIC_THUMBNAIL_URL);

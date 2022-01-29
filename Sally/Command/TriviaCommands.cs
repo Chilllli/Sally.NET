@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Newtonsoft.Json;
+using Sally.NET.Handler;
 using Sally.NET.Service;
 using System;
 using System.Threading.Tasks;
@@ -12,10 +13,15 @@ namespace Sally.Command
     /// </summary>
     public class TriviaCommands : ModuleBase
     {
+        private readonly WikipediaApiHandler wikipediaApiHandler;
+        public TriviaCommands(WikipediaApiHandler wikipediaApiHandler)
+        {
+            this.wikipediaApiHandler = wikipediaApiHandler;
+        }
         [Command("ask")]
         public async Task AskWikipedia(string searchTerm)
         {
-            dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(await ApiRequestService.Request2WikipediaApiAsync(searchTerm));
+            dynamic searchResult = JsonConvert.DeserializeObject<dynamic>(await wikipediaApiHandler.Request2WikipediaApiAsync(searchTerm));
 
             EmbedBuilder searchEmbed = new EmbedBuilder()
                 .WithTitle($"What is \"{searchTerm}\"?")
