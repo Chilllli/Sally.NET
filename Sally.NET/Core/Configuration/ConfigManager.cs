@@ -6,7 +6,7 @@ namespace Sally.NET.Core.Configuration
 {
     public class ConfigManager
     {
-        public List<string> OptionalSettings = new List<string>();
+        public List<string> OptionalSettings { get; set; } = new List<string>();
         public ConfigManager(BotCredentials credentials)
         {
             foreach (var property in credentials.GetType().GetProperties())

@@ -21,6 +21,9 @@ Sally is a friendly multipurpose discordbot. She provides many game integrations
 
 ## Overview
 
+- [Welcome to Sally (◕‿◕✿)](#welcome-to-sally-‿)
+  - [Quick Links](#quick-links)
+  - [Overview](#overview)
   - [Commands](#commands)
   - [Features](#features)
     - [Integrations - Games](#integrations---games)
@@ -34,6 +37,15 @@ Sally is a friendly multipurpose discordbot. She provides many game integrations
   - [Support](#support)
   - [Credits](#credits)
 
+  - [Self-hosting](#self-hosting)
+    - [Windows](#windows)
+    - [Linux](#linux)
+    - [Mac](#mac)
+    - [Docker](#docker)
+
+  - [Support](#support)
+  - [Credits](#credits)
+
 ## Commands
 
 All Commands can be found on the webpage: <https://its-sally.net/commands>.
@@ -43,32 +55,32 @@ It will be updated regularly.
 
 ### Integrations - Games
 
-* Oldschool Runescape
-* Osu! (planned)
-* League of Legends (planned)
+- Oldschool Runescape
+- Osu! (planned)
+- League of Legends (planned)
 
 ### Integrations - APIs
 
-* Wikipedia
-* OpenWeather
-* Konachan
-* Cleverbot
-* more planned
+- Wikipedia
+- OpenWeather
+- Konachan
+- Cleverbot
+- more planned
 
 ### Build-In
 
-* Command suggestion
-* YouTube music player
-* Mood system
-* Level and rankup system
-* Livechat replies
-* Service subscription
+- Command suggestion
+- YouTube music player
+- Mood system
+- Level and rankup system
+- Livechat replies
+- Service subscription
 
 ## Self-hosting
 
-* Prerequisite:
-  * MySQL or (planned sqlite)
-  * .NET 5
+- Prerequisite:
+  - MySQL or (planned sqlite)
+  - .NET 5
 
 ### Windows
 
@@ -79,22 +91,22 @@ coming soon!
 1. Install MySql Server  
 Guide: [How to install a mysql server on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-20-04)
 
-1. Install .NET Core  
+2. Install .NET Core  
 Guide: [How to install .NET 5 on Ubuntu 20.04](https://docs.microsoft.com/de-de/dotnet/core/install/linux-ubuntu#2004-)
 
-1. Clone this repository
+3. Clone this repository
 
         git clone https://github.com/Chilllli/Sally.NET.git
 
-2. Move into repo directory
+4. Move into repo directory
 
         cd Sally.NET
 
-3. Compile release build
+5. Compile release build
 
         dotnet build Sally.NET.sln -c Release
 
-4. Start the bot for the first time  
+6. Start the bot for the first time  
 **Note: The bot will crash because the config file is missing!**
 
         dotnet Sally/bin/Release/net5.0/Sally.dll
@@ -127,10 +139,9 @@ Paste in following structure:
     Now the bot should run just fine. If something not working, you may check your credentials.
 
    **Note: I recommend tmux or systemd to run the bot in the background.**  
-   Guides: 
-     * [Getting started with tmux](https://linuxhandbook.com/tmux/)
-     * [Getting started with systemd service](https://www.linode.com/docs/guides/start-service-at-boot/)
-
+   Guides:
+     - [Getting started with tmux](https://linuxhandbook.com/tmux/)
+     - [Getting started with systemd service](https://www.linode.com/docs/guides/start-service-at-boot/)
 
 ### Mac
 
@@ -143,11 +154,12 @@ coming soon!
 ## Support
 
 You can support Sally directly with ko-fi or patreon.
-* [Ko-Fi](https://ko-fi.com/sallynet)
-* [Patreon](https://patreon.com/sallynet)
+
+- [Ko-Fi](https://ko-fi.com/sallynet)
+- [Patreon](https://patreon.com/sallynet)
 
 ## Credits
 
-* avatar/character design: [SakuraAlice33](https://www.deviantart.com/sakuraalice33)
+- avatar/character design: [SakuraAlice33](https://www.deviantart.com/sakuraalice33)
 
 **Thanks for tuning in and have a awesome day!** (づ｡◕‿‿◕｡)づ

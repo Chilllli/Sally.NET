@@ -208,8 +208,7 @@ namespace Sally_NET.Command
                 {
                     ulong guildId = guildChannel.Guild.Id;
                     SocketGuild guild = guildChannel.Guild;
-                    Dictionary<int, ulong> guildRankRoleCollection = new Dictionary<int, ulong>();
-                    guildRankRoleCollection = RoleManagerService.RankRoleCollection[guildId];
+                    Dictionary<int, ulong> guildRankRoleCollection = RoleManagerService.RankRoleCollection[guildId];
                     if (guildRankRoleCollection.Count == 0)
                     {
                         await Context.Message.Channel.SendMessageAsync("You didn't added rank roles yet.");
