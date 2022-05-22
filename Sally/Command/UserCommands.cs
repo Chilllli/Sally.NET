@@ -50,13 +50,14 @@ namespace Sally_NET.Command
                         }
                         string oldColorName = colornamesApiHandler.GetColorName(previousColor);
                         if (oldColorName == null)
+                        {
                             oldColorName = "Color has no name yet.";
-
+                        }
                         string newColorName = colornamesApiHandler.GetColorName(color);
                         if (newColorName == null)
+                        {
                             newColorName = "Color has no name yet.";
-
-
+                        }
                         //hex value is in range
                         User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
                         user.EmbedColor = result;
