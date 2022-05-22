@@ -10,7 +10,6 @@ namespace Sally.NET.Core
 {
     public class GuildUser
     {
-        private bool onInit = true;
         public ulong Id { get; set; }
         public ulong GuildId { get; set; }
         private int xp;
@@ -58,7 +57,6 @@ namespace Sally.NET.Core
             this.Id = id;
             this.GuildId = guildId;
             this.Xp = xp;
-            this.onInit = false;
         }
 
         private void Update(GuildUser guildUser)

@@ -1,5 +1,4 @@
-﻿using Autofac;
-using Discord;
+﻿using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;

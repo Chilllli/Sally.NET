@@ -38,7 +38,7 @@ namespace Sally.Command
             this.LowResUrl = video.Thumbnails[0].Url;
             this.Url = video.Url;
             this.SongTitle = video.Title;
-            this.Author = video.Author.Title;
+            this.Author = video.Author.ChannelTitle;
             this.Views = video.Engagement.ViewCount;
         }
         public string Interpret
