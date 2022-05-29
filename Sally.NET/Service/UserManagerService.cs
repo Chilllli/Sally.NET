@@ -23,9 +23,10 @@ namespace Sally.NET.Service
             GuildUser.OnLevelUp += GuildUser_OnLevelUp;
         }
 
-        private static void GuildUser_OnLevelUp(GuildUser guildUser)
+        private static Task GuildUser_OnLevelUp(GuildUser guildUser)
         {
             logger.Info($"{guildUser.Id} has reached Level {guildUser.Level}");
+            return Task.CompletedTask;
         }
 
         private static Task Client_JoinedGuild(SocketGuild arg)

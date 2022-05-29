@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Addons.Interactive;
 using Discord.Audio;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -78,7 +77,7 @@ namespace Sally.Command
     }
 
 
-    public class MusicCommands : InteractiveBase
+    public class MusicCommands : ModuleBase<CommandContext>
     {
         private static Stopwatch stopwatch = new Stopwatch();
         public static void Initialize(DiscordSocketClient client)
@@ -145,6 +144,7 @@ namespace Sally.Command
         private static int currentVideoIndex = -1;
 
         [Command("join", RunMode = RunMode.Async)]
+        [RequireContext(ContextType.Guild)]
         public async Task Join(IVoiceChannel voiceChannel = null)
         {
             await Task.Run(async () =>
@@ -155,14 +155,7 @@ namespace Sally.Command
                     await Context.Message.Channel.SendMessageAsync("You are not in a voice channel.");
                     return;
                 }
-                SocketVoiceChannel lastVoiceChannel = Context.Client.Guilds.Select(g => g.VoiceChannels.Where(c => c.Users.Count(u => u.Id == Context.Client.CurrentUser.Id) > 0).FirstOrDefault()).Where(c => c != null).FirstOrDefault();
-                if (lastVoiceChannel != null)
-                {
-                    audioClient = await lastVoiceChannel.ConnectAsync();
-                    await audioClient.StopAsync();
-                }
                 audioClient = await voiceChannel.ConnectAsync();
-                //alle nachrichten löschen
                 ITextChannel textChannel = (Context.Message.Channel as SocketGuildChannel).Guild.GetChannel(Program.BotConfiguration.RadioControlChannel) as SocketTextChannel;
                 List<IMessage> userMessages = await (textChannel.GetMessagesAsync().Flatten()).ToListAsync();
                 foreach (IMessage message in userMessages)
@@ -321,26 +314,16 @@ namespace Sally.Command
                     {
                         Console.WriteLine("cant download video");
                     }
-
-
-                    try
+                    using (FileStream fileStream = new FileStream(path, FileMode.Open))
                     {
-                        using (FileStream fileStream = new FileStream(path, FileMode.Open))
+                        try
                         {
-                            try
-                            {
-                                await outputStream.CopyToAsync(fileStream);
-                            }
-                            catch (Exception)
-                            {
-                                Console.WriteLine("cant write to file");
-                            }
-
+                            await outputStream.CopyToAsync(fileStream);
                         }
-
-                    }
-                    catch (Exception)
-                    {
+                        catch (Exception)
+                        {
+                            Console.WriteLine("cant write to file");
+                        }
 
                     }
                 }
@@ -602,24 +585,18 @@ namespace Sally.Command
             const string YoutubeLinkRegex = "(?:.+?)?(?:\\/v\\/|watch\\/|\\?v=|\\&v=|youtu\\.be\\/|\\/v=|^youtu\\.be\\/)([a-zA-Z0-9_-]{11})+";
             Regex regexExtractId = new Regex(YoutubeLinkRegex, RegexOptions.Compiled);
             string[] validAuthorities = { "youtube.com", "www.youtube.com", "youtu.be", "www.youtu.be" };
-            try
-            {
-                string authority = new UriBuilder(uri).Uri.Authority.ToLower();
+            string authority = new UriBuilder(uri).Uri.Authority.ToLower();
 
-                //check if the url is a youtube url
-                if (validAuthorities.Contains(authority))
+            //check if the url is a youtube url
+            if (validAuthorities.Contains(authority))
+            {
+                //and extract the id
+                var regRes = regexExtractId.Match(uri.ToString());
+                if (regRes.Success)
                 {
-                    //and extract the id
-                    var regRes = regexExtractId.Match(uri.ToString());
-                    if (regRes.Success)
-                    {
-                        return regRes.Groups[1].Value;
-                    }
+                    return regRes.Groups[1].Value;
                 }
             }
-            catch { }
-
-
             return null;
         }
     }

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Sally.Command
@@ -34,7 +35,7 @@ namespace Sally.Command
         public async Task SendPicture(params String[] tags)
         {
             string[] lowerTags = tags.Select(s => s.ToLowerInvariant()).ToArray();
-            string tagUrl = String.Empty;
+            StringBuilder tagUrl = new StringBuilder();
             //generalize rating input, so misstyping isnt so bad
             string lowerRating = tags[0].ToLower();
             //try to parse as enum
@@ -45,18 +46,18 @@ namespace Sally.Command
                 string[] tagCollection = lowerTags.Skip(1).ToArray();
                 foreach (string tag in tagCollection)
                 {
-                    tagUrl += $"{tag} ";
+                    tagUrl.Append($"{tag} ");
                 }
-                await generateImageEmbed(konachanApiHandler.GetKonachanPictureUrl(tagCollection, rating), tagUrl);
+                await generateImageEmbed(konachanApiHandler.GetKonachanPictureUrl(tagCollection, rating), tagUrl.ToString());
             }
             else
             {
                 //first arg isn't an enum
                 foreach (string tag in lowerTags)
                 {
-                    tagUrl += $"{tag} ";
+                    tagUrl.Append($"{tag} ");
                 }
-                await generateImageEmbed(konachanApiHandler.GetKonachanPictureUrl(lowerTags), tagUrl);
+                await generateImageEmbed(konachanApiHandler.GetKonachanPictureUrl(lowerTags), tagUrl.ToString());
             }
         }
 
@@ -67,15 +68,15 @@ namespace Sally.Command
         /// <returns></returns>
         private async Task generateImageEmbed(string response)
         {
-            string tagResponse = String.Empty;
+            StringBuilder tagResponse = new StringBuilder();
             List<string> tags = getTagsFromKonachanImageUrl(response).ToList();
             tags.RemoveRange(0, 3);
             foreach (string tag in tags)
             {
-                tagResponse += $"[{tag}](https://konachan.com/post?tags={tag}) ";
+                tagResponse.Append($"[{tag}](https://konachan.com/post?tags={tag}) ");
             }
             EmbedBuilder embedBuilder = new EmbedBuilder()
-                .WithDescription($"Tags: {tagResponse.Trim()}")
+                .WithDescription($"Tags: {tagResponse.ToString().Trim()}")
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
                 .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);

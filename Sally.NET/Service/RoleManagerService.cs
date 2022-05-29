@@ -6,36 +6,17 @@ using Sally.NET.Core;
 using Sally.NET.Core.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Sally.NET.Service
 {
     public static class RoleManagerService
     {
-        public static Dictionary<int, ulong> roleDictionary = new Dictionary<int, ulong>
-        {
-            { 0, 583712540069199893},
-            { 5, 583712661347237888},
-            { 10, 583712739407691817},
-            { 15, 583712794101284894},
-            { 20, 583712865878409226},
-            { 25, 583712966327926785},
-            { 30, 583713031410679826},
-            { 35, 583713106623201281},
-            { 40, 583713192258306058},
-            { 45, 583713277792485389},
-            { 50, 583713406247239843},
-            { 55, 583713511176404992},
-            { 60, 583713745595793410},
-            { 65, 583714001687412746},
-            { 70, 583714264070619158},
-            { 75, 583714339018637314}
-
-        };
-
-        public static Dictionary<ulong, Dictionary<int, ulong>> RankRoleCollection = new Dictionary<ulong, Dictionary<int, ulong>>();
+        public static Dictionary<ulong, Dictionary<int, ulong>> RankRoleCollection { get; set; } = new Dictionary<ulong, Dictionary<int, ulong>>();
         public static BotCredentials credentials { get; set; }
         public static DiscordSocketClient client { get; private set; }
         public static SocketGuild myGuild { get; set; }
@@ -47,7 +28,7 @@ namespace Sally.NET.Service
             fetchAllServer();
             GuildUser.OnLevelUp += GuildUser_LevelUp;
         }
-        private static async void GuildUser_LevelUp(GuildUser myGuildUser)
+        private static async Task GuildUser_LevelUp(GuildUser myGuildUser)
         {
             ulong guildId = myGuildUser.GuildId;
             if (RankRoleCollection.ContainsKey(myGuildUser.GuildId))

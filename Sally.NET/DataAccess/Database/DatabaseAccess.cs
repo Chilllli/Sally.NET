@@ -13,10 +13,9 @@ namespace Sally.NET.DataAccess.Database
 {
     public class DatabaseAccess : IDisposable
     {
-        public List<User> Users = new List<User>();
-        public List<GuildSettings> guildSettings = new List<GuildSettings>();
-        public Dictionary<ulong, GuildUser> GuildUserCollection = new Dictionary<ulong, GuildUser>();
-        //public List<GuildUser> GuildUser = new List<GuildUser>();
+        public List<User> Users { get; set; } = new List<User>();
+        public List<GuildSettings> GuildSettings { get; set; } = new List<GuildSettings>();
+        public Dictionary<ulong, GuildUser> GuildUserCollection { get; set; } = new Dictionary<ulong, GuildUser>();
         public static DatabaseAccess Instance { get; private set; }
         MySqlConnection connection;
         private static Task databaseWriter;
@@ -28,23 +27,22 @@ namespace Sally.NET.DataAccess.Database
         /// <param name="user"></param>
         /// <param name="password"></param>
         /// <param name="database"></param>
-        public static void Initialize(string user, string password, string database, string host)
+        public static async Task InitializeAsync(string user, string password, string database, string host)
         {
             if (Instance == null)
             {
                 Instance = new DatabaseAccess(user, password, database, host);
             }
-            databaseWriter = new Task(databaseQueueLoop);
-            databaseWriter.Start();
+            Task.Run(() => databaseQueueLoopAsync());
         }
 
-        private static async void databaseQueueLoop()
+        private static async Task databaseQueueLoopAsync()
         {
             while (true)
             {
                 if (databaseQueue.TryDequeue(out MySqlCommand command))
                 {
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
                 else
                 {
@@ -201,7 +199,7 @@ namespace Sally.NET.DataAccess.Database
             command.Parameters.AddWithValue("@levelbackground", settings.LevelbackgroundImage);
             command.Prepare();
             command.ExecuteNonQuery();
-            guildSettings.Add(settings);
+            GuildSettings.Add(settings);
         }
 
         /// <summary>
@@ -227,7 +225,7 @@ namespace Sally.NET.DataAccess.Database
             MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                guildSettings.Add(new GuildSettings((ulong)reader["id"], (ulong)reader["owner"], (byte[])reader["levelbackground"], (ulong)reader["musicchannelid"]));
+                GuildSettings.Add(new GuildSettings((ulong)reader["id"], (ulong)reader["owner"], (byte[])reader["levelbackground"], (ulong)reader["musicchannelid"]));
             }
             reader.Close();
         }

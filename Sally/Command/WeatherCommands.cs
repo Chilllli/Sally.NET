@@ -10,20 +10,23 @@ using Sally.NET.Handler;
 using Sally.NET.Module;
 using Sally.NET.Core.ApiReference;
 using System.Linq;
+using Sally.NET.Core.Configuration;
 
 namespace Sally.Command
 {
     public class WeatherCommands : ModuleBase
     {
         private readonly WeatherApiHandler weatherApiHandler;
-        public WeatherCommands(WeatherApiHandler weatherApiHandler)
+        private readonly ConfigManager configManager;
+        public WeatherCommands(WeatherApiHandler weatherApiHandler, ConfigManager configManager)
         {
             this.weatherApiHandler = weatherApiHandler;
+            this.configManager = configManager;
         }
         [Command("sub2weather")]
         public async Task SubToService(string location, TimeSpan notiferTime)
         {
-            if (Program.CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
+            if (configManager.OptionalSettings.Contains("WeatherApiKey"))
             {
                 return;
             }
@@ -47,7 +50,7 @@ namespace Sally.Command
         [Command("unsub2weather")]
         public async Task UnSubToService()
         {
-            if (Program.CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
+            if (configManager.OptionalSettings.Contains("WeatherApiKey"))
             {
                 return;
             }
@@ -59,7 +62,7 @@ namespace Sally.Command
         [Command("currentWeather")]
         public async Task CheckCurrentWeather(string location)
         {
-            if (Program.CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
+            if (configManager.OptionalSettings.Contains("WeatherApiKey"))
             {
                 return;
             }

@@ -41,7 +41,7 @@ namespace Sally_NET.Command
                         return;
                     }
                     //add or update channel to guildsettings from server
-                    GuildSettings guildSetting = DatabaseAccess.Instance.guildSettings.Find(g => g.GuildId == guild.Id);
+                    GuildSettings guildSetting = DatabaseAccess.Instance.GuildSettings.Find(g => g.GuildId == guild.Id);
                     guildSetting.MusicChannelId = musicChannelId;
                     DatabaseAccess.Instance.UpdateGuildSettings(guildSetting);
                     await Context.Message.Channel.SendMessageAsync($"{guildChannel.Name} was set as music channel.");
@@ -106,8 +106,7 @@ namespace Sally_NET.Command
                     }
                     ulong guildId = guildChannel.Guild.Id;
                     SocketGuild guild = guildChannel.Guild;
-                    Dictionary<int, ulong> guildRankRoleCollection = new Dictionary<int, ulong>();
-                    guildRankRoleCollection = RoleManagerService.RankRoleCollection[guildId];
+                    Dictionary<int, ulong>  guildRankRoleCollection = RoleManagerService.RankRoleCollection[guildId];
                     if (index > 500)
                     {
                         await Context.Message.Channel.SendMessageAsync("Desired level is too high.");

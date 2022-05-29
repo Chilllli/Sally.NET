@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using log4net;
@@ -14,6 +13,7 @@ using Sally.NET.Handler;
 using Sally.NET.Module;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -30,7 +30,7 @@ namespace Sally.NET.Service
         private static DiscordSocketClient client;
         private static BotCredentials credentials;
         private static CommandService commands;
-        public static Dictionary<ulong, char> IdPrefixCollection = new Dictionary<ulong, char>();
+        public static Dictionary<ulong, char> IdPrefixCollection { get; set; } = new Dictionary<ulong, char>();
         private static List<Type> commandClasses;
         private static IServiceProvider services;
         public static User MessageAuthor { get; set; }

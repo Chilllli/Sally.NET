@@ -3,6 +3,7 @@ using Sally.NET.Service;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
@@ -48,7 +49,7 @@ namespace Sally.NET.Core
             return (int)Math.Floor(Math.Sqrt((xp - 200) / (double)300) + Math.Sqrt((xp - 200) / (double)500));
         }
 
-        public delegate void LevelUp(GuildUser guildUser);
+        public delegate Task LevelUp(GuildUser guildUser);
 
         //why is this event static?
         public static event LevelUp OnLevelUp;

@@ -23,8 +23,8 @@ namespace Sally.NET.Core
                 return hasMuted;
             }
         }
-        public DateTime LastGreeting = new DateTime();
-        public DateTime LastFarewell = new DateTime();
+        public DateTime LastGreeting { get; set; } = new DateTime();
+        public DateTime LastFarewell { get; set; } = new DateTime();
         private string weatherLocation;
         private TimeSpan? notifierTime;
 
@@ -68,7 +68,7 @@ namespace Sally.NET.Core
             }
         }
 
-        public Dictionary<ulong, GuildUser> GuildSpecificUser = new Dictionary<ulong, GuildUser>();
+        public Dictionary<ulong, GuildUser> GuildSpecificUser { get; set; } = new Dictionary<ulong, GuildUser>();
 
         public User(ulong id, bool mute, string weatherLocation = null, TimeSpan? notifierTime = null, string embedColor = null)
         {

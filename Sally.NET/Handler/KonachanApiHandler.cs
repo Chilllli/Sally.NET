@@ -79,21 +79,20 @@ namespace Sally.NET.Handler
         /// </example>
         private async Task<string> Request2KonachanApiAsync(string[] tags)
         {
-            string tagUrl = "";
-            JObject parsedResponse = new JObject();
             int pageCounter = 0;
             const int limit = 90;
             List<string> responseCollector = new List<string>();
+            StringBuilder tagUrl = new StringBuilder();
             foreach (string tag in tags)
             {
-                tagUrl = tagUrl + $"{tag}%20";
+                tagUrl.Append($"{tag}%20");
             }
             string response = string.Empty;
             //make multiple http requests, so there is more variety
             //it may occure that the randImage index is out of bound. think about, creating a new construct to store all parts of the response and work with that
             //caching response. current matrix[99][8]. there is no need for refreshing the response with every new command
             //the size of the matrix sets a good portion of randomness
-            string formattedTagString = tagUrl.Replace("%20", " ");
+            string formattedTagString = tagUrl.ToString().Replace("%20", " ");
             formattedTagString = formattedTagString.Remove(formattedTagString.Length - 1);
             List<KonachanApi> imageCollection = new List<KonachanApi>();
             if (File.Exists($"cached/{formattedTagString}.json"))
@@ -129,9 +128,8 @@ namespace Sally.NET.Handler
             }
             Random rng = new Random();
             //int randImage = rng.Next(limit);
-            int randPage = rng.Next(pageCounter);
             int randImage = rng.Next(imageCollection.Count());
-            checkAndSaveTagPopularity(tagUrl);
+            checkAndSaveTagPopularity(tagUrl.ToString());
             return imageCollection[randImage].ImageUrl;
         }
 

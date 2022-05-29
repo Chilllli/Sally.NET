@@ -19,7 +19,7 @@ using Sally.NET.Core.Configuration;
 using Sally.NET.Core;
 using Sally.NET.Handler;
 using Microsoft.Extensions.DependencyInjection;
-using Discord.Addons.Interactive;
+using System.Collections.Immutable;
 
 namespace Sally
 {
@@ -67,9 +67,9 @@ namespace Sally
             }
         }
         private static int startValue;
-        private static Dictionary<ulong, char> prefixDictionary;
+        private Dictionary<ulong, char> prefixDictionary;
         public static readonly ILog Logging = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static ConfigManager CredentialManager;
+        public ConfigManager CredentialManager;
         private static ILog consoleLogger = LogManager.GetLogger("console");
         private static ILog fileLogger = LogManager.GetLogger("file");
         private static DateTime startTime { get; set; }
@@ -117,7 +117,7 @@ namespace Sally
             }
 
             BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("config/configuration.json"));
-            DatabaseAccess.Initialize(BotConfiguration.DbUser, BotConfiguration.DbPassword, BotConfiguration.Db, BotConfiguration.DbHost);
+            await DatabaseAccess.InitializeAsync(BotConfiguration.DbUser, BotConfiguration.DbPassword, BotConfiguration.Db, BotConfiguration.DbHost);
             CredentialManager = new ConfigManager(BotConfiguration);
 
 
@@ -200,12 +200,12 @@ namespace Sally
         {
             IServiceProvider services = new ServiceCollection()
               .AddSingleton(Client)
-              .AddSingleton<InteractiveService>()
               .AddSingleton<CleverbotApiHandler>()
               .AddSingleton<ColornamesApiHandler>()
               .AddSingleton<KonachanApiHandler>()
               .AddSingleton<WeatherApiHandler>()
               .AddSingleton<WikipediaApiHandler>()
+              .AddSingleton(CredentialManager)
               .BuildServiceProvider();
             AddonLoader.Load(Client);
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();

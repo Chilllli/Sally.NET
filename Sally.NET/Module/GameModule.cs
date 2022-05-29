@@ -75,7 +75,6 @@ namespace Sally.NET.Module
                         }
                         if (json2 == null)
                         {
-                            jsonItem = new JObject();
                             rsEmbed
                             .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                             .WithDescription("Check current prices of items in the grand exchange")
