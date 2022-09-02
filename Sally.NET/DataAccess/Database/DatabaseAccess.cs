@@ -164,29 +164,6 @@ namespace Sally.NET.DataAccess.Database
             //Console.WriteLine($"{string.Format("{0:HH:mm:ss}", DateTime.Now)} DataAccess    All Users loaded");
         }
 
-
-        public void saveMood(Mood mood)
-        {
-#if RELEASE
-            MySqlCommand command = new MySqlCommand("INSERT INTO moodtable(mood) VALUES (@mood)", connection);
-            command.Parameters.Add("@mood", MySqlDbType.VarString).Value = mood.ToString();
-            command.Prepare();
-            try
-            {
-                command.ExecuteNonQuery();
-            }
-            catch (MySqlException e)
-            {
-                MySqlCommand createTable = new MySqlCommand(@"CREATE TABLE `moodtable` (
-                                                                `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                                                `mood` varchar(10) DEFAULT NULL
-                                                                ) ENGINE=InnoDB DEFAULT CHARSET=latin1;", connection);
-                createTable.ExecuteNonQuery();
-            }
-#endif
-        }
-
-
         /// <summary>
         /// insert new guild settings into database and list
         /// </summary>

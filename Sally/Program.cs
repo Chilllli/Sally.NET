@@ -98,24 +98,6 @@ namespace Sally
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
             InitializeDirectories();
             StartTime = DateTime.Now;
-            string[] moods = { "Sad", "Meh", "Happy", "Extatic" };
-
-            //download content
-            using (var client = new WebClient())
-            {
-                foreach (string item in moods)
-                {
-                    if (!File.Exists($"mood/{item}.png"))
-                    {
-                        client.DownloadFile($"https://cdn.its-sally.net/content/{item}.png", $"mood/{item}.png");
-                    }
-                    if (!File.Exists($"mood/{item}.json"))
-                    {
-                        client.DownloadFile($"https://cdn.its-sally.net/content/{item}.json", $"mood/{item}.json");
-                    }
-                }
-            }
-
             BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("config/configuration.json"));
             await DatabaseAccess.InitializeAsync(BotConfiguration.DbUser, BotConfiguration.DbPassword, BotConfiguration.Db, BotConfiguration.DbHost);
             CredentialManager = new ConfigManager(BotConfiguration);
@@ -242,11 +224,6 @@ namespace Sally
             }
             if (!CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
             {
-                if (!CredentialManager.OptionalSettings.Contains("WeatherPlace"))
-                {
-                    MoodDictionary.InitializeMoodDictionary(Client, BotConfiguration);
-                    await MoodHandlerService.InitializeHandler(Client, BotConfiguration, services.GetRequiredService<WeatherApiHandler>(), fileLogger);
-                }
                 WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration, services.GetRequiredService<WeatherApiHandler>());
             }
             consoleLogger.Info($"Addons loaded: {AddonLoader.LoadedAddonsCount}");

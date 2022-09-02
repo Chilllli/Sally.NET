@@ -39,7 +39,7 @@ namespace Sally.NET.Service
             if ((!currentUser.HasMuted && (DateTime.Now - currentUser.LastFarewell).TotalHours > 12) && hasCleverbotApiKey)
             {
                 //send private message
-                await disUser.SendMessageAsync(MoodDictionary.getMoodMessage("Bye"));//Bye
+                await disUser.SendMessageAsync("Goodbye!");//Bye
                 currentUser.LastFarewell = DateTime.Now;
             }
             stopTrackingVoiceChannel(guildUser);
@@ -57,7 +57,7 @@ namespace Sally.NET.Service
             if ((!currentUser.HasMuted && (DateTime.Now - currentUser.LastGreeting).TotalHours > 12) && hasCleverbotApiKey)
             {
                 //send private message
-                await disUser.SendMessageAsync(String.Format(MoodDictionary.getMoodMessage("Hello"), disUser.Username));//Hello
+                await disUser.SendMessageAsync(String.Format("Welcome!", disUser.Username));//Hello
                 currentUser.LastGreeting = DateTime.Now;
             }
             StartTrackingVoiceChannel(guildUser);
