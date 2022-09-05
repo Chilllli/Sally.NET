@@ -20,6 +20,9 @@ using Sally.NET.Core;
 using Sally.NET.Handler;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Immutable;
+using Sally.NET.Core.Enum;
+using AngleSharp.Common;
+using Discord.Interactions;
 
 namespace Sally
 {
@@ -96,10 +99,15 @@ namespace Sally
         {
             ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
-            InitializeDirectories();
+            initializeDirectories();
             StartTime = DateTime.Now;
             BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("config/configuration.json"));
-            await DatabaseAccess.InitializeAsync(BotConfiguration.DbUser, BotConfiguration.DbPassword, BotConfiguration.Db, BotConfiguration.DbHost);
+            if (!validateConfig(BotConfiguration, out string message))
+            {
+                consoleLogger.Error(message);
+                return;
+            }
+            //await DatabaseAccess.InitializeAsync(BotConfiguration.DbUser, BotConfiguration.DbPassword, BotConfiguration.Db, BotConfiguration.DbHost);
             CredentialManager = new ConfigManager(BotConfiguration);
 
 
@@ -126,7 +134,13 @@ namespace Sally
             }
             RequestCounter = Int32.Parse(File.ReadAllText("ApiRequests.txt"));
 
-            Client = new DiscordSocketClient();
+            Client = new DiscordSocketClient(new DiscordSocketConfig()
+            {
+                AlwaysDownloadUsers = true,
+                GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildBans | 
+                                 GatewayIntents.GuildEmojis | GatewayIntents.GuildIntegrations | GatewayIntents.GuildWebhooks | GatewayIntents.GuildVoiceStates |
+                                 GatewayIntents.GuildMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessageTyping | GatewayIntents.DirectMessages
+            });
 
 
             Client.Ready += Client_Ready;
@@ -139,29 +153,71 @@ namespace Sally
             await Task.Delay(-1);
         }
 
-        private void checkNewUserEntries()
+        private bool validateConfig(BotCredentials botConfiguration, out string message)
         {
-            List<SocketGuild> guilds = Client.Guilds.ToList();
-            foreach (SocketGuild guild in guilds)
+            message = "";
+            switch (botConfiguration.SQLType)
             {
-                List<SocketGuildUser> guildUsers = guild.Users.ToList();
-                foreach (SocketGuildUser guildUser in guildUsers)
+                case SQLType.Sqlite:
+                    if (String.IsNullOrWhiteSpace(botConfiguration.SqliteConnectionString))
+                {
+                        message = "If using Sqlite: provide a valid sqlite connection string";
+                        return false;
+                    }
+                    break;
+                case SQLType.MySQL:
+                    if (String.IsNullOrWhiteSpace(botConfiguration.Db))
+                    {
+                        message = "If using MySQL: provide a valid database name";
+                        return false;
+                    }
+                    if (String.IsNullOrWhiteSpace(botConfiguration.DbUser))
+                    {
+                        message = "If using MySQL: provide a valid db user";
+                        return false;
+                    }
+                    if (String.IsNullOrWhiteSpace(botConfiguration.DbPassword))
+                    {
+                        message = "If using MySQL: provide a valid db password";
+                        return false;
+                    }
+                    if (String.IsNullOrWhiteSpace(botConfiguration.DbHost))
+                    {
+                        message = "If using MySQL: provide a valid db host";
+                        return false;
+                    }
+                    break;
+                default:
+                    message = "can't determine sql type";
+                    return false;
+            }
+            return true;
+        }
+
+        private void checkNewUserEntries<T>(T dbAccess) where T : IDBAccess 
+        {
+            foreach (SocketGuild guild in Client.Guilds)
+            {
+                foreach (SocketGuildUser guildUser in guild.Users)
                 {
                     if (guildUser.Id == BotConfiguration.MeId)
                     {
                         Me = guildUser;
                     }
                     //check if user exist in global instance
-                    User myUser = DatabaseAccess.Instance.Users.Find(u => u.Id == guildUser.Id);
+                    User myUser = dbAccess.GetUser(guildUser.Id);
                     if (myUser == null)
                     {
-                        DatabaseAccess.Instance.InsertUser(new User(guildUser.Id, true));
+                        dbAccess.InsertUser(new User(guildUser.Id, true));
                     }
-                    myUser = DatabaseAccess.Instance.Users.Find(u => u.Id == guildUser.Id);
+                    myUser = dbAccess.GetUser(guildUser.Id);
                     //check if guilduser exist in guild instance
                     if (!myUser.GuildSpecificUser.ContainsKey(guild.Id))
                     {
-                        DatabaseAccess.Instance.InsertGuildUser(guild.Id, new GuildUser(guildUser.Id, guild.Id, 500));
+                        if (dbAccess.GetGuildUser(guildUser.Id, guild.Id) == null)
+                        {
+                            dbAccess.InsertGuildUser(new GuildUser(guildUser.Id, guild.Id, 500));
+                    }
                     }
                     //check if user is already in a voice channel
                     if (guildUser.VoiceChannel != null)
@@ -180,15 +236,27 @@ namespace Sally
 
         private async Task Client_Ready()
         {
-            IServiceProvider services = new ServiceCollection()
+            IServiceCollection serviceCollection = new ServiceCollection()
               .AddSingleton(Client)
               .AddSingleton<CleverbotApiHandler>()
               .AddSingleton<ColornamesApiHandler>()
               .AddSingleton<KonachanApiHandler>()
               .AddSingleton<WeatherApiHandler>()
               .AddSingleton<WikipediaApiHandler>()
-              .AddSingleton(CredentialManager)
-              .BuildServiceProvider();
+              .AddSingleton(CredentialManager);
+            switch (BotConfiguration.SQLType)
+            {
+                case SQLType.Sqlite:
+                    serviceCollection.AddSingleton<IDBAccess>(new SQLiteAccess(BotConfiguration.SqliteConnectionString));
+                    break;
+                case SQLType.MySQL:
+                    serviceCollection.AddSingleton<IDBAccess>(new MySQLAccess(BotConfiguration.DbUser, BotConfiguration.DbPassword, BotConfiguration.Db, BotConfiguration.DbHost));
+                    break;
+                default:
+                    consoleLogger.Warn($"{MethodBase.GetCurrentMethod()}: can't determine sql type. set sqlite as default");
+                    serviceCollection.AddSingleton<IDBAccess>(new SQLiteAccess(BotConfiguration.SqliteConnectionString));
+                    break;
+            }
             AddonLoader.Load(Client);
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             List<Type> commandClasses = new List<Type>();
@@ -197,12 +265,12 @@ namespace Sally
             {
                 commandClasses.AddRange(assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList());
             }
-            VoiceRewardService.InitializeHandler(Client, BotConfiguration, !CredentialManager.OptionalSettings.Contains("CleverApi"));
-            checkNewUserEntries();
+            VoiceRewardService.InitializeHandler(Client, BotConfiguration, !CredentialManager.OptionalSettings.Contains("CleverApi"), services.GetService<IDBAccess>());
+            checkNewUserEntries(services.GetService<IDBAccess>());
             StatusNotifierService.InitializeService(Me);
             MusicCommands.Initialize(Client);
             RoleManagerService.InitializeHandler(Client, BotConfiguration);
-            UserManagerService.InitializeHandler(Client, fileLogger);
+            UserManagerService.InitializeHandler(Client, fileLogger, services.GetService<IDBAccess>());
             await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary, !CredentialManager.OptionalSettings.Contains("CleverApi"), fileLogger, services);
             CacheService.InitializeHandler();
             switch (startValue)
@@ -224,15 +292,16 @@ namespace Sally
             }
             if (!CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
             {
-                WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration, services.GetRequiredService<WeatherApiHandler>());
+                WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration, services.GetRequiredService<WeatherApiHandler>(), services.GetService<IDBAccess>());
             }
             consoleLogger.Info($"Addons loaded: {AddonLoader.LoadedAddonsCount}");
-            consoleLogger.Info($"User loaded: {DatabaseAccess.Instance.Users.Count}");
+            consoleLogger.Info($"User loaded: {services.GetService<IDBAccess>().GetUsers().Count}");
             consoleLogger.Info($"Registered guilds: {Client.Guilds.Count}");
             consoleLogger.Info($"Bot start up time: {(DateTime.Now - startTime).TotalSeconds} s");
+            await Client.SetGameAsync("$help", type: ActivityType.Watching);
         }
 
-        private static void InitializeDirectories()
+        private static void initializeDirectories()
         {
             string[] directories = {
                 "mood",

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Sally.NET.Core.Enum;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,5 +21,8 @@ namespace Sally.NET.Core.Configuration
         public string WeatherPlace { get; set; } = String.Empty;
         public string WeatherApiKey { get; set; } = String.Empty;
         public string CleverApi { get; set; } = String.Empty;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public SQLType SQLType { get; set; }
+        public string SqliteConnectionString { get; set; }
     }
 }

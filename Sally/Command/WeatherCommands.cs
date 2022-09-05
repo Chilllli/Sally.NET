@@ -18,10 +18,12 @@ namespace Sally.Command
     {
         private readonly WeatherApiHandler weatherApiHandler;
         private readonly ConfigManager configManager;
-        public WeatherCommands(WeatherApiHandler weatherApiHandler, ConfigManager configManager)
+        private readonly IDBAccess dbAccess;
+        public WeatherCommands(WeatherApiHandler weatherApiHandler, ConfigManager configManager, IDBAccess dbAccess)
         {
             this.weatherApiHandler = weatherApiHandler;
             this.configManager = configManager;
+            this.dbAccess = dbAccess;
         }
         [Command("sub2weather")]
         public async Task SubToService(string location, TimeSpan notiferTime)
@@ -42,9 +44,10 @@ namespace Sally.Command
                 return;
             }
 
-            User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
+            User currentUser = dbAccess.GetUser(Context.Message.Author.Id);
             currentUser.WeatherLocation = location;
             currentUser.NotifierTime = notiferTime;
+            dbAccess.UpdateUser(currentUser);
             await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author}, you successfully subbed to weather notifications.");
         }
         [Command("unsub2weather")]
@@ -54,9 +57,10 @@ namespace Sally.Command
             {
                 return;
             }
-            User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
+            User currentUser = dbAccess.GetUser(Context.Message.Author.Id);
             currentUser.WeatherLocation = null;
             currentUser.NotifierTime = null;
+            dbAccess.UpdateUser(currentUser);
             await Context.Message.Channel.SendMessageAsync($"{Context.Message.Author}, you successfully unsubbed to weather notifications.");
         }
         [Command("currentWeather")]

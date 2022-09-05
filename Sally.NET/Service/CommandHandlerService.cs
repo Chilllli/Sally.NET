@@ -49,6 +49,7 @@ namespace Sally.NET.Service
         }
         private static bool HasCleverbotApiKey;
         private static ILog logger;
+        private static IDBAccess dbAccess;
 
         public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses, Dictionary<ulong, char> collection, bool hasCleverbotApiKey, ILog logger, IServiceProvider services)
         {
@@ -56,6 +57,8 @@ namespace Sally.NET.Service
             CommandHandlerService.credentials = credentials;
             CommandHandlerService.commandClasses = commandClasses;
             CommandHandlerService.IdPrefixCollection = collection;
+            CommandHandlerService.services = services;
+            CommandHandlerService.dbAccess = services.GetService<IDBAccess>();
             HasCleverbotApiKey = hasCleverbotApiKey;
             CommandHandlerService.logger = logger;
             commands = new CommandService();
@@ -244,7 +247,7 @@ namespace Sally.NET.Service
             {
                 return;
             }
-            MessageAuthor = DatabaseAccess.Instance.Users.Find(u => u.Id == message.Author.Id);
+            MessageAuthor = dbAccess.GetUser(message.Author.Id);
             Input input = ClassifyAs(message);
             await HandleMessage(input);
         }

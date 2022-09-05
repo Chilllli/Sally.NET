@@ -22,12 +22,14 @@ namespace Sally.NET.Service
         private static DiscordSocketClient client { get; set; }
         public static BotCredentials credentials { get; set; }
         private static WeatherApiHandler weatherApiHandler;
+        private static IDBAccess dbAccess;
 
-        public static void InitializeWeatherSub(DiscordSocketClient client, BotCredentials credentials, WeatherApiHandler weatherApiHandler)
+        public static void InitializeWeatherSub(DiscordSocketClient client, BotCredentials credentials, WeatherApiHandler weatherApiHandler, IDBAccess dbAccess)
         {
             WeatherSubscriptionService.client = client;
             WeatherSubscriptionService.weatherApiHandler = weatherApiHandler;
             WeatherSubscriptionService.credentials = credentials;
+            WeatherSubscriptionService.dbAccess = dbAccess;
             Timer checkWeather = new Timer(60 * 1000);
             checkWeather.Start();
             checkWeather.Elapsed += CheckWeather_Elapsed;
@@ -35,7 +37,8 @@ namespace Sally.NET.Service
 
         private static async void CheckWeather_Elapsed(object sender, ElapsedEventArgs e)
         {
-            foreach (User user in DatabaseAccess.Instance.Users)
+            List<User> users = dbAccess.GetUsers();
+            foreach (User user in users)
             {
                 if (user.NotifierTime == null || user.WeatherLocation == null)
                     continue;

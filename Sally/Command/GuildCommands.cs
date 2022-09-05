@@ -22,6 +22,11 @@ namespace Sally_NET.Command
         [Group("set")]
         public class SetCommands : ModuleBase
         {
+            private readonly IDBAccess dbAccess;
+            public SetCommands(IDBAccess dbAccess)
+            {
+                this.dbAccess = dbAccess;
+            }
             /// <summary>
             /// sets the channel for the music playlist embed
             /// </summary>
@@ -41,9 +46,9 @@ namespace Sally_NET.Command
                         return;
                     }
                     //add or update channel to guildsettings from server
-                    GuildSettings guildSetting = DatabaseAccess.Instance.GuildSettings.Find(g => g.GuildId == guild.Id);
+                    GuildSettings guildSetting = dbAccess.GetGuildSettings(guild.Id);
                     guildSetting.MusicChannelId = musicChannelId;
-                    DatabaseAccess.Instance.UpdateGuildSettings(guildSetting);
+                    dbAccess.UpdateGuildSettings(guildSetting);
                     await Context.Message.Channel.SendMessageAsync($"{guildChannel.Name} was set as music channel.");
                 }
                 else

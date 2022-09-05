@@ -14,10 +14,12 @@ namespace Sally.NET.Service
     {
         private static DiscordSocketClient client;
         private static ILog logger;
-        public static void InitializeHandler(DiscordSocketClient client, ILog logger)
+        private static IDBAccess dbAccess;
+        public static void InitializeHandler(DiscordSocketClient client, ILog logger, IDBAccess dbAccess)
         {
             UserManagerService.client = client;
             UserManagerService.logger = logger;
+            UserManagerService.dbAccess = dbAccess;
             client.UserJoined += Client_UserJoined;
             client.JoinedGuild += Client_JoinedGuild;
             GuildUser.OnLevelUp += GuildUser_OnLevelUp;
@@ -35,16 +37,16 @@ namespace Sally.NET.Service
             foreach (SocketGuildUser guildUser in guildUsers)
             {
                 //check if the currrent user exists globally
-                if (DatabaseAccess.Instance.Users.Find(u => u.Id == guildUser.Id) == null)
+                if (dbAccess.GetUser(guildUser.Id) == null)
                 {
                     //current user dont exist in the global context
-                    DatabaseAccess.Instance.InsertUser(new User(guildUser.Id, true));
+                    dbAccess.InsertUser(new User(guildUser.Id, true));
                 }
-                User myUser = DatabaseAccess.Instance.Users.Find(u => u.Id == guildUser.Id);
+                User myUser = dbAccess.GetUser(guildUser.Id);
                 //check if the user has a guild entry of the current guild
                 if (!myUser.GuildSpecificUser.ContainsKey(arg.Id))
                 {
-                    DatabaseAccess.Instance.InsertGuildUser(arg.Id, new GuildUser(guildUser.Id, arg.Id, 500));
+                    dbAccess.InsertGuildUser(new GuildUser(guildUser.Id, arg.Id, 500));
                 }
             }
             return Task.CompletedTask;
@@ -54,14 +56,14 @@ namespace Sally.NET.Service
         {
             //check if the user is complete new
             
-            if (DatabaseAccess.Instance.Users.Find(u => u.Id == userNew.Id) == null)
+            if (dbAccess.GetUser(userNew.Id) == null)
             {
-                DatabaseAccess.Instance.InsertUser(new User(userNew.Id, false));
+                dbAccess.InsertUser(new User(userNew.Id, false));
             }
-            User joinedUser = DatabaseAccess.Instance.Users.Find(u => u.Id == userNew.Id);
+            User joinedUser = dbAccess.GetUser(userNew.Id);
             if (!joinedUser.GuildSpecificUser.ContainsKey(userNew.Guild.Id))
             {
-                DatabaseAccess.Instance.InsertGuildUser(userNew.Guild.Id, new GuildUser(userNew.Id, userNew.Guild.Id, 500));
+                dbAccess.InsertGuildUser(new GuildUser(userNew.Id, userNew.Guild.Id, 500));
             }
             return Task.CompletedTask;
         }

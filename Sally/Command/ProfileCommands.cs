@@ -17,10 +17,15 @@ namespace Sally.Command
 
     public class ProfileCommands : ModuleBase
     {
+        private readonly IDBAccess dbAccess;
+        public ProfileCommands(IDBAccess dbAccess)
+        {
+            this.dbAccess = dbAccess;
+        }
         [Command("mute")]
         public async Task MuteBot()
         {
-            User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
+            User user = dbAccess.GetUser(Context.Message.Author.Id);
             user.HasMuted = true;
             await Context.Message.Channel.SendMessageAsync("The bot is muted now");
         }
@@ -28,7 +33,7 @@ namespace Sally.Command
         [Command("unmute")]
         public async Task UnmuteBot()
         {
-            User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
+            User user = dbAccess.GetUser(Context.Message.Author.Id);
             user.HasMuted = false;
             await Context.Message.Channel.SendMessageAsync("The bot is unmuted now");
         }
@@ -37,7 +42,9 @@ namespace Sally.Command
         [Command("myxp")]
         public async Task LevelOverview()
         {
-            User myUser = CommandHandlerService.MessageAuthor;
+            //User myUser = CommandHandlerService.MessageAuthor;
+            User myUser = dbAccess.GetUser(Context.User.Id);
+            
             if (Context.Message.Channel is SocketGuildChannel guildChannel)
             {
                 //message from guild
@@ -108,10 +115,15 @@ namespace Sally.Command
         [Group("status")]
         public class StatusManagement : ModuleBase
         {
+            private readonly IDBAccess dbAccess;
+            public StatusManagement(IDBAccess dbAccess)
+            {
+                this.dbAccess = dbAccess;
+            }
             [Command("isMuted")]
             public async Task ShowMuteStatus()
             {
-                User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
+                User user = dbAccess.GetUser(Context.Message.Author.Id);
                 if(user.HasMuted)
                 {
                     await Context.Message.Channel.SendMessageAsync($"The bot is currently muted for you.");

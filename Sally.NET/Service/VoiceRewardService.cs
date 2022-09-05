@@ -18,11 +18,13 @@ namespace Sally.NET.Service
         private static DiscordSocketClient client;
         private static BotCredentials credentials;
         private static bool hasCleverbotApiKey;
+        private static IDBAccess dbAccess;
 
-        public static void InitializeHandler(DiscordSocketClient client, BotCredentials credentials, bool hasCleverBotKey)
+        public static void InitializeHandler(DiscordSocketClient client, BotCredentials credentials, bool hasCleverBotKey, IDBAccess dbAccess)
         {
             VoiceRewardService.client = client;
             VoiceRewardService.credentials = credentials;
+            VoiceRewardService.dbAccess = dbAccess;
             hasCleverbotApiKey = hasCleverBotKey;
             client.UserVoiceStateUpdated += voiceChannelJoined;
             client.UserVoiceStateUpdated += voiceChannelLeft;
@@ -34,7 +36,7 @@ namespace Sally.NET.Service
             {
                 return;
             }
-            User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == disUser.Id);
+            User currentUser = dbAccess.GetUser(disUser.Id);
             GuildUser guildUser = currentUser.GuildSpecificUser[voiceStateOld.VoiceChannel.Guild.Id];
             if ((!currentUser.HasMuted && (DateTime.Now - currentUser.LastFarewell).TotalHours > 12) && hasCleverbotApiKey)
             {
@@ -52,7 +54,7 @@ namespace Sally.NET.Service
             {
                 return;
             }
-            User currentUser = DatabaseAccess.Instance.Users.Find(u => u.Id == disUser.Id);
+            User currentUser = dbAccess.GetUser(disUser.Id);
             GuildUser guildUser = currentUser.GuildSpecificUser[voiceStateNew.VoiceChannel.Guild.Id];
             if ((!currentUser.HasMuted && (DateTime.Now - currentUser.LastGreeting).TotalHours > 12) && hasCleverbotApiKey)
             {
@@ -84,12 +86,14 @@ namespace Sally.NET.Service
             }
             guildUser.Xp += credentials.GainedXp;
             guildUser.LastXpTime = DateTime.Now;
+            dbAccess.UpdateGuildUser(guildUser);
         }
 
         private static void stopTrackingVoiceChannel(GuildUser guildUser)
         {
             guildUser.XpTimer.Stop();
             guildUser.Xp += (int)Math.Round(((DateTime.Now - guildUser.LastXpTime).TotalMilliseconds / (credentials.XpTimerInMin * 1000 * 60)) * credentials.GainedXp);
+            dbAccess.UpdateGuildUser(guildUser);
         }
     }
 }

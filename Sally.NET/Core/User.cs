@@ -37,7 +37,6 @@ namespace Sally.NET.Core
             set
             {
                 weatherLocation = value;
-                Update(this);
             }
         }
 
@@ -50,7 +49,6 @@ namespace Sally.NET.Core
             set
             {
                 notifierTime = value;
-                Update(this);
             }
         }
 
@@ -64,7 +62,6 @@ namespace Sally.NET.Core
             set
             {
                 embedColor = value;
-                Update(this);
             }
         }
 
@@ -77,17 +74,6 @@ namespace Sally.NET.Core
             this.weatherLocation = weatherLocation;
             this.notifierTime = notifierTime;
             this.embedColor = embedColor;
-        }
-
-        private void Update(User user)
-        {
-            //this if is only needed for unit testing
-            //check if there is a instance for the database
-            if (DatabaseAccess.Instance != null)
-            {
-                DatabaseAccess.Instance.UpdateUser(this);
-            }
-
         }
     }
 }

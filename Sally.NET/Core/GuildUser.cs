@@ -13,6 +13,18 @@ namespace Sally.NET.Core
     {
         public ulong Id { get; set; }
         public ulong GuildId { get; set; }
+        private int level = 1;
+        public int Level
+        {
+            get
+            {
+                return level;
+            }
+            set
+            {
+                level = GetLevelFromXp(this.Xp);
+            }
+        }
         private int xp;
         public int Xp
         {
@@ -32,16 +44,9 @@ namespace Sally.NET.Core
                     OnLevelUp?.Invoke(this);
                 }
                 xp = value;
-                Update(this);
             }
         }
-        public int Level
-        {
-            get
-            {
-                return GetLevelFromXp(this.Xp);
-            }
-        }
+        
         public Timer XpTimer { get; set; }
         public DateTime LastXpTime { get; set; }
         public static int GetLevelFromXp(int xp)
@@ -58,17 +63,6 @@ namespace Sally.NET.Core
             this.Id = id;
             this.GuildId = guildId;
             this.Xp = xp;
-        }
-
-        private void Update(GuildUser guildUser)
-        {
-            //this if is only needed for unit testing
-            //check if there is a instance for the database
-            if (DatabaseAccess.Instance != null)
-            {
-                DatabaseAccess.Instance.UpdateGuildUser(this);
-            }
-
         }
     }
 }

@@ -21,9 +21,11 @@ namespace Sally_NET.Command
         public class SetUserCommands : ModuleBase
         {
             private readonly ColornamesApiHandler colornamesApiHandler;
-            public SetUserCommands(ColornamesApiHandler colornamesApiHandler)
+            private readonly IDBAccess dbAccess;
+            public SetUserCommands(ColornamesApiHandler colornamesApiHandler, IDBAccess dbAccess)
             {
                 this.colornamesApiHandler = colornamesApiHandler;
+                this.dbAccess = dbAccess;
             }
             [Command("color")]
             public async Task SetEmbedColor(string color)
@@ -59,8 +61,9 @@ namespace Sally_NET.Command
                             newColorName = "Color has no name yet.";
                         }
                         //hex value is in range
-                        User user = DatabaseAccess.Instance.Users.Find(u => u.Id == Context.Message.Author.Id);
+                        User user = dbAccess.GetUser(Context.Message.Author.Id);
                         user.EmbedColor = result;
+                        dbAccess.UpdateUser(user);
 
                         EmbedBuilder embed = new EmbedBuilder()
                             .WithTitle("Custom embed color changed successfully")
