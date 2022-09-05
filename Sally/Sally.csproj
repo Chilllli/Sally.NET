@@ -81,4 +81,8 @@
     <ProjectReference Include="..\Sally.NET\Sally.NET.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Command\General\" />
+  </ItemGroup>
+
 </Project>

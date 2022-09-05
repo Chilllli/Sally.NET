@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Interactions;
 using Sally.NET.Module;
 using Sally.NET.Service;
 using System;
@@ -12,7 +13,6 @@ namespace Sally.Command
     /// </summary>
     public class GeneralCommands : ModuleBase
     {
-        public static readonly string PongMessage = "pong";
 
         [Command("ping")]
         public async Task Ping()
@@ -34,6 +34,13 @@ namespace Sally.Command
 
         [Command("uptime")]
         public async Task CalculateUptime()
+        {
+            TimeSpan uptime = DateTime.Now - Program.StartTime;
+            await Context.Message.Channel.SendMessageAsync($"My current uptime is {GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
+        }
+
+        [SlashCommand("uptime", "Check current uptime")]
+        public async Task SlashCalculateUptime()
         {
             TimeSpan uptime = DateTime.Now - Program.StartTime;
             await Context.Message.Channel.SendMessageAsync($"My current uptime is {GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
@@ -63,6 +70,28 @@ namespace Sally.Command
                 .WithTitle("If you want to have Sally on your server, you came to the right place! (▰˘◡˘▰)")
                 .AddField("Invite Link", "https://invite.its.sally.net");
             await Context.Message.Channel.SendMessageAsync(embed: embed.Build());
+        }
+    }
+
+    public class GeneralSlashCommands : InteractionModuleBase
+    {
+        [SlashCommand("uptime", "check current uptime")]
+        public async Task SlashCalculateUptime()
+        {
+            TimeSpan uptime = DateTime.Now - Program.StartTime;
+            await Context.Interaction.RespondAsync($"My current uptime is {GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
+        }
+
+        [SlashCommand("commands", "get url for command overview")]
+        public async Task GetCommandPage()
+        {
+            await Context.Interaction.RespondAsync("Here you can find the list of all available commands: <https://its-sally.net/commands>");
+        }
+
+        [SlashCommand("ping", "get command ping")]
+        public async Task Ping()
+        {
+            await Context.Interaction.RespondAsync($"Pong! `{Math.Abs(Math.Round((DateTimeOffset.UtcNow - Context.Interaction.CreatedAt).TotalMilliseconds))} ms`");
         }
     }
 }

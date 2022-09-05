@@ -91,7 +91,6 @@ namespace Sally
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
-            DatabaseAccess.Instance.Dispose();
             Environment.Exit(0);
         }
 
@@ -160,7 +159,7 @@ namespace Sally
             {
                 case SQLType.Sqlite:
                     if (String.IsNullOrWhiteSpace(botConfiguration.SqliteConnectionString))
-                {
+                    {
                         message = "If using Sqlite: provide a valid sqlite connection string";
                         return false;
                     }
@@ -217,7 +216,7 @@ namespace Sally
                         if (dbAccess.GetGuildUser(guildUser.Id, guild.Id) == null)
                         {
                             dbAccess.InsertGuildUser(new GuildUser(guildUser.Id, guild.Id, 500));
-                    }
+                        }
                     }
                     //check if user is already in a voice channel
                     if (guildUser.VoiceChannel != null)
@@ -257,6 +256,17 @@ namespace Sally
                     serviceCollection.AddSingleton<IDBAccess>(new SQLiteAccess(BotConfiguration.SqliteConnectionString));
                     break;
             }
+            IServiceProvider services = serviceCollection.BuildServiceProvider();
+            var _interactionService = new InteractionService(Client);
+            await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+            await _interactionService.RegisterCommandsToGuildAsync(559796025817038848);
+
+            Client.InteractionCreated += async interaction =>
+            {
+                var scope = services.CreateScope();
+                var ctx = new SocketInteractionContext(Client, interaction);
+                await _interactionService.ExecuteCommandAsync(ctx, scope.ServiceProvider);
+            };
             AddonLoader.Load(Client);
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             List<Type> commandClasses = new List<Type>();

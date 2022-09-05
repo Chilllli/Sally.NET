@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using GroupAttribute = Discord.Commands.GroupAttribute;
+using IResult = Discord.Commands.IResult;
 
 namespace Sally.NET.Service
 {
@@ -51,6 +54,8 @@ namespace Sally.NET.Service
         private static ILog logger;
         private static IDBAccess dbAccess;
 
+        private static InteractionService interaction;
+
         public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses, Dictionary<ulong, char> collection, bool hasCleverbotApiKey, ILog logger, IServiceProvider services)
         {
             CommandHandlerService.client = client;
@@ -62,14 +67,27 @@ namespace Sally.NET.Service
             HasCleverbotApiKey = hasCleverbotApiKey;
             CommandHandlerService.logger = logger;
             commands = new CommandService();
-            CommandHandlerService.services = services;
+            interaction = new InteractionService(CommandHandlerService.client);
+            
             client.MessageReceived += CommandHandler;
+            client.SlashCommandExecuted += Client_SlashCommandExecuted;
+
             AppDomain appDomain = AppDomain.CurrentDomain;
             Assembly[] assemblies = appDomain.GetAssemblies();
             foreach (Assembly assembly in assemblies)
             {
                 await commands.AddModulesAsync(assembly, services);
             }
+            foreach (Assembly assembly in assemblies)
+            {
+                //await interaction.AddModulesAsync(assembly, services);
+            }
+        }
+
+        private static async Task Client_SlashCommandExecuted(SocketSlashCommand arg)
+        {
+            var context = new SocketInteractionContext(client, arg);
+            await interaction.ExecuteCommandAsync(context, services);
         }
 
         /// <summary>
