@@ -257,16 +257,10 @@ namespace Sally
                     break;
             }
             IServiceProvider services = serviceCollection.BuildServiceProvider();
-            var _interactionService = new InteractionService(Client);
-            await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-            await _interactionService.RegisterCommandsToGuildAsync(559796025817038848);
+            //var _interactionService = new InteractionService(Client);
+            //await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+            //await _interactionService.RegisterCommandsToGuildAsync(559796025817038848);
 
-            Client.InteractionCreated += async interaction =>
-            {
-                var scope = services.CreateScope();
-                var ctx = new SocketInteractionContext(Client, interaction);
-                await _interactionService.ExecuteCommandAsync(ctx, scope.ServiceProvider);
-            };
             AddonLoader.Load(Client);
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             List<Type> commandClasses = new List<Type>();

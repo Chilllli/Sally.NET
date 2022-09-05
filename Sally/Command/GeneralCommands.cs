@@ -39,13 +39,6 @@ namespace Sally.Command
             await Context.Message.Channel.SendMessageAsync($"My current uptime is {GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
         }
 
-        [SlashCommand("uptime", "Check current uptime")]
-        public async Task SlashCalculateUptime()
-        {
-            TimeSpan uptime = DateTime.Now - Program.StartTime;
-            await Context.Message.Channel.SendMessageAsync($"My current uptime is {GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
-        }
-
         [Command("support")]
         public async Task ShowSupportLinks()
         {
@@ -76,7 +69,7 @@ namespace Sally.Command
     public class GeneralSlashCommands : InteractionModuleBase
     {
         [SlashCommand("uptime", "check current uptime")]
-        public async Task SlashCalculateUptime()
+        public async Task CalculateUptime()
         {
             TimeSpan uptime = DateTime.Now - Program.StartTime;
             await Context.Interaction.RespondAsync($"My current uptime is {GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
@@ -92,6 +85,12 @@ namespace Sally.Command
         public async Task Ping()
         {
             await Context.Interaction.RespondAsync($"Pong! `{Math.Abs(Math.Round((DateTimeOffset.UtcNow - Context.Interaction.CreatedAt).TotalMilliseconds))} ms`");
+        }
+
+        [SlashCommand("help", "get link to homepage")]
+        public async Task GetHelpPage()
+        {
+            await Context.Interaction.RespondAsync("If you are looking for help open the following webpage: <https://its-sally.net>");
         }
     }
 }

@@ -22,6 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GroupAttribute = Discord.Commands.GroupAttribute;
 using IResult = Discord.Commands.IResult;
+using ModuleInfo = Discord.Interactions.ModuleInfo;
 
 namespace Sally.NET.Service
 {
@@ -77,11 +78,9 @@ namespace Sally.NET.Service
             foreach (Assembly assembly in assemblies)
             {
                 await commands.AddModulesAsync(assembly, services);
+                await interaction.AddModulesAsync(assembly, services);
             }
-            foreach (Assembly assembly in assemblies)
-            {
-                //await interaction.AddModulesAsync(assembly, services);
-            }
+            await interaction.RegisterCommandsGloballyAsync(true);
         }
 
         private static async Task Client_SlashCommandExecuted(SocketSlashCommand arg)
