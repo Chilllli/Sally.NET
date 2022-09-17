@@ -16,7 +16,6 @@ namespace Sally.NET.Core
             set
             {
                 hasMuted = value;
-                DatabaseAccess.Instance.UpdateUser(this);
             }
             get
             {

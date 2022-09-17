@@ -141,7 +141,6 @@ namespace Sally
                                  GatewayIntents.GuildMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessageTyping | GatewayIntents.DirectMessages
             });
 
-
             Client.Ready += Client_Ready;
             Client.Log += Log;
 

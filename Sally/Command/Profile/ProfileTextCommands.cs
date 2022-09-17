@@ -23,6 +23,7 @@ namespace Sally_NET.Command.Profile
         {
             User user = dbAccess.GetUser(Context.Message.Author.Id);
             user.HasMuted = true;
+            dbAccess.UpdateUser(user);
             await Context.Message.Channel.SendMessageAsync("The bot is muted now");
         }
 
@@ -31,6 +32,7 @@ namespace Sally_NET.Command.Profile
         {
             User user = dbAccess.GetUser(Context.Message.Author.Id);
             user.HasMuted = false;
+            dbAccess.UpdateUser(user);
             await Context.Message.Channel.SendMessageAsync("The bot is unmuted now");
         }
 
