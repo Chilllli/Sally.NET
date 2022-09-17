@@ -263,19 +263,19 @@ namespace Sally.NET.Handler
             }
         }
 
-        public async Task<string> GetKonachanPictureUrl()
+        public async Task<string> GetKonachanPictureUrlAsync()
         {
             return await Request2KonachanApiAsync();
         }
 
-        public string GetKonachanPictureUrl(string[] tagCollection)
+        public async Task<string> GetKonachanPictureUrlAsync(string[] tagCollection)
         {
-            return Request2KonachanApiAsync(tagCollection).Result;
+            return await Request2KonachanApiAsync(tagCollection);
         }
 
-        public string GetKonachanPictureUrl(string[] tagCollection, Rating rating)
+        public async Task<string> GetKonachanPictureUrlAsync(string[] tagCollection, Rating rating)
         {
-            return Request2KonachanApiAsync(tagCollection, rating).Result;
+            return await Request2KonachanApiAsync(tagCollection, rating);
         }
     }
 }

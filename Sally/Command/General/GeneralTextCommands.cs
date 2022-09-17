@@ -1,17 +1,20 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.Interactions;
+﻿using Discord.Commands;
+using Discord;
 using Sally.NET.Module;
 using Sally.NET.Service;
+using Sally;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace Sally.Command
+namespace Sally_NET.Command.General
 {
     /// <summary>
     /// general purpose commands
     /// </summary>
-    public class GeneralCommands : ModuleBase
+    public class GeneralTextCommands : ModuleBase
     {
 
         [Command("ping")]
@@ -45,7 +48,7 @@ namespace Sally.Command
             EmbedBuilder embed = new EmbedBuilder()
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithCurrentTimestamp()
-                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
+                .WithFooter(Sally.NET.DataAccess.File.FileAccess.GENERIC_FOOTER, Sally.NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
                 .WithTitle("Thanks for considering to support us! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
                 .AddField("Patreon", "<https://patreon.com/sallydev>")
                 .AddField("PayPal", "Coming soon");
@@ -59,38 +62,10 @@ namespace Sally.Command
             EmbedBuilder embed = new EmbedBuilder()
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithCurrentTimestamp()
-                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
+                .WithFooter(Sally.NET.DataAccess.File.FileAccess.GENERIC_FOOTER, Sally.NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
                 .WithTitle("If you want to have Sally on your server, you came to the right place! (▰˘◡˘▰)")
                 .AddField("Invite Link", "https://invite.its.sally.net");
             await Context.Message.Channel.SendMessageAsync(embed: embed.Build());
-        }
-    }
-
-    public class GeneralSlashCommands : InteractionModuleBase
-    {
-        [SlashCommand("uptime", "check current uptime")]
-        public async Task CalculateUptime()
-        {
-            TimeSpan uptime = DateTime.Now - Program.StartTime;
-            await Context.Interaction.RespondAsync($"My current uptime is {GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
-        }
-
-        [SlashCommand("commands", "get url for command overview")]
-        public async Task GetCommandPage()
-        {
-            await Context.Interaction.RespondAsync("Here you can find the list of all available commands: <https://its-sally.net/commands>");
-        }
-
-        [SlashCommand("ping", "get command ping")]
-        public async Task Ping()
-        {
-            await Context.Interaction.RespondAsync($"Pong! `{Math.Abs(Math.Round((DateTimeOffset.UtcNow - Context.Interaction.CreatedAt).TotalMilliseconds))} ms`");
-        }
-
-        [SlashCommand("help", "get link to homepage")]
-        public async Task GetHelpPage()
-        {
-            await Context.Interaction.RespondAsync("If you are looking for help open the following webpage: <https://its-sally.net>");
         }
     }
 }

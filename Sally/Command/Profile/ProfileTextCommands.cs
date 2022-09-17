@@ -1,24 +1,20 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
-using Newtonsoft.Json;
+using Discord;
 using Sally.NET.Core;
 using Sally.NET.DataAccess.Database;
-using Sally.NET.Service;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace Sally.Command
+namespace Sally_NET.Command.Profile
 {
-
-    public class ProfileCommands : ModuleBase
+    public class ProfileTextCommands : ModuleBase
     {
         private readonly IDBAccess dbAccess;
-        public ProfileCommands(IDBAccess dbAccess)
+        public ProfileTextCommands(IDBAccess dbAccess)
         {
             this.dbAccess = dbAccess;
         }
@@ -44,7 +40,7 @@ namespace Sally.Command
         {
             //User myUser = CommandHandlerService.MessageAuthor;
             User myUser = dbAccess.GetUser(Context.User.Id);
-            
+
             if (Context.Message.Channel is SocketGuildChannel guildChannel)
             {
                 //message from guild
@@ -58,7 +54,7 @@ namespace Sally.Command
                     .AddField($"Current \"{guildChannel.Guild.Name}\" Level", myUser.GuildSpecificUser[guildChannel.Guild.Id].Level)
                 .AddField("Xp needed until level up", (Math.Floor(-50 * (15 * Math.Sqrt(15) * Math.Pow(myUser.GuildSpecificUser[guildChannel.Guild.Id].Level + 1, 2) - 60 * Math.Pow(myUser.GuildSpecificUser[guildChannel.Guild.Id].Level + 1, 2) - 4))) - myUser.GuildSpecificUser[guildChannel.Guild.Id].Xp)
                     .WithColor(new Discord.Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
-                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
+                .WithFooter(Sally.NET.DataAccess.File.FileAccess.GENERIC_FOOTER, Sally.NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
                 await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
                 return;
             }
@@ -73,7 +69,7 @@ namespace Sally.Command
                     .WithThumbnailUrl(Context.Message.Author.GetAvatarUrl())
                     .AddField("Current Global Level", myUser.GuildSpecificUser.Sum(x => x.Value.Level) / myUser.GuildSpecificUser.Count)
                     .WithColor(new Discord.Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
-                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
+                .WithFooter(Sally.NET.DataAccess.File.FileAccess.GENERIC_FOOTER, Sally.NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
                 await Context.Message.Channel.SendMessageAsync(embed: lvlEmbed.Build());
                 return;
             }
@@ -124,7 +120,7 @@ namespace Sally.Command
             public async Task ShowMuteStatus()
             {
                 User user = dbAccess.GetUser(Context.Message.Author.Id);
-                if(user.HasMuted)
+                if (user.HasMuted)
                 {
                     await Context.Message.Channel.SendMessageAsync($"The bot is currently muted for you.");
                 }

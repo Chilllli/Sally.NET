@@ -85,6 +85,7 @@ namespace Sally.NET.Service
 
         private static async Task Client_SlashCommandExecuted(SocketSlashCommand arg)
         {
+            MessageAuthor = dbAccess.GetUser(arg.User.Id);
             var context = new SocketInteractionContext(client, arg);
             await interaction.ExecuteCommandAsync(context, services);
         }
@@ -169,6 +170,7 @@ namespace Sally.NET.Service
 
                 foreach (Type commandClass in commandClasses)
                 {
+                    //TODO: maybe initalize values on startup because they dont change and cache results
                     MemberInfo[] memInfo = commandClass.GetMembers();
                     foreach (MemberInfo memberInfo in memInfo)
                     {
@@ -212,7 +214,7 @@ namespace Sally.NET.Service
                         {
                             messageCompareValues[resultCommand] = stringValue;
                         }
-                    }
+                    }                
                 }
                 commandResult = String.Join(Environment.NewLine, messageCompareValues.Where(d => d.Value == messageCompareValues.Values.Min()).Select(k => k.Key));
                 //await context.Channel.SendMessageAsync($"Sorry, I dont know what you are saying ¯\\_(ツ)_/¯, but did you mean: {commandResult}");
@@ -229,9 +231,10 @@ namespace Sally.NET.Service
 
             //Error Handler
             if (!result.IsSuccess)
-                await context.Channel.SendMessageAsync($"{result.ErrorReason} ¯\\_(ツ)_/¯");
+                await context.Channel.SendMessageAsync("Oh no... Something went wrong...");
 
             logger.Info($"{context.Message.Content} from {context.Message.Author}");
+            logger.Error(result.ErrorReason);
         }
 
         private static async Task HandleNaturalInput(Input input)

@@ -1,8 +1,7 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
+using Discord;
 using Sally.NET.Core.Enum;
 using Sally.NET.Handler;
-using Sally.NET.Module;
 using Sally.NET.Service;
 using System;
 using System.Collections.Generic;
@@ -11,15 +10,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sally.Command
+namespace Sally_NET.Command.Picture
 {
     /// <summary>
     /// command group for all related to pictures
     /// </summary>
-    public class PictureCommands : ModuleBase
+    public class PictureTextCommands : ModuleBase
     {
         private readonly KonachanApiHandler konachanApiHandler;
-        public PictureCommands(KonachanApiHandler konachanApiHandler)
+        public PictureTextCommands(KonachanApiHandler konachanApiHandler)
         {
             this.konachanApiHandler = konachanApiHandler;
         }
@@ -27,7 +26,7 @@ namespace Sally.Command
         [Alias("k")]
         public async Task SendPicture()
         {
-            await generateImageEmbed(await konachanApiHandler.GetKonachanPictureUrl());
+            await generateImageEmbed(await konachanApiHandler.GetKonachanPictureUrlAsync());
         }
 
         [Command("konachan")]
@@ -48,7 +47,7 @@ namespace Sally.Command
                 {
                     tagUrl.Append($"{tag} ");
                 }
-                await generateImageEmbed(konachanApiHandler.GetKonachanPictureUrl(tagCollection, rating), tagUrl.ToString());
+                await generateImageEmbed(await konachanApiHandler.GetKonachanPictureUrlAsync(tagCollection, rating), tagUrl.ToString());
             }
             else
             {
@@ -57,7 +56,7 @@ namespace Sally.Command
                 {
                     tagUrl.Append($"{tag} ");
                 }
-                await generateImageEmbed(konachanApiHandler.GetKonachanPictureUrl(lowerTags), tagUrl.ToString());
+                await generateImageEmbed(await konachanApiHandler.GetKonachanPictureUrlAsync(lowerTags), tagUrl.ToString());
             }
         }
 
@@ -79,7 +78,7 @@ namespace Sally.Command
                 .WithDescription($"Tags: {tagResponse.ToString().Trim()}")
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
-                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
+                .WithFooter(Sally.NET.DataAccess.File.FileAccess.GENERIC_FOOTER, Sally.NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
         }
 
@@ -111,12 +110,12 @@ namespace Sally.Command
                     tagResponse += $"[{tag}](https://konachan.com/post?tags={tag}) ";
                 }
             }
-            
+
             EmbedBuilder embedBuilder = new EmbedBuilder()
                 .WithDescription($"Tags: {tagResponse.Trim()}")
                 .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
                 .WithImageUrl(response)
-                .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
+                .WithFooter(Sally.NET.DataAccess.File.FileAccess.GENERIC_FOOTER, Sally.NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
         }
 
