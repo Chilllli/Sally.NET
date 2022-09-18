@@ -1,4 +1,5 @@
 ﻿using Sally.NET.Core;
+using Sally.NET.Core.ApiReference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace Sally.NET.Handler
         /// <returns>Returns a json string result from the api call.</returns>
         public async Task<string> Request2WikipediaApiAsync(string term)
         {
-            return await (CreateHttpRequest(httpClient, $"/w/api.php?action=opensearch&format=json&search={term}&namespace=0&limit=5&utf8=1").Result).Content.ReadAsStringAsync();
+            return await (await CreateHttpRequest(httpClient, $"/w/api.php?action=opensearch&format=json&search={term}&namespace=0&limit=5&utf8=1")).Content.ReadAsStringAsync();
         }
     }
 }

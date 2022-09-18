@@ -231,10 +231,11 @@ namespace Sally.NET.Service
 
             //Error Handler
             if (!result.IsSuccess)
+            {
+                logger.Error(result.ErrorReason);
                 await context.Channel.SendMessageAsync("Oh no... Something went wrong...");
-
+            }
             logger.Info($"{context.Message.Content} from {context.Message.Author}");
-            logger.Error(result.ErrorReason);
         }
 
         private static async Task HandleNaturalInput(Input input)

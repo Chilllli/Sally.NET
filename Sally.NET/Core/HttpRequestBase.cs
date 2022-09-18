@@ -9,7 +9,7 @@ namespace Sally.NET.Core
 {
     public abstract class HttpRequestBase
     {
-        public static async Task<HttpResponseMessage> CreateHttpRequest(HttpClient httpClient, string urlExtension)
+        public async Task<HttpResponseMessage> CreateHttpRequest(HttpClient httpClient, string urlExtension)
         {
             return await httpClient.GetAsync(urlExtension);
         }
