@@ -332,5 +332,26 @@ namespace Sally.NET.DataAccess.Database
                 }
             }
         }
+
+        public async Task<string?> GetColorByUserIdAsync(ulong userId)
+        {
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT embedColor FROM User where id=@id;";
+                    command.Parameters.AddWithValue("@id", userId);
+                    using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            return (string)reader["embedColor"];
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
     }
 }

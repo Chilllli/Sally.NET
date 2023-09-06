@@ -66,6 +66,7 @@ namespace Sally.Command
         [Command("currentWeather")]
         public async Task CheckCurrentWeather(string location)
         {
+            var myUser = dbAccess.GetUser(Context.User.Id);
             if (configManager.OptionalSettings.Contains("WeatherApiKey"))
             {
                 return;
@@ -83,7 +84,7 @@ namespace Sally.Command
                     .AddField("Max. Temp today", $"{apiResult.Weather.MaxTemperature} °C")
                     .AddField("Min. Temp for today", $"{apiResult.Weather.MinTemperature} °C")
                     .AddField("Weather Condition", apiResult.WeatherCondition.First().ShortDescription)
-                    .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
+                    .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
                     .WithTimestamp(DateTime.Now)
                     .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: weatherEmbed.Build()).ConfigureAwait(false);

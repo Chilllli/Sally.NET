@@ -11,11 +11,12 @@ namespace Sally.NET.XUnit.ModuleTests
         [Fact]
         public void CurrentUptime_ShouldReturnValidUptimeString()
         {
+            GeneralModule generalModule = new GeneralModule();
             TimeSpan span = new TimeSpan(2, 1, 5);
 
             string expect = $" {span.Hours} Hours {span.Minutes} Minute {span.Seconds} Seconds";
 
-            string actual = GeneralModule.CurrentUptime(span);
+            string actual = generalModule.CurrentUptime(span);
 
             Assert.Equal(expect, actual);
         }

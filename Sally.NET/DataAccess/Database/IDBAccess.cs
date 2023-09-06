@@ -24,5 +24,7 @@ namespace Sally.NET.DataAccess.Database
         void UpdateGuildSettings(GuildSettings guildSettings);
         List<GuildSettings> GetGuildSettings();
         GuildSettings GetGuildSettings(ulong id);
+
+        Task<string?> GetColorByUserIdAsync(ulong userId);
     }
 }

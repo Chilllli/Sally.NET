@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using Sally.NET.Core;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sally.NET.DataAccess.Database
 {
@@ -14,6 +15,27 @@ namespace Sally.NET.DataAccess.Database
             connectionString = String.Format("server={0};port={1};user id={2}; password={3}; database={4}; SslMode=none",
                           host, 3306, user, password, database);
             initializeTables();
+        }
+
+        public async Task<string?> GetColorByUserIdAsync(ulong userId)
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                using (MySqlCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT embedColor FROM User where id=@id;";
+                    command.Parameters.AddWithValue("@id", userId);
+                    using (MySqlDataReader reader = (MySqlDataReader)await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            return (string)reader["embedColor"];
+                        }
+                        return null;
+                    }
+                }
+            }
         }
 
         public List<GuildSettings> GetGuildSettings()

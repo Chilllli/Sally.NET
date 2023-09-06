@@ -23,11 +23,16 @@ namespace Sally.Command
         [Group("rs")]
         public class RuneScapeCommands : ModuleBase
         {
+            private readonly GameModule gameModule;
+            public RuneScapeCommands(GameModule gameModule)
+            {
+                this.gameModule = gameModule;
+            }
             [Command("value")]
             public async Task CheckPrice(string name)
             {
                 IMessage searchMessage = Context.Message.Channel.SendMessageAsync("Searching for item....").Result;
-                Embed embed = GameModule.TryGetRsItemPrice(name, out string suggestion);
+                Embed embed = gameModule.TryGetRsItemPrice(name, Context.Message.Author.Id, out string suggestion);
                 await searchMessage.DeleteAsync();
                 if (embed != null)
                 {

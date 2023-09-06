@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sally.NET.DataAccess.Database;
 
 namespace Sally_NET.Command.Picture
 {
@@ -18,9 +19,11 @@ namespace Sally_NET.Command.Picture
     public class PictureTextCommands : ModuleBase
     {
         private readonly KonachanApiHandler konachanApiHandler;
-        public PictureTextCommands(KonachanApiHandler konachanApiHandler)
+        private readonly IDBAccess dbAccess;
+        public PictureTextCommands(KonachanApiHandler konachanApiHandler, IDBAccess dBAccess)
         {
             this.konachanApiHandler = konachanApiHandler;
+            this.dbAccess = dBAccess;
         }
         [Command("konachan")]
         [Alias("k")]
@@ -67,6 +70,7 @@ namespace Sally_NET.Command.Picture
         /// <returns></returns>
         private async Task generateImageEmbed(string response)
         {
+            var myUser = dbAccess.GetUser(Context.User.Id);
             StringBuilder tagResponse = new StringBuilder();
             List<string> tags = getTagsFromKonachanImageUrl(response).ToList();
             tags.RemoveRange(0, 3);
@@ -76,7 +80,7 @@ namespace Sally_NET.Command.Picture
             }
             EmbedBuilder embedBuilder = new EmbedBuilder()
                 .WithDescription($"Tags: {tagResponse.ToString().Trim()}")
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
                 .WithImageUrl(response)
                 .WithFooter(Sally.NET.DataAccess.File.FileAccess.GENERIC_FOOTER, Sally.NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());
@@ -90,6 +94,7 @@ namespace Sally_NET.Command.Picture
         /// <returns></returns>
         private async Task generateImageEmbed(string response, string tagUrl)
         {
+            var myUser = dbAccess.GetUser(Context.User.Id);
             if (response.Length == 0)
             {
                 await Context.Message.Channel.SendMessageAsync("nothing found!");
@@ -113,7 +118,7 @@ namespace Sally_NET.Command.Picture
 
             EmbedBuilder embedBuilder = new EmbedBuilder()
                 .WithDescription($"Tags: {tagResponse.Trim()}")
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(myUser.EmbedColor, 16)))
                 .WithImageUrl(response)
                 .WithFooter(Sally.NET.DataAccess.File.FileAccess.GENERIC_FOOTER, Sally.NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
             await Context.Message.Channel.SendMessageAsync(embed: embedBuilder.Build());

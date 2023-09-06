@@ -11,11 +11,16 @@ namespace Sally_NET.Command.General
 {
     public class GeneralSlashCommands : InteractionModuleBase
     {
+        private readonly GeneralModule generalModule;
+        public GeneralSlashCommands(GeneralModule generalModule)
+        {
+            this.generalModule = generalModule;
+        }
         [SlashCommand("uptime", "check current uptime")]
         public async Task CalculateUptime()
         {
             TimeSpan uptime = DateTime.Now - Program.StartTime;
-            await Context.Interaction.RespondAsync($"My current uptime is {GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
+            await Context.Interaction.RespondAsync($"My current uptime is {generalModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
         }
 
         [SlashCommand("commands", "get url for command overview")]

@@ -1,4 +1,5 @@
 ﻿using Sally.NET.Core;
+using Sally.NET.DataAccess.Database;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,9 +15,10 @@ namespace Sally.NET.XUnit.CoreTests
         [InlineData("aaaa", "bbbb", 4)]
         public void CalcLevenshteinDistance_ShouldReturnValidInt(string a, string b, int difference)
         {
+            Helper helper = new Helper(new SQLiteAccess(""));
             int expected = difference;
 
-            int actual = Helper.CalcLevenshteinDistance(a, b);
+            int actual = helper.CalcLevenshteinDistance(a, b);
 
             Assert.Equal(expected, actual);
         }

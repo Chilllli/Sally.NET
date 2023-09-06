@@ -18,6 +18,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using GroupAttribute = Discord.Commands.GroupAttribute;
@@ -37,7 +38,7 @@ namespace Sally.NET.Service
         public static Dictionary<ulong, char> IdPrefixCollection { get; set; } = new Dictionary<ulong, char>();
         private static List<Type> commandClasses;
         private static IServiceProvider services;
-        public static User MessageAuthor { get; set; }
+        //public static User MessageAuthor { get; set; }
         private static int requestCounter;
         public static int RequestCounter
         {
@@ -54,8 +55,10 @@ namespace Sally.NET.Service
         private static bool HasCleverbotApiKey;
         private static ILog logger;
         private static IDBAccess dbAccess;
+        private static MusicService musicService;
 
         private static InteractionService interaction;
+        private static Helper helper;
 
         public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses, Dictionary<ulong, char> collection, bool hasCleverbotApiKey, ILog logger, IServiceProvider services)
         {
@@ -65,6 +68,8 @@ namespace Sally.NET.Service
             CommandHandlerService.IdPrefixCollection = collection;
             CommandHandlerService.services = services;
             CommandHandlerService.dbAccess = services.GetService<IDBAccess>();
+            CommandHandlerService.musicService = services.GetService<MusicService>();
+            CommandHandlerService.helper = services.GetService<Helper>();
             HasCleverbotApiKey = hasCleverbotApiKey;
             CommandHandlerService.logger = logger;
             commands = new CommandService();
@@ -72,6 +77,7 @@ namespace Sally.NET.Service
             
             client.MessageReceived += CommandHandler;
             client.SlashCommandExecuted += Client_SlashCommandExecuted;
+            client.ButtonExecuted += Client_ButtonExecuted;
 
             AppDomain appDomain = AppDomain.CurrentDomain;
             Assembly[] assemblies = appDomain.GetAssemblies();
@@ -83,9 +89,40 @@ namespace Sally.NET.Service
             await interaction.RegisterCommandsGloballyAsync(true);
         }
 
+        private static async Task Client_ButtonExecuted(SocketMessageComponent arg)
+        {
+            SocketGuildChannel guildChannel = (SocketGuildChannel)arg.Channel;
+            MusicPlayer musicPlayer = musicService.GetPlayerByGuildId(guildChannel.Id);
+            switch (arg.Data.CustomId)
+            {
+                case "btnPause":
+                    await arg.DeferAsync();
+                    await arg.Channel.SendMessageAsync("Pause");
+                    await musicPlayer.Pause();
+                    break;
+                case "btnRepeat":
+                    await arg.DeferAsync();
+                    await arg.Channel.SendMessageAsync("Repeat");
+                    await musicPlayer.Repeat();
+                    break;
+                case "btnPrevious":
+                    await arg.DeferAsync();
+                    await arg.Channel.SendMessageAsync("Previous");
+                    await musicPlayer.PlayPreviousTrack();
+                    break;
+                case "btnSkip":
+                    await arg.DeferAsync();
+                    await arg.Channel.SendMessageAsync("Skip");
+                    await musicPlayer.PlayNextTrack();
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private static async Task Client_SlashCommandExecuted(SocketSlashCommand arg)
         {
-            MessageAuthor = dbAccess.GetUser(arg.User.Id);
+            //MessageAuthor = dbAccess.GetUser(arg.User.Id);
             var context = new SocketInteractionContext(client, arg);
             await interaction.ExecuteCommandAsync(context, services);
         }
@@ -194,7 +231,7 @@ namespace Sally.NET.Service
                         int stringValue;
                         while (copMessage.Contains(" "))
                         {
-                            stringValue = Helper.CalcLevenshteinDistance(resultCommand, copMessage);
+                            stringValue = helper.CalcLevenshteinDistance(resultCommand, copMessage);
                             if (!messageCompareValues.ContainsKey(resultCommand))
                             {
                                 messageCompareValues.Add(resultCommand, stringValue);
@@ -205,7 +242,7 @@ namespace Sally.NET.Service
                             }
                             copMessage = copMessage.Substring(0, copMessage.LastIndexOf(" "));
                         }
-                        stringValue = Helper.CalcLevenshteinDistance(resultCommand, copMessage);
+                        stringValue = helper.CalcLevenshteinDistance(resultCommand, copMessage);
                         if (!messageCompareValues.ContainsKey(resultCommand))
                         {
                             messageCompareValues.Add(resultCommand, stringValue);
@@ -218,10 +255,8 @@ namespace Sally.NET.Service
                 }
                 commandResult = String.Join(Environment.NewLine, messageCompareValues.Where(d => d.Value == messageCompareValues.Values.Min()).Select(k => k.Key));
                 //await context.Channel.SendMessageAsync($"Sorry, I dont know what you are saying ¯\\_(ツ)_/¯, but did you mean: {commandResult}");
-                EmbedBuilder embed = new EmbedBuilder()
-                    .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
-                    .WithCurrentTimestamp()
-                    .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
+                
+                EmbedBuilder embed = (await helper.GetEmbedBuilderBase(context.User.Id))
                     .WithThumbnailUrl("https://sallynet.blob.core.windows.net/content/question.png")
                     .WithTitle("Sorry, I dont know what you are saying ¯\\_(ツ)_/¯")
                     .AddField("I have following commands, which might be correct", commandResult);
@@ -268,7 +303,7 @@ namespace Sally.NET.Service
             {
                 return;
             }
-            MessageAuthor = dbAccess.GetUser(message.Author.Id);
+            //MessageAuthor = dbAccess.GetUser(message.Author.Id);
             Input input = ClassifyAs(message);
             await HandleMessage(input);
         }

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sally.NET.Core;
+using Sally.NET.DataAccess.Database;
 using Sally.NET.Service;
 using System;
 using System.Collections.Generic;
@@ -13,20 +14,27 @@ using System.Threading.Tasks;
 
 namespace Sally.NET.Module
 {
-    public static class GameModule
+    public class GameModule
     {
+        private readonly Helper helper;
+        private readonly IDBAccess dBAccess;
+        public GameModule(Helper helper, IDBAccess dBAccess)
+        {
+            this.helper = helper;
+            this.dBAccess = dBAccess;
+        }
         /// <summary>
         /// Returns a string array of enabled terraria mods
         /// 
         /// </summary>
         /// <param name="file">File, where enabled terraria mods are stored e.g.: enabled.json</param>
         /// <returns>string[]</returns>
-        public static string[] GetTerrariaMods(string file)
+        public string[] GetTerrariaMods(string file)
         {
             return JsonConvert.DeserializeObject<string[]>(File.ReadAllText(file));
         }
 
-        public static Embed TryGetRsItemPrice(string name, out string suggestion)
+        public Embed TryGetRsItemPrice(string name, ulong userId, out string suggestion)
         {
             ////create a generic text format
             //TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
@@ -55,7 +63,7 @@ namespace Sally.NET.Module
                     string dataItemName = (string)jsonIdFinder[item.Key]["name"];
                     if (!itemNameComparison.ContainsKey(dataItemName))
                     {
-                        itemNameComparison.Add(dataItemName, Helper.CalcLevenshteinDistance(dataItemName, normInput));
+                        itemNameComparison.Add(dataItemName, helper.CalcLevenshteinDistance(dataItemName, normInput));
                     }
                     //check if the item is equal to the input
                     if (normInput == dataItemName && !hasBreaked)
@@ -75,10 +83,11 @@ namespace Sally.NET.Module
                         }
                         if (json2 == null)
                         {
+                            //TODO: fix user color
                             rsEmbed
                             .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                             .WithDescription("Check current prices of items in the grand exchange")
-                            .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
+                            .WithColor(new Color((uint)Convert.ToInt32("ff6600", 16)))
                             .WithTimestamp(DateTime.Now)
                             .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
                             .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
@@ -94,7 +103,7 @@ namespace Sally.NET.Module
                             rsEmbed
                             .WithTitle("Oldschool Runescape Grand Exchange Price Check")
                             .WithDescription("Check current prices of items in the grand exchange")
-                            .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
+                            .WithColor(new Color((uint)Convert.ToInt32("ff6600", 16)))
                             .WithTimestamp(DateTime.Now)
                             .WithThumbnailUrl($"https://oldschool.runescape.wiki/images/thumb/7/72/{itemUrl}_detail.png/130px-Dragon_longsword_detail.png?7052f")
                             .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)

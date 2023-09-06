@@ -40,7 +40,8 @@ namespace Sally_NET.Command
                     string result = "0x" + color.PadRight(6, '0');
                     if (hexColor < 16777216 && hexColor >= 0)
                     {
-                        string previousColorCode = CommandHandlerService.MessageAuthor.EmbedColor;
+                        var myUser = dbAccess.GetUser(Context.User.Id);
+                        string previousColorCode = myUser.EmbedColor;
                         string previousColor;
                         if (previousColorCode.Length != 6)
                         {

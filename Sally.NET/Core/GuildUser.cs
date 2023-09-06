@@ -40,7 +40,6 @@ namespace Sally.NET.Core
                 }
                 if (Level < GetLevelFromXp(value))
                 {
-                    xp = value;
                     OnLevelUp?.Invoke(this);
                 }
                 xp = value;

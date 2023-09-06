@@ -154,13 +154,18 @@ namespace Sally_NET.Command
         [Group("remove")]
         public class RemoveCommands : ModuleBase
         {
+            private readonly GeneralModule generalModule;
+            public RemoveCommands(GeneralModule generalModule)
+            {
+                this.generalModule = generalModule;
+            }
             [Command("role")]
             public async Task RemoveRankRole(int index)
             {
                 if (Context.Message.Channel is SocketGuildChannel guildChannel)
                 {
                     //check if user has admin priviliges
-                    if (AdminModule.IsAuthorized(GeneralModule.GetGuildUserFromGuild(Context.Message.Author as SocketUser, guildChannel.Guild)))
+                    if (AdminModule.IsAuthorized(generalModule.GetGuildUserFromGuild(Context.Message.Author as SocketUser, guildChannel.Guild)))
                     {
                         await Context.Message.Channel.SendMessageAsync("You cant do this.");
                         return;

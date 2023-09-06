@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using Sally.NET.DataAccess.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,14 +7,14 @@ using System.Text;
 
 namespace Sally.NET.Module
 {
-    public static class GeneralModule
+    public class GeneralModule
     {
         /// <summary>
         /// Builds a string cotaining the current uptime
         /// </summary>
         /// <param name="uptime"></param>
         /// <returns>string</returns>
-        public static string CurrentUptime(TimeSpan uptime)
+        public string CurrentUptime(TimeSpan uptime)
         {
             //build result, through checking some properties
             string result = String.Empty;
@@ -42,7 +43,7 @@ namespace Sally.NET.Module
         /// <param name="user"></param>
         /// <param name="guild"></param>
         /// <returns></returns>
-        public static SocketGuildUser GetGuildUserFromGuild(SocketUser user, SocketGuild guild)
+        public SocketGuildUser GetGuildUserFromGuild(SocketUser user, SocketGuild guild)
         {
             return guild.Users.ToList().Find(u => u.Id == user.Id);
         }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sally.NET.DataAccess.Database;
 
 namespace Sally_NET.Command.General
 {
@@ -16,6 +17,14 @@ namespace Sally_NET.Command.General
     /// </summary>
     public class GeneralTextCommands : ModuleBase
     {
+        private readonly GeneralModule generalModule;
+        private readonly IDBAccess dBAccess;
+
+        public GeneralTextCommands(GeneralModule generalModule, IDBAccess dBAccess)
+        {
+            this.generalModule = generalModule;
+            this.dBAccess = dBAccess;
+        }
 
         [Command("ping")]
         public async Task Ping()
@@ -39,14 +48,15 @@ namespace Sally_NET.Command.General
         public async Task CalculateUptime()
         {
             TimeSpan uptime = DateTime.Now - Program.StartTime;
-            await Context.Message.Channel.SendMessageAsync($"My current uptime is {GeneralModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
+            await Context.Message.Channel.SendMessageAsync($"My current uptime is {generalModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
         }
 
         [Command("support")]
         public async Task ShowSupportLinks()
         {
+            string? colorCode = await dBAccess.GetColorByUserIdAsync(Context.Message.Author.Id);
             EmbedBuilder embed = new EmbedBuilder()
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(colorCode ?? "ff6600", 16)))
                 .WithCurrentTimestamp()
                 .WithFooter(Sally.NET.DataAccess.File.FileAccess.GENERIC_FOOTER, Sally.NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
                 .WithTitle("Thanks for considering to support us! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
@@ -59,8 +69,9 @@ namespace Sally_NET.Command.General
         [Command("invite")]
         public async Task ShowInviteLink()
         {
+            string? colorCode = await dBAccess.GetColorByUserIdAsync(Context.Message.Author.Id);
             EmbedBuilder embed = new EmbedBuilder()
-                .WithColor(new Color((uint)Convert.ToInt32(CommandHandlerService.MessageAuthor.EmbedColor, 16)))
+                .WithColor(new Color((uint)Convert.ToInt32(colorCode ?? "ff6600", 16)))
                 .WithCurrentTimestamp()
                 .WithFooter(Sally.NET.DataAccess.File.FileAccess.GENERIC_FOOTER, Sally.NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL)
                 .WithTitle("If you want to have Sally on your server, you came to the right place! (▰˘◡˘▰)")

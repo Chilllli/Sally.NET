@@ -23,6 +23,7 @@ using System.Collections.Immutable;
 using Sally.NET.Core.Enum;
 using AngleSharp.Common;
 using Discord.Interactions;
+using Sally.NET.Module;
 
 namespace Sally
 {
@@ -136,9 +137,20 @@ namespace Sally
             Client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 AlwaysDownloadUsers = true,
-                GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildBans | 
-                                 GatewayIntents.GuildEmojis | GatewayIntents.GuildIntegrations | GatewayIntents.GuildWebhooks | GatewayIntents.GuildVoiceStates |
-                                 GatewayIntents.GuildMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessageTyping | GatewayIntents.DirectMessages
+                GatewayIntents = GatewayIntents.DirectMessageReactions |
+                GatewayIntents.DirectMessages |
+                GatewayIntents.DirectMessageTyping |
+                GatewayIntents.GuildBans |
+                GatewayIntents.GuildEmojis |
+                GatewayIntents.GuildIntegrations |
+                GatewayIntents.GuildMembers |
+                GatewayIntents.GuildMessageReactions |
+                GatewayIntents.GuildMessages |
+                GatewayIntents.GuildMessageTyping |
+                GatewayIntents.Guilds |
+                GatewayIntents.GuildVoiceStates |
+                GatewayIntents.GuildWebhooks |
+                GatewayIntents.MessageContent 
             });
 
             Client.Ready += Client_Ready;
@@ -241,7 +253,12 @@ namespace Sally
               .AddSingleton<KonachanApiHandler>()
               .AddSingleton<WeatherApiHandler>()
               .AddSingleton<WikipediaApiHandler>()
-              .AddSingleton(CredentialManager);
+              .AddSingleton<MusicModule>()
+              .AddSingleton<GeneralModule>()
+              .AddSingleton(CredentialManager)
+              .AddSingleton<MusicService>()
+              .AddSingleton<Helper>()
+              .AddSingleton(fileLogger);
             switch (BotConfiguration.SQLType)
             {
                 case SQLType.Sqlite:
@@ -272,7 +289,7 @@ namespace Sally
             checkNewUserEntries(services.GetService<IDBAccess>());
             StatusNotifierService.InitializeService(Me);
             MusicCommands.Initialize(Client);
-            RoleManagerService.InitializeHandler(Client, BotConfiguration);
+            //RoleManagerService.InitializeHandler(Client, BotConfiguration);
             UserManagerService.InitializeHandler(Client, fileLogger, services.GetService<IDBAccess>());
             await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary, !CredentialManager.OptionalSettings.Contains("CleverApi"), fileLogger, services);
             CacheService.InitializeHandler();

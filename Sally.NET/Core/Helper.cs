@@ -1,11 +1,20 @@
-﻿using System;
+﻿using Discord;
+using Sally.NET.DataAccess.Database;
+using Sally.NET.Service;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Sally.NET.Core
 {
-    public static class Helper
+    public class Helper
     {
+        private readonly IDBAccess dBAccess;
+        public Helper(IDBAccess dBAccess)
+        {
+            this.dBAccess = dBAccess;
+        }
         /// <summary>
         /// The Levenstein algorithm is used to calculate the similarities between two strings. 
         /// </summary>
@@ -17,7 +26,7 @@ namespace Sally.NET.Core
         /// <returns>
         /// The returned value is an int with the calculated differences of the two strings.
         /// </returns>
-        public static int CalcLevenshteinDistance(string a, string b)
+        public int CalcLevenshteinDistance(string a, string b)
         {
             if (String.IsNullOrEmpty(a) && String.IsNullOrEmpty(b))
             {
@@ -49,6 +58,15 @@ namespace Sally.NET.Core
                         );
                 }
             return distances[lengthA, lengthB];
+        }
+
+        public async Task<EmbedBuilder> GetEmbedBuilderBase(ulong userId)
+        {
+            string embedColor = await dBAccess.GetColorByUserIdAsync(userId) ?? "ffcc00";
+            return new EmbedBuilder()
+                    .WithColor(new Color((uint)Convert.ToInt32(embedColor, 16)))
+                    .WithCurrentTimestamp()
+                    .WithFooter(NET.DataAccess.File.FileAccess.GENERIC_FOOTER, NET.DataAccess.File.FileAccess.GENERIC_THUMBNAIL_URL);
         }
     }
 }
