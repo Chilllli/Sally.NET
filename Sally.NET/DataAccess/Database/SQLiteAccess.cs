@@ -45,7 +45,28 @@ namespace Sally.NET.DataAccess.Database
             }
         }
 
-        public GuildSettings GetGuildSettings(ulong id)
+        public async Task<List<GuildSettings>> GetGuildSettingsAsync()
+        {
+            List<GuildSettings> guildSettings = new();
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT id,owner,levelbackground FROM Guildsettings;";
+                    using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            guildSettings.Add(new GuildSettings((ulong)reader["id"], (ulong)reader["owner"], (byte[])reader["levelbackground"], (ulong)reader["musicchannelid"]));
+                        }
+                        return guildSettings;
+                    }
+                }
+            }
+        }
+
+        public GuildSettings? GetGuildSettingsById(ulong id)
         {
             using (SqliteConnection connection = new SqliteConnection(connectionString))
             {
@@ -66,7 +87,28 @@ namespace Sally.NET.DataAccess.Database
             }
         }
 
-        public GuildUser GetGuildUser(ulong id, ulong guildId)
+        public async Task<GuildSettings?> GetGuildSettingsByIdAsync(ulong id)
+        {
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT owner,levelbackground FROM Guildsettings where id=@id";
+                    command.Parameters.AddWithValue("@id", id);
+                    using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            return new GuildSettings((ulong)reader["id"], (ulong)reader["owner"], (byte[])reader["levelbackground"], (ulong)reader["musicchannelid"]);
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+
+        public GuildUser? GetGuildUser(ulong id, ulong guildId)
         {
             using (SqliteConnection connection = new SqliteConnection(connectionString))
             {
@@ -88,6 +130,28 @@ namespace Sally.NET.DataAccess.Database
             }
         }
 
+        public async Task<GuildUser?> GetGuildUserAsync(ulong id, ulong guildId)
+        {
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT xp FROM GuildUser where id=@id and guildid=@guildId;";
+                    command.Parameters.AddWithValue("@id", id);
+                    command.Parameters.AddWithValue("guildId", guildId);
+                    using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            return new GuildUser(id, guildId, Convert.ToInt32(reader["xp"]));
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+
         public List<GuildUser> GetGuildUsers()
         {
             List<GuildUser> guildUsers = new ();
@@ -100,6 +164,27 @@ namespace Sally.NET.DataAccess.Database
                     using (SqliteDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
+                        {
+                            guildUsers.Add(new GuildUser(Convert.ToUInt64(reader["id"]), Convert.ToUInt64(reader["guildid"]), Convert.ToInt32(reader["xp"])));
+                        }
+                        return guildUsers;
+                    }
+                }
+            }
+        }
+
+        public async Task<List<GuildUser>> GetGuildUsersAsync()
+        {
+            List<GuildUser> guildUsers = new();
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT id, guildid, xp FROM GuildUser;";
+                    using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
                         {
                             guildUsers.Add(new GuildUser(Convert.ToUInt64(reader["id"]), Convert.ToUInt64(reader["guildid"]), Convert.ToInt32(reader["xp"])));
                         }
@@ -131,7 +216,29 @@ namespace Sally.NET.DataAccess.Database
             }
         }
 
-        public User GetUser(ulong id)
+        public async Task<List<GuildUser>> GetGuildUsersFromUserAsync(ulong id)
+        {
+            List<GuildUser> guildUsers = new();
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT guildid,xp FROM GuildUser where id=@id;";
+                    command.Parameters.AddWithValue("@id", id);
+                    using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            guildUsers.Add(new GuildUser(id, Convert.ToUInt64(reader["guildid"]), Convert.ToInt32(reader["xp"])));
+                        }
+                        return guildUsers;
+                    }
+                }
+            }
+        }
+
+        public User? GetUser(ulong id)
         {
             using (SqliteConnection connection = new SqliteConnection(connectionString))
             {
@@ -143,6 +250,34 @@ namespace Sally.NET.DataAccess.Database
                     using (SqliteDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
+                        {
+                            User user = new User(id, (long)reader["isMuted"] == 1, reader["weatherLocation"] == DBNull.Value ? null : (string)reader["weatherLocation"], reader["notifierTime"] == DBNull.Value ? null : (TimeSpan?)reader["notifierTime"], (string)reader["embedColor"]);
+                            List<GuildUser> guildUsers = GetGuildUsersFromUser(user.Id);
+                            foreach (GuildUser guildUser in guildUsers)
+                            {
+                                user.GuildSpecificUser.Add(guildUser.GuildId, guildUser);
+
+                            }
+                            return user;
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+
+        public async Task<User?> GetUserAsync(ulong id)
+        {
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "select isMuted,weatherLocation,notifierTime,embedColor FROM User where id=@id;";
+                    command.Parameters.AddWithValue("@id", id);
+                    using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
                         {
                             User user = new User(id, (long)reader["isMuted"] == 1, reader["weatherLocation"] == DBNull.Value ? null : (string)reader["weatherLocation"], reader["notifierTime"] == DBNull.Value ? null : (TimeSpan?)reader["notifierTime"], (string)reader["embedColor"]);
                             List<GuildUser> guildUsers = GetGuildUsersFromUser(user.Id);
@@ -187,6 +322,34 @@ namespace Sally.NET.DataAccess.Database
             }
         }
 
+        public async Task<List<User>> GetUsersAsync()
+        {
+            List<User> users = new();
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "select id,isMuted,weatherLocation,notifierTime,embedColor FROM User;";
+                    using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            User user = new User(Convert.ToUInt64(reader["id"]), (long)reader["isMuted"] == 1, reader["weatherLocation"] == DBNull.Value ? null : (string)reader["weatherLocation"], reader["notifierTime"] == DBNull.Value ? null : (TimeSpan?)reader["notifierTime"], (string)reader["embedColor"]);
+                            List<GuildUser> guildUsers = await GetGuildUsersFromUserAsync(user.Id);
+                            foreach (GuildUser guildUser in guildUsers)
+                            {
+                                user.GuildSpecificUser.Add(guildUser.GuildId, guildUser);
+
+                            }
+                            users.Add(user);
+                        }
+                        return users;
+                    }
+                }
+            }
+        }
+
         public void InsertGuildSettings(GuildSettings guildSettings)
         {
             using (SqliteConnection connection = new SqliteConnection(connectionString))
@@ -200,6 +363,23 @@ namespace Sally.NET.DataAccess.Database
                     command.Parameters.AddWithValue("@levelbackground", guildSettings.LevelbackgroundImage);
                     command.Prepare();
                     command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public async Task InsertGuildSettingsAsync(GuildSettings guildSettings)
+        {
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "INSERT INTO Guildsettings(id,owner,levelbackground) VALUES (@id,@owner,@levelbackground)";
+                    command.Parameters.AddWithValue("@id", guildSettings.GuildId);
+                    command.Parameters.AddWithValue("@owner", guildSettings.Owner);
+                    command.Parameters.AddWithValue("@levelbackground", guildSettings.LevelbackgroundImage);
+                    await command.PrepareAsync();
+                    await command.ExecuteNonQueryAsync();
                 }
             }
         }
@@ -221,6 +401,23 @@ namespace Sally.NET.DataAccess.Database
             }
         }
 
+        public async Task InsertGuildUserAsync(GuildUser guildUser)
+        {
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "INSERT INTO GuildUser(id,guildid,xp) VALUES (@id,@guildid,@xp)";
+                    command.Parameters.AddWithValue("@id", guildUser.Id);
+                    command.Parameters.AddWithValue("@guildid", guildUser.GuildId);
+                    command.Parameters.AddWithValue("@xp", guildUser.Xp);
+                    await command.PrepareAsync();
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
         public void InsertUser(User user)
         {
             using (SqliteConnection connection = new SqliteConnection(connectionString))
@@ -233,6 +430,22 @@ namespace Sally.NET.DataAccess.Database
                     command.Parameters.AddWithValue("@mute", user.HasMuted ? 1 : 0);
                     command.Prepare();
                     command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public async Task InsertUserAsync(User user)
+        {
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "INSERT INTO User(id,isMuted) VALUES (@id,@mute)";
+                    command.Parameters.AddWithValue("@id", user.Id);
+                    command.Parameters.AddWithValue("@mute", user.HasMuted ? 1 : 0);
+                    await command.PrepareAsync();
+                    await command.ExecuteNonQueryAsync();
                 }
             }
         }
@@ -254,6 +467,23 @@ namespace Sally.NET.DataAccess.Database
             }
         }
 
+        public async Task UpdateGuildSettingsAsync(GuildSettings guildSettings)
+        {
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "UPDATE Guildsettings SET owner=@owner,levelbackground=@levelbackground WHERE id = @id";
+                    command.Parameters.AddWithValue("@id", guildSettings.GuildId);
+                    command.Parameters.AddWithValue("@owner", guildSettings.Owner);
+                    command.Parameters.AddWithValue("@levelbackground", guildSettings.LevelbackgroundImage);
+                    await command.PrepareAsync();
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
         public void UpdateGuildUser(GuildUser guildUser)
         {
             using (SqliteConnection connection = new SqliteConnection(connectionString))
@@ -267,6 +497,23 @@ namespace Sally.NET.DataAccess.Database
                     command.Parameters.AddWithValue("@guildid", guildUser.GuildId);
                     command.Prepare();
                     command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public async Task UpdateGuildUserAsync(GuildUser guildUser)
+        {
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "UPDATE GuildUser SET xp=@xp WHERE id = @id and guildid=@guildid";
+                    command.Parameters.AddWithValue("@id", guildUser.Id);
+                    command.Parameters.AddWithValue("@xp", guildUser.Xp);
+                    command.Parameters.AddWithValue("@guildid", guildUser.GuildId);
+                    await command.PrepareAsync();
+                    await command.ExecuteNonQueryAsync();
                 }
             }
         }
@@ -286,6 +533,25 @@ namespace Sally.NET.DataAccess.Database
                     command.Parameters.AddWithValue("@embedColor", user.EmbedColor);
                     command.Prepare();
                     command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            using (SqliteConnection connection = new SqliteConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "UPDATE User SET isMuted = @mute, weatherLocation = @weatherLocation, notifierTime = @notifierTime, embedColor = @embedColor WHERE id = @id";
+                    command.Parameters.AddWithValue("@id", user.Id);
+                    command.Parameters.AddWithValue("@mute", user.HasMuted ? 1 : 0);
+                    command.Parameters.AddWithValue("@weatherLocation", user.WeatherLocation);
+                    command.Parameters.AddWithValue("@notifierTime", user.NotifierTime);
+                    command.Parameters.AddWithValue("@embedColor", user.EmbedColor);
+                    await command.PrepareAsync();
+                    await command.ExecuteNonQueryAsync();
                 }
             }
         }

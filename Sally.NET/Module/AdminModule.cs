@@ -10,7 +10,7 @@ namespace Sally.NET.Module
     {
         public static bool IsAuthorized(SocketGuildUser user)
         {
-            if(user?.Roles.ToList().FindAll(r => r.Permissions.Administrator) == null)
+            if(user?.Roles.Any(r => r.Permissions.Administrator) == null)
             {
                 //user has no admin rights on guild
                 return false;

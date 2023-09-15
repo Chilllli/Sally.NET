@@ -204,6 +204,7 @@ namespace Sally
             return true;
         }
 
+        //TODO: change everything to async
         private void checkNewUserEntries<T>(T dbAccess) where T : IDBAccess 
         {
             foreach (SocketGuild guild in Client.Guilds)
@@ -268,8 +269,7 @@ namespace Sally
                     serviceCollection.AddSingleton<IDBAccess>(new MySQLAccess(BotConfiguration.DbUser, BotConfiguration.DbPassword, BotConfiguration.Db, BotConfiguration.DbHost));
                     break;
                 default:
-                    consoleLogger.Warn($"{MethodBase.GetCurrentMethod()}: can't determine sql type. set sqlite as default");
-                    serviceCollection.AddSingleton<IDBAccess>(new SQLiteAccess(BotConfiguration.SqliteConnectionString));
+                    
                     break;
             }
             IServiceProvider services = serviceCollection.BuildServiceProvider();
@@ -285,12 +285,14 @@ namespace Sally
             {
                 commandClasses.AddRange(assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList());
             }
-            VoiceRewardService.InitializeHandler(Client, BotConfiguration, !CredentialManager.OptionalSettings.Contains("CleverApi"), services.GetService<IDBAccess>());
-            checkNewUserEntries(services.GetService<IDBAccess>());
+
+            IDBAccess dBAccess = services.GetService<IDBAccess>()!;
+            VoiceRewardService.InitializeHandler(Client, BotConfiguration, !CredentialManager.OptionalSettings.Contains("CleverApi"), dBAccess);
+            checkNewUserEntries(dBAccess);
             StatusNotifierService.InitializeService(Me);
             MusicCommands.Initialize(Client);
             //RoleManagerService.InitializeHandler(Client, BotConfiguration);
-            UserManagerService.InitializeHandler(Client, fileLogger, services.GetService<IDBAccess>());
+            UserManagerService.InitializeHandler(Client, fileLogger, dBAccess);
             await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary, !CredentialManager.OptionalSettings.Contains("CleverApi"), fileLogger, services);
             CacheService.InitializeHandler();
             switch (startValue)
@@ -312,10 +314,10 @@ namespace Sally
             }
             if (!CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
             {
-                WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration, services.GetRequiredService<WeatherApiHandler>(), services.GetService<IDBAccess>());
+                WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration, services.GetRequiredService<WeatherApiHandler>(), dBAccess);
             }
             consoleLogger.Info($"Addons loaded: {AddonLoader.LoadedAddonsCount}");
-            consoleLogger.Info($"User loaded: {services.GetService<IDBAccess>().GetUsers().Count}");
+            consoleLogger.Info($"User loaded: {dBAccess.GetUsers().Count}");
             consoleLogger.Info($"Registered guilds: {Client.Guilds.Count}");
             consoleLogger.Info($"Bot start up time: {(DateTime.Now - startTime).TotalSeconds} s");
             await Client.SetGameAsync("$help", type: ActivityType.Watching);

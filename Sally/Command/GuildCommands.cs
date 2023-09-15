@@ -46,7 +46,12 @@ namespace Sally_NET.Command
                         return;
                     }
                     //add or update channel to guildsettings from server
-                    GuildSettings guildSetting = dbAccess.GetGuildSettings(guild.Id);
+                    GuildSettings? guildSetting = await dbAccess.GetGuildSettingsByIdAsync(guild.Id);
+                    if (guildSetting == null)
+                    {
+                        await Context.Message.Channel.SendMessageAsync($"No guild settings found.");
+                        return;
+                    }
                     guildSetting.MusicChannelId = musicChannelId;
                     dbAccess.UpdateGuildSettings(guildSetting);
                     await Context.Message.Channel.SendMessageAsync($"{guildChannel.Name} was set as music channel.");
