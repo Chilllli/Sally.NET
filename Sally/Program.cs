@@ -4,11 +4,7 @@ using Sally.Command;
 using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Net;
-using System.Collections.Generic;
-using Discord.Commands;
 using System.Reflection;
 using log4net;
 using log4net.Config;
@@ -19,122 +15,37 @@ using Sally.NET.Core.Configuration;
 using Sally.NET.Core;
 using Sally.NET.Handler;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Immutable;
 using Sally.NET.Core.Enum;
-using AngleSharp.Common;
-using Discord.Interactions;
 using Sally.NET.Module;
 
 namespace Sally
 {
     class Program
     {
-        public static BotCredentials BotConfiguration
+        public static async Task Main(string[] args)
         {
-            get;
-            private set;
-        }
-
-        public static DiscordSocketClient Client
-        {
-            get;
-            private set;
-        }
-
-        public static SocketGuild MyGuild
-        {
-            get;
-            private set;
-        }
-        public static SocketUser Me
-        {
-            get;
-            private set;
-        }
-
-        public static DateTime StartTime
-        {
-            get;
-            private set;
-        }
-        private static int requestCounter;
-        public static int RequestCounter
-        {
-            get
-            {
-                return requestCounter;
-            }
-            set
-            {
-                requestCounter = value;
-                File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
-            }
-        }
-        private static int startValue;
-        private Dictionary<ulong, char> prefixDictionary;
-        public static readonly ILog Logging = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public ConfigManager CredentialManager;
-        private static ILog consoleLogger = LogManager.GetLogger("console");
-        private static ILog fileLogger = LogManager.GetLogger("file");
-        private static DateTime startTime { get; set; }
-
-
-        public static void Main(string[] args)
-        {
-            startTime = DateTime.Now;
-            if (args.Length > 0)
-            {
-                startValue = Int32.Parse(args[0]);
-            }
-            Console.CancelKeyPress += Console_CancelKeyPress;
-            new Program().MainAsync().GetAwaiter().GetResult();
-        }
-
-        private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
-        {
-            Environment.Exit(0);
+            await new Program().MainAsync();
         }
 
         public async Task MainAsync()
         {
             ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+            var logger = LogManager.GetLogger("Logger");
             initializeDirectories();
-            StartTime = DateTime.Now;
-            BotConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("config/configuration.json"));
-            if (!validateConfig(BotConfiguration, out string message))
+            var botConfiguration = JsonConvert.DeserializeObject<BotCredentials>(File.ReadAllText("config/configuration.json"));
+            if (botConfiguration is null)
             {
-                consoleLogger.Error(message);
+                throw new Exception("Configuration file not found");
+            }
+            if (!validateConfig(botConfiguration, out string message))
+            {
+                logger.Error(message);
                 return;
             }
-            //await DatabaseAccess.InitializeAsync(BotConfiguration.DbUser, BotConfiguration.DbPassword, BotConfiguration.Db, BotConfiguration.DbHost);
-            CredentialManager = new ConfigManager(BotConfiguration);
+            var CredentialManager = new ConfigManager(botConfiguration);
 
-
-            if (!File.Exists("meta/prefix.json"))
-            {
-                File.Create("meta/prefix.json").Dispose();
-            }
-            //store in database
-            prefixDictionary = new Dictionary<ulong, char>();
-            prefixDictionary = JsonConvert.DeserializeObject<Dictionary<ulong, char>>(File.ReadAllText("meta/prefix.json"));
-            if (prefixDictionary == null)
-            {
-                prefixDictionary = new Dictionary<ulong, char>();
-            }
-
-            if (!File.Exists("ApiRequests.txt"))
-            {
-                // Create a file to write to.
-                using (StreamWriter sw = File.CreateText("ApiRequests.txt"))
-                {
-                    sw.WriteLine("0");
-                    sw.Close();
-                }
-            }
-            RequestCounter = Int32.Parse(File.ReadAllText("ApiRequests.txt"));
-
-            Client = new DiscordSocketClient(new DiscordSocketConfig()
+            var client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 AlwaysDownloadUsers = true,
                 GatewayIntents = GatewayIntents.DirectMessageReactions |
@@ -150,15 +61,50 @@ namespace Sally
                 GatewayIntents.Guilds |
                 GatewayIntents.GuildVoiceStates |
                 GatewayIntents.GuildWebhooks |
-                GatewayIntents.MessageContent 
+                GatewayIntents.MessageContent
             });
 
-            Client.Ready += Client_Ready;
-            Client.Log += Log;
 
-            await Client.LoginAsync(TokenType.Bot, BotConfiguration.Token);
-            await Client.StartAsync();
+            IServiceCollection serviceCollection = new ServiceCollection()
+              .AddSingleton(client)
+              .AddSingleton(botConfiguration)
+              .AddSingleton<CleverbotApiHandler>()
+              .AddSingleton<ColornamesApiHandler>()
+              .AddSingleton<KonachanApiHandler>()
+              .AddSingleton<WeatherApiHandler>()
+              .AddSingleton<WikipediaApiHandler>()
+              .AddSingleton<MusicModule>()
+              .AddSingleton<GeneralModule>()
+              .AddSingleton(CredentialManager)
+              .AddSingleton<Helper>()
+              .AddSingleton(logger)
+              .AddSingleton<GameModule>()
+              .AddSingleton<CommandHandlerService>()
+              .AddSingleton<Bot>()
+              .AddSingleton<VoiceRewardService>()
+              .AddSingleton<OAuthHttpListener>();
 
+            serviceCollection.AddHttpClient<CleverbotApiHandler>(c => c.BaseAddress = new("https://www.cleverbot.com"));
+            serviceCollection.AddHttpClient<ColornamesApiHandler>(c => c.BaseAddress = new("https://colornames.org"));
+            serviceCollection.AddHttpClient<KonachanApiHandler>(c => c.BaseAddress = new("https://konachan.com"));
+            serviceCollection.AddHttpClient<WeatherApiHandler>(c => c.BaseAddress = new("https://api.openweathermap.org"));
+            serviceCollection.AddHttpClient<WikipediaApiHandler>(c => c.BaseAddress = new("https://en.wikipedia.org"));
+
+            switch (botConfiguration.SQLType)
+            {
+                case SQLType.Sqlite:
+                    serviceCollection.AddSingleton<IDBAccess>(new SQLiteAccess(botConfiguration.SqliteConnectionString));
+                    break;
+                case SQLType.MySQL:
+                    serviceCollection.AddSingleton<IDBAccess>(new MySQLAccess(botConfiguration.DbUser, botConfiguration.DbPassword, botConfiguration.Db, botConfiguration.DbHost));
+                    break;
+                default:
+
+                    break;
+            }
+            IServiceProvider services = serviceCollection.BuildServiceProvider();
+            var bot = services.GetRequiredService<Bot>();
+            await bot.RunAsync();
             // Block this task until the program is closed.
             await Task.Delay(-1);
         }
@@ -204,124 +150,42 @@ namespace Sally
             return true;
         }
 
-        //TODO: change everything to async
-        private void checkNewUserEntries<T>(T dbAccess) where T : IDBAccess 
-        {
-            foreach (SocketGuild guild in Client.Guilds)
-            {
-                foreach (SocketGuildUser guildUser in guild.Users)
-                {
-                    if (guildUser.Id == BotConfiguration.MeId)
-                    {
-                        Me = guildUser;
-                    }
-                    //check if user exist in global instance
-                    User myUser = dbAccess.GetUser(guildUser.Id);
-                    if (myUser == null)
-                    {
-                        dbAccess.InsertUser(new User(guildUser.Id, true));
-                    }
-                    myUser = dbAccess.GetUser(guildUser.Id);
-                    //check if guilduser exist in guild instance
-                    if (!myUser.GuildSpecificUser.ContainsKey(guild.Id))
-                    {
-                        if (dbAccess.GetGuildUser(guildUser.Id, guild.Id) == null)
-                        {
-                            dbAccess.InsertGuildUser(new GuildUser(guildUser.Id, guild.Id, 500));
-                        }
-                    }
-                    //check if user is already in a voice channel
-                    if (guildUser.VoiceChannel != null)
-                    {
-                        //start tracking if user detected
-                        VoiceRewardService.StartTrackingVoiceChannel(myUser.GuildSpecificUser[guild.Id]);
-                    }
-                }
-            }
-        }
-        private Task Log(LogMessage msg)
-        {
-            consoleLogger.Info(msg.ToString());
-            return Task.CompletedTask;
-        }
+        //private async Task checkNewUserEntriesAsync<T>(T dbAccess) where T : IDBAccess
+        //{
+        //    foreach (SocketGuild guild in Client.Guilds)
+        //    {
+        //        foreach (SocketGuildUser guildUser in guild.Users)
+        //        {
+        //            if (guildUser.Id == BotConfiguration.MeId)
+        //            {
+        //                Me = guildUser;
+        //            }
+        //            //check if user exist in global instance
+        //            User? myUser = await dbAccess.GetUserAsync(guildUser.Id);
+        //            if (myUser == null)
+        //            {
+        //                await dbAccess.InsertUserAsync(new User(guildUser.Id, true));
+        //            }
+        //            myUser = await dbAccess.GetUserAsync(guildUser.Id);
+        //            //check if guilduser exist in guild instance
+        //            if (!myUser!.GuildSpecificUser.ContainsKey(guild.Id))
+        //            {
+        //                if (await dbAccess.GetGuildUserAsync(guildUser.Id, guild.Id) == null)
+        //                {
+        //                    await dbAccess.InsertGuildUserAsync(new GuildUser(guildUser.Id, guild.Id, 500));
+        //                }
+        //            }
+        //            //check if user is already in a voice channel
+        //            if (guildUser.VoiceChannel != null)
+        //            {
+        //                //start tracking if user detected
+        //                //VoiceRewardService.StartTrackingVoiceChannel(myUser.GuildSpecificUser[guild.Id]);
+        //            }
+        //        }
+        //    }
+        //}
 
-        private async Task Client_Ready()
-        {
-            IServiceCollection serviceCollection = new ServiceCollection()
-              .AddSingleton(Client)
-              .AddSingleton<CleverbotApiHandler>()
-              .AddSingleton<ColornamesApiHandler>()
-              .AddSingleton<KonachanApiHandler>()
-              .AddSingleton<WeatherApiHandler>()
-              .AddSingleton<WikipediaApiHandler>()
-              .AddSingleton<MusicModule>()
-              .AddSingleton<GeneralModule>()
-              .AddSingleton(CredentialManager)
-              .AddSingleton<MusicService>()
-              .AddSingleton<Helper>()
-              .AddSingleton(fileLogger);
-            switch (BotConfiguration.SQLType)
-            {
-                case SQLType.Sqlite:
-                    serviceCollection.AddSingleton<IDBAccess>(new SQLiteAccess(BotConfiguration.SqliteConnectionString));
-                    break;
-                case SQLType.MySQL:
-                    serviceCollection.AddSingleton<IDBAccess>(new MySQLAccess(BotConfiguration.DbUser, BotConfiguration.DbPassword, BotConfiguration.Db, BotConfiguration.DbHost));
-                    break;
-                default:
-                    
-                    break;
-            }
-            IServiceProvider services = serviceCollection.BuildServiceProvider();
-            //var _interactionService = new InteractionService(Client);
-            //await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-            //await _interactionService.RegisterCommandsToGuildAsync(559796025817038848);
 
-            AddonLoader.Load(Client);
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            List<Type> commandClasses = new List<Type>();
-
-            foreach (Assembly assembly in assemblies)
-            {
-                commandClasses.AddRange(assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList());
-            }
-
-            IDBAccess dBAccess = services.GetService<IDBAccess>()!;
-            VoiceRewardService.InitializeHandler(Client, BotConfiguration, !CredentialManager.OptionalSettings.Contains("CleverApi"), dBAccess);
-            checkNewUserEntries(dBAccess);
-            StatusNotifierService.InitializeService(Me);
-            MusicCommands.Initialize(Client);
-            //RoleManagerService.InitializeHandler(Client, BotConfiguration);
-            UserManagerService.InitializeHandler(Client, fileLogger, dBAccess);
-            await CommandHandlerService.InitializeHandler(Client, BotConfiguration, commandClasses, prefixDictionary, !CredentialManager.OptionalSettings.Contains("CleverApi"), fileLogger, services);
-            CacheService.InitializeHandler();
-            switch (startValue)
-            {
-                case 0:
-                    //shutdown
-                    break;
-                case 1:
-                    //restarting
-                    await Me.SendMessageAsync("I have restored and restarted successfully.");
-                    break;
-                case 2:
-                    //updating
-                    //check if an update is nessasarry
-                    await Me.SendMessageAsync("I at all the new features and restarted successfully.");
-                    break;
-                default:
-                    break;
-            }
-            if (!CredentialManager.OptionalSettings.Contains("WeatherApiKey"))
-            {
-                WeatherSubscriptionService.InitializeWeatherSub(Client, BotConfiguration, services.GetRequiredService<WeatherApiHandler>(), dBAccess);
-            }
-            consoleLogger.Info($"Addons loaded: {AddonLoader.LoadedAddonsCount}");
-            consoleLogger.Info($"User loaded: {dBAccess.GetUsers().Count}");
-            consoleLogger.Info($"Registered guilds: {Client.Guilds.Count}");
-            consoleLogger.Info($"Bot start up time: {(DateTime.Now - startTime).TotalSeconds} s");
-            await Client.SetGameAsync("$help", type: ActivityType.Watching);
-        }
 
         private static void initializeDirectories()
         {

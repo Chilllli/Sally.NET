@@ -13,12 +13,11 @@ namespace Sally.NET.Handler
 {
     public class WeatherApiHandler : HttpRequestBase
     {
-        private readonly HttpClient httpClient = new HttpClient();
-        private readonly Uri weatherUri = new("https://api.openweathermap.org");
-        
-        public WeatherApiHandler()
+        private readonly HttpClient httpClient;
+
+        public WeatherApiHandler(HttpClient httpClient)
         {
-            httpClient.BaseAddress = weatherUri;
+            this.httpClient = httpClient;
         }
 
         /// <summary>
@@ -81,9 +80,10 @@ namespace Sally.NET.Handler
             return weatherApi.StatusCode == 200;
         }
 
-        public WeatherApi GetWeatherApiResult(string apiKey, string location)
+        public async Task<WeatherApi> GetWeatherApiResultAsync(string apiKey, string location)
         {
-            return Request2WeatherApiAsync(apiKey, location).Result;
+            var api = await Request2WeatherApiAsync(apiKey, location);
+            return api;
         }
     }
 }

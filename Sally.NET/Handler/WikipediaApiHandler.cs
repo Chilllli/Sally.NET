@@ -11,11 +11,11 @@ namespace Sally.NET.Handler
 {
     public class WikipediaApiHandler : HttpRequestBase
     {
-        private readonly HttpClient httpClient = new HttpClient();
-        private readonly Uri uri = new Uri("https://en.wikipedia.org");
-        public WikipediaApiHandler()
+        private readonly HttpClient httpClient;
+
+        public WikipediaApiHandler(HttpClient httpClient)
         {
-            httpClient.BaseAddress = uri;
+            this.httpClient = httpClient;
         }
 
         /// <summary>

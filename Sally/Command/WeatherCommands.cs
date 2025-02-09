@@ -19,11 +19,14 @@ namespace Sally.Command
         private readonly WeatherApiHandler weatherApiHandler;
         private readonly ConfigManager configManager;
         private readonly IDBAccess dbAccess;
-        public WeatherCommands(WeatherApiHandler weatherApiHandler, ConfigManager configManager, IDBAccess dbAccess)
+        private readonly BotCredentials credentials;
+
+        public WeatherCommands(WeatherApiHandler weatherApiHandler, ConfigManager configManager, IDBAccess dbAccess, BotCredentials credentials)
         {
             this.weatherApiHandler = weatherApiHandler;
             this.configManager = configManager;
             this.dbAccess = dbAccess;
+            this.credentials = credentials;
         }
         [Command("sub2weather")]
         public async Task SubToService(string location, TimeSpan notiferTime)
@@ -38,7 +41,7 @@ namespace Sally.Command
                 return;
             }
 
-            if (!weatherApiHandler.TryGetWeatherApi(Program.BotConfiguration.WeatherApiKey, location, out WeatherApi weatherApi))
+            if (!weatherApiHandler.TryGetWeatherApi(credentials.WeatherApiKey, location, out WeatherApi weatherApi))
             {
                 await Context.Message.Channel.SendMessageAsync("The request returned an error.");
                 return;
@@ -71,7 +74,7 @@ namespace Sally.Command
             {
                 return;
             }
-            WeatherApi apiResult = weatherApiHandler.GetWeatherApiResult(Program.BotConfiguration.WeatherApiKey, location);
+            WeatherApi apiResult = await weatherApiHandler.GetWeatherApiResultAsync(credentials.WeatherApiKey, location);
             if (apiResult.StatusCode != 200)
             {
                 await Context.Message.Channel.SendMessageAsync("Warn: can't process request");

@@ -62,37 +62,6 @@ namespace Sally_NET.Command
                     await Context.Message.Channel.SendMessageAsync("Try this command on a server.");
                 }
             }
-
-            /// <summary>
-            /// sets a custom prefix
-            /// </summary>
-            /// <param name="prefix"></param>
-            /// <returns></returns>
-            [Command("prefix")]
-            public async Task ChangePrefix(char prefix)
-            {
-                //try casting to guild channel
-                if (Context.Message.Channel is SocketGuildChannel guildChannel)
-                {
-                    //check if this user is an admin of the specific guild
-                    SocketGuildUser user = guildChannel.Guild.Users.ToList().Find(u => u.Id == Context.Message.Author.Id);
-                    if (AdminModule.IsAuthorized(user))
-                    {
-                        CommandHandlerService.IdPrefixCollection[guildChannel.Guild.Id] = prefix;
-                        File.WriteAllText("meta/prefix.json", JsonConvert.SerializeObject(CommandHandlerService.IdPrefixCollection));
-                        await Context.Message.Channel.SendMessageAsync($"Now the new prefix is \"{prefix}\"");
-                    }
-                    else
-                    {
-                        await Context.Message.Channel.SendMessageAsync("You have no permission.");
-                    }
-                }
-                else
-                {
-                    //channel isn't a guild channel
-                    await Context.Message.Channel.SendMessageAsync("This command has no effect here. Try using it on a guild.");
-                }
-            }
         }
 
         /// <summary>

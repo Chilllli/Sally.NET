@@ -11,11 +11,11 @@ namespace Sally.NET.Handler
 {
     public class CleverbotApiHandler : HttpRequestBase
     {
-        private readonly HttpClient httpClient = new HttpClient();
-        private readonly Uri cleverbotUri = new("https://www.cleverbot.com");
-        public CleverbotApiHandler()
+        private readonly HttpClient httpClient;
+
+        public CleverbotApiHandler(HttpClient httpClient)
         {
-            httpClient.BaseAddress = cleverbotUri;
+            this.httpClient = httpClient;
         }
 
         /// <summary>

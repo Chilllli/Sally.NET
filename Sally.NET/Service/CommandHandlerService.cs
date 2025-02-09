@@ -15,6 +15,7 @@ using Sally.NET.Module;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -30,17 +31,18 @@ namespace Sally.NET.Service
     /// <summary>
     /// This class handles all command-related content.
     /// </summary>
-    public static class CommandHandlerService
+    public class CommandHandlerService
     {
-        private static DiscordSocketClient client;
-        private static BotCredentials credentials;
-        private static CommandService commands;
-        public static Dictionary<ulong, char> IdPrefixCollection { get; set; } = new Dictionary<ulong, char>();
-        private static List<Type> commandClasses;
-        private static IServiceProvider services;
-        //public static User MessageAuthor { get; set; }
-        private static int requestCounter;
-        public static int RequestCounter
+        private DiscordSocketClient client;
+        private BotCredentials credentials;
+        private CommandService commands = new CommandService();
+        private InteractionService? interaction;
+        public Dictionary<ulong, char> IdPrefixCollection { get; set; } = new Dictionary<ulong, char>();
+        private List<Type> commandClasses = new List<Type>();
+        private IServiceProvider? services;
+        //public   User MessageAuthor { get; set; }
+        private int requestCounter;
+        public   int RequestCounter
         {
             get
             {
@@ -52,47 +54,48 @@ namespace Sally.NET.Service
                 File.WriteAllText("ApiRequests.txt", requestCounter.ToString());
             }
         }
-        private static bool HasCleverbotApiKey;
-        private static ILog logger;
-        private static IDBAccess dbAccess;
-        private static MusicService musicService;
+        private bool HasCleverbotApiKey;
+        private ILog logger;
+        private IDBAccess dbAccess;
 
-        private static InteractionService interaction;
-        private static Helper helper;
+        private Helper helper;
+        private readonly IServiceProvider provider;
+        private readonly MusicModule musicModule;
 
-        public static async Task InitializeHandler(DiscordSocketClient client, BotCredentials credentials, List<Type> commandClasses, Dictionary<ulong, char> collection, bool hasCleverbotApiKey, ILog logger, IServiceProvider services)
+        public CommandHandlerService(DiscordSocketClient client, BotCredentials credentials, ILog logger, IDBAccess dBAccess, Helper helper, IServiceProvider provider, ConfigManager configManager, MusicModule musicModule)
         {
-            CommandHandlerService.client = client;
-            CommandHandlerService.credentials = credentials;
-            CommandHandlerService.commandClasses = commandClasses;
-            CommandHandlerService.IdPrefixCollection = collection;
-            CommandHandlerService.services = services;
-            CommandHandlerService.dbAccess = services.GetService<IDBAccess>();
-            CommandHandlerService.musicService = services.GetService<MusicService>();
-            CommandHandlerService.helper = services.GetService<Helper>();
-            HasCleverbotApiKey = hasCleverbotApiKey;
-            CommandHandlerService.logger = logger;
-            commands = new CommandService();
-            interaction = new InteractionService(CommandHandlerService.client);
-            
+            this.client = client;
+            this.credentials = credentials;
+            this.dbAccess = dBAccess;
+            this.helper = helper;
+            this.provider = provider;
+            this.musicModule = musicModule;
+            HasCleverbotApiKey = configManager.OptionalSettings.Contains("CleverApi");
+            this.logger = logger;
             client.MessageReceived += CommandHandler;
             client.SlashCommandExecuted += Client_SlashCommandExecuted;
             client.ButtonExecuted += Client_ButtonExecuted;
+        }
 
+        public async Task Start(IServiceProvider services)
+        {
+            InteractionService interaction = new InteractionService(client);
             AppDomain appDomain = AppDomain.CurrentDomain;
             Assembly[] assemblies = appDomain.GetAssemblies();
             foreach (Assembly assembly in assemblies)
             {
                 await commands.AddModulesAsync(assembly, services);
                 await interaction.AddModulesAsync(assembly, services);
+                commandClasses.AddRange(assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)) && !t.IsAbstract).ToList());
             }
-            await interaction.RegisterCommandsGloballyAsync(true);
+            this.interaction = interaction;
+            this.services = services;
         }
 
-        private static async Task Client_ButtonExecuted(SocketMessageComponent arg)
+        private async Task Client_ButtonExecuted(SocketMessageComponent arg)
         {
             SocketGuildChannel guildChannel = (SocketGuildChannel)arg.Channel;
-            MusicPlayer musicPlayer = musicService.GetPlayerByGuildId(guildChannel.Id);
+            MusicPlayer musicPlayer = musicModule.GetPlayerByGuildId(guildChannel.Id);
             switch (arg.Data.CustomId)
             {
                 case "btnPause":
@@ -115,12 +118,16 @@ namespace Sally.NET.Service
                     await arg.Channel.SendMessageAsync("Skip");
                     await musicPlayer.PlayNextTrack();
                     break;
+                //case "LinkToMAL":
+                //    await arg.DeferAsync();
+                //    await arg.Channel.SendMessageAsync("asdasd");
+                //    break;
                 default:
                     break;
             }
         }
 
-        private static async Task Client_SlashCommandExecuted(SocketSlashCommand arg)
+        private async Task Client_SlashCommandExecuted(SocketInteraction arg)
         {
             //MessageAuthor = dbAccess.GetUser(arg.User.Id);
             var context = new SocketInteractionContext(client, arg);
@@ -132,7 +139,7 @@ namespace Sally.NET.Service
         /// </summary>
         /// <param name="message">Raw input</param>
         /// <returns>Classified message including input</returns>
-        private static Input ClassifyAs(SocketUserMessage message)
+        private Input ClassifyAs(SocketUserMessage message)
         {
             char newPrefix;
             int argPos = 0;
@@ -174,7 +181,7 @@ namespace Sally.NET.Service
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        private static async Task HandleMessage(Input input)
+        private async Task HandleMessage(Input input)
         {
             if (input.Type == InputType.Command || input.Type == InputType.Mention)
             {
@@ -189,7 +196,7 @@ namespace Sally.NET.Service
             }
         }
 
-        private static async Task HandleCommand(Input input)
+        private async Task HandleCommand(Input input)
         {
             int argPos = input.ArgumentPosition ?? 0;
 
@@ -273,7 +280,7 @@ namespace Sally.NET.Service
             logger.Info($"{context.Message.Content} from {context.Message.Author}");
         }
 
-        private static async Task HandleNaturalInput(Input input)
+        private async Task HandleNaturalInput(Input input)
         {
             SocketUserMessage message = input.Message;
 
@@ -289,7 +296,7 @@ namespace Sally.NET.Service
             }
         }
 
-        private static async Task CommandHandler(SocketMessage arg)
+        private async Task CommandHandler(SocketMessage arg)
         {
             // Don't process the command if it was a System Message
             SocketUserMessage message = arg as SocketUserMessage;

@@ -11,11 +11,11 @@ namespace Sally.NET.Handler
 {
     public class ColornamesApiHandler : HttpRequestBase
     {
-        private readonly HttpClient httpClient = new HttpClient();
-        private readonly Uri uri = new Uri("https://colornames.org");
-        public ColornamesApiHandler()
+        private readonly HttpClient httpClient;
+
+        public ColornamesApiHandler(HttpClient httpClient)
         {
-            httpClient.BaseAddress = uri;
+            this.httpClient = httpClient;
         }
         /// <summary>
         /// The <c>Request2ColorNamesApiAsync</c> method creates a api call to the color names api.

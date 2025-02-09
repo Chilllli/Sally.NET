@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Sally.NET.Core
 {
-    public abstract class HttpRequestBase
+    public class HttpRequestBase
     {
         public async Task<HttpResponseMessage> CreateHttpRequest(HttpClient httpClient, string urlExtension)
         {

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using OpenTelemetry.Metrics;
 
 namespace Sally_NET.Command.General
 {
@@ -19,8 +21,9 @@ namespace Sally_NET.Command.General
         [SlashCommand("uptime", "check current uptime")]
         public async Task CalculateUptime()
         {
-            TimeSpan uptime = DateTime.Now - Program.StartTime;
-            await Context.Interaction.RespondAsync($"My current uptime is {generalModule.CurrentUptime(uptime)}. I'm online since {Program.StartTime} .");
+            var startTime = Process.GetCurrentProcess().StartTime;
+            TimeSpan uptime = DateTime.Now - startTime;
+            await Context.Interaction.RespondAsync($"My current uptime is {generalModule.CurrentUptime(uptime)}. I'm online since {startTime} .");
         }
 
         [SlashCommand("commands", "get url for command overview")]

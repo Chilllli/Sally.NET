@@ -13,24 +13,28 @@ using Timer = System.Timers.Timer;
 
 namespace Sally.NET.Service
 {
-    public static class VoiceRewardService
+    public class VoiceRewardService
     {
-        private static DiscordSocketClient client;
-        private static BotCredentials credentials;
-        private static bool hasCleverbotApiKey;
-        private static IDBAccess dbAccess;
-
-        public static void InitializeHandler(DiscordSocketClient client, BotCredentials credentials, bool hasCleverBotKey, IDBAccess dbAccess)
+        private DiscordSocketClient client;
+        private BotCredentials credentials;
+        private readonly ConfigManager configManager;
+        private bool hasCleverbotApiKey;
+        private IDBAccess dbAccess;
+        public VoiceRewardService(DiscordSocketClient client, BotCredentials credentials, ConfigManager configManager, IDBAccess dbAccess)
         {
-            VoiceRewardService.client = client;
-            VoiceRewardService.credentials = credentials;
-            VoiceRewardService.dbAccess = dbAccess;
-            hasCleverbotApiKey = hasCleverBotKey;
+            this.client = client;
+            this.credentials = credentials;
+            this.configManager = configManager;
+            this.dbAccess = dbAccess;
+        }
+        public void Start()
+        {
+            this.hasCleverbotApiKey = !configManager.OptionalSettings.Contains("CleverApi");
             client.UserVoiceStateUpdated += voiceChannelJoined;
             client.UserVoiceStateUpdated += voiceChannelLeft;
         }
 
-        private static async Task voiceChannelLeft(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
+        private async Task voiceChannelLeft(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
         {
             if (voiceStateNew.VoiceChannel != null || voiceStateOld.VoiceChannel?.Id == voiceStateNew.VoiceChannel?.Id || disUser.IsBot)
             {
@@ -47,7 +51,7 @@ namespace Sally.NET.Service
             stopTrackingVoiceChannel(guildUser);
         }
 
-        private static async Task voiceChannelJoined(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
+        private async Task voiceChannelJoined(SocketUser disUser, SocketVoiceState voiceStateOld, SocketVoiceState voiceStateNew)
         {
             //if guild joined
             if (voiceStateOld.VoiceChannel?.Id == voiceStateNew.VoiceChannel?.Id || voiceStateNew.VoiceChannel == null || disUser.IsBot)
@@ -65,7 +69,7 @@ namespace Sally.NET.Service
             StartTrackingVoiceChannel(guildUser);
         }
 
-        public static void StartTrackingVoiceChannel(GuildUser guildUser)
+        public void StartTrackingVoiceChannel(GuildUser guildUser)
         {
             guildUser.LastXpTime = DateTime.Now;
             guildUser.XpTimer = new Timer(credentials.XpTimerInMin * 1000 * 60);
@@ -73,7 +77,7 @@ namespace Sally.NET.Service
             guildUser.XpTimer.Elapsed += (s, e) => trackVoiceChannel(guildUser);
         }
 
-        private static void trackVoiceChannel(GuildUser guildUser)
+        private void trackVoiceChannel(GuildUser guildUser)
         {
             SocketGuildUser trackedUser = client.GetGuild(guildUser.GuildId).Users.ToList().Find(u => u.Id == guildUser.Id);
             if (trackedUser == null)
@@ -89,7 +93,7 @@ namespace Sally.NET.Service
             dbAccess.UpdateGuildUser(guildUser);
         }
 
-        private static void stopTrackingVoiceChannel(GuildUser guildUser)
+        private void stopTrackingVoiceChannel(GuildUser guildUser)
         {
             guildUser.XpTimer.Stop();
             guildUser.Xp += (int)Math.Round(((DateTime.Now - guildUser.LastXpTime).TotalMilliseconds / (credentials.XpTimerInMin * 1000 * 60)) * credentials.GainedXp);

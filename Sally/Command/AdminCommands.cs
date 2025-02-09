@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Sally.NET.Core;
+using Sally.NET.Core.Configuration;
 using Sally.NET.Module;
 using Sally.NET.Service;
 using System;
@@ -16,11 +17,16 @@ namespace Sally.Command
 {
     public class AdminCommands : ModuleBase
     {
+        private readonly DiscordSocketClient client;
 
+        public AdminCommands(DiscordSocketClient client)
+        {
+            this.client = client;
+        }
         [Command("whois")]
         public async Task WhoIs(ulong userId)
         {
-            SocketUser foundUser = Program.Client.GetUser(userId);
+            SocketUser foundUser = client.GetUser(userId);
             if (foundUser == null)
             {
                 await Context.Message.Channel.SendMessageAsync("User couldn't be found.");
@@ -36,28 +42,30 @@ namespace Sally.Command
         [Group("owner")]
         public class OwnerCommands : ModuleBase
         {
-            [Command("apiRequests")]
-            [RequireOwner]
-            public async Task ShowCurrentApiRequests()
+            private readonly BotCredentials credentials;
+            private readonly DiscordSocketClient client;
+
+            public OwnerCommands(BotCredentials credentials, DiscordSocketClient client)
             {
-                if (Context.Message.Author.Id != Program.BotConfiguration.MeId)
-                {
-                    await Context.Message.Channel.SendMessageAsync("permission denied");
-                    return;
-                }
-                await Program.Me.SendMessageAsync($"There are currently {Program.RequestCounter} Requests.");
+                this.credentials = credentials;
+                this.client = client;
             }
 
             [Command("shutdown")]
             [RequireOwner]
             public async Task ShutdownBot()
             {
-                if (Context.Message.Author.Id != Program.BotConfiguration.MeId)
+                if (Context.Message.Author.Id != credentials.MeId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
                 }
-                await Program.Me.SendMessageAsync("I am shutting down now");
+                var me = client.GetUser(credentials.MeId);
+                if (me is null)
+                {
+                    throw new ArgumentException("User not found");
+                }
+                await me.SendMessageAsync("I am shutting down now");
                 Environment.Exit(0);
             }
 
@@ -65,12 +73,17 @@ namespace Sally.Command
             [RequireOwner]
             public async Task RestartBot()
             {
-                if (Context.Message.Author.Id != Program.BotConfiguration.MeId)
+                if (Context.Message.Author.Id != credentials.MeId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
                 }
-                await Program.Me.SendMessageAsync("I am restarting now");
+                var me = client.GetUser(credentials.MeId);
+                if (me is null)
+                {
+                    throw new ArgumentException("User not found");
+                }
+                await me.SendMessageAsync("I am restarting now");
                 Environment.Exit(1);
             }
 
@@ -78,15 +91,21 @@ namespace Sally.Command
             [RequireOwner]
             public async Task PerformUpdate()
             {
-                if (Context.Message.Author.Id != Program.BotConfiguration.MeId)
+                if (Context.Message.Author.Id != credentials.MeId)
                 {
                     await Context.Message.Channel.SendMessageAsync("permission denied");
                     return;
                 }
 
                 //perform update
-                await Program.Me.SendMessageAsync("I am updating now");
+                var me = client.GetUser(credentials.MeId);
+                if (me is null)
+                {
+                    throw new ArgumentException("User not found");
+                }
+                await me.SendMessageAsync("I am updating now");
                 Environment.Exit(2);
+                
             }
         }
     }

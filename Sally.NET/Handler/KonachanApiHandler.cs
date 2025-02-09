@@ -23,12 +23,11 @@ namespace Sally.NET.Handler
 #if DEBUG
         private const int pageResultLimit = 1;
 #endif
-        private readonly Uri konachanUri = new Uri("https://konachan.com");
-        private readonly HttpClient httpClient = new HttpClient();
+        private readonly HttpClient httpClient;
 
-        public KonachanApiHandler()
+        public KonachanApiHandler(HttpClient httpClient)
         {
-            httpClient.BaseAddress = konachanUri;
+            this.httpClient = httpClient;
         }
 
         /// <summary>
