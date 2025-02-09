@@ -1,7 +1,9 @@
 ﻿
+using Discord;
 using Discord.Audio;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Mysqlx.Session;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,60 +20,8 @@ using YoutubeExplode.Videos.Streams;
 
 namespace Sally.NET.Core
 {
-    struct VideoInfo : IEquatable<VideoInfo>
-    {
-        public string Id { get; set; }
-        public string Path { get; set; }
-        public TimeSpan Duration { get; set; }
-        public string LowResUrl { get; set; }
-        public string Url { get; set; }
-        public string SongTitle { get; set; }
-        public string Author { get; set; }
-        public long Views { get; set; }
-
-        public VideoInfo(Video video, string path)
-        {
-            this.Id = video.Id;
-            this.Path = path;
-            this.Duration = video.Duration.GetValueOrDefault();
-            this.LowResUrl = video.Thumbnails[0].Url;
-            this.Url = video.Url;
-            this.SongTitle = video.Title;
-            this.Author = video.Author.ChannelTitle;
-            this.Views = video.Engagement.ViewCount;
-        }
-        public string Interpret
-        {
-            get
-            {
-                if (!SongTitle.Contains("-"))
-                {
-                    return Author;
-                }
-                return SongTitle.Substring(0, SongTitle.IndexOf("-")).Trim();
-            }
-        }
-        public string Title
-        {
-            get
-            {
-                if (!SongTitle.Contains("-"))
-                {
-                    return SongTitle;
-                }
-                return SongTitle.Substring(SongTitle.IndexOf("-") + 1).Trim();
-            }
-        }
-
-        public bool Equals(VideoInfo other)
-        {
-            return this.Id == other.Id;
-        }
-    }
     public class MusicPlayer
     {
-        private TaskCompletionSource<bool> taskCompletionSource = new();
-        private CancellationTokenSource cancellationTokenSource = new();
         private List<VideoInfo> musicQueue = new();
         private VideoInfo currentVideoInfo;
         private int currentVideoIndex = -1;
@@ -81,6 +31,38 @@ namespace Sally.NET.Core
         private string lastStatus = "Initialize...";
         private Stopwatch stopwatch = new();
         private IAudioClient audioClient;
+        private bool pause
+        {
+            get => _internalPause;
+            set
+            {
+                Task.Run(() => taskCompletionSource.TrySetResult(value));
+                _internalPause = value;
+                if (value)
+                {
+                    stopwatch.Stop();
+                }
+                else if (!stopwatch.IsRunning)
+                {
+                    stopwatch.Start();
+                }
+            }
+        }
+        private bool _internalPause;
+        private bool skip
+        {
+            get
+            {
+                bool ret = _internalSkip;
+                _internalSkip = false;
+                return ret;
+            }
+            set => _internalSkip = value;
+        }
+        private bool _internalSkip = false;
+        private bool repeat = false;
+        private TaskCompletionSource<bool> taskCompletionSource = new TaskCompletionSource<bool>();
+        private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         public MusicPlayer(IAudioClient audioClient)
         {
             this.audioClient = audioClient;
@@ -225,7 +207,7 @@ namespace Sally.NET.Core
                             {
                                 lastStatus = "Playing";
                             }
-                            await sendAudio(currentVideoInfo.Path);
+                            await sendAudioAsync(currentVideoInfo.Path);
                             try
                             {
                                 lock (musicQueue)
@@ -287,7 +269,7 @@ namespace Sally.NET.Core
             isSkipped = true;
         }
 
-        private async Task sendAudio(string path)
+        private async Task sendAudioAsync(string path)
         {
             await audioClient.SetSpeakingAsync(true);
             try
@@ -378,6 +360,59 @@ namespace Sally.NET.Core
                 }
             }
             return null;
+        }
+
+        public Embed AudioInfoEmbed()
+        {
+            EmbedBuilder dynamicEmbed = new EmbedBuilder();
+            if (currentVideoInfo.Path == null)
+            {
+                dynamicEmbed
+                .WithDescription("Use `$add url` to add music to the queue")
+                .WithAuthor("Welcome to the music player")
+                .WithColor(Color.DarkBlue)
+                .WithTitle("♪♫♪ Media Player ♫♪♫")
+                .WithFooter(f => f.Text = "stop \u23EF, skip \u23ED, previous \u23EE, repeat \U0001F502");
+            }
+            else
+            {
+                dynamicEmbed
+                .WithAuthor($"{currentVideoInfo.Title}")
+                .WithColor(Color.DarkPurple)
+                .WithDescription($"`|{"".PadLeft((int)(40.0 * (stopwatch.Elapsed.TotalSeconds / currentVideoInfo.Duration.TotalSeconds)), '#').PadRight(40, '-')}|`\n\nZeit: {stopwatch.Elapsed.FormatTime()} / {currentVideoInfo.Duration.FormatTime()}")
+                .WithFooter(f => f.Text = "stop \u23EF, skip \u23ED, previous \u23EE, repeat \U0001F502")
+                .WithTitle($"{currentVideoInfo.Interpret}\n\n")
+                .WithUrl(currentVideoInfo.Url)
+                .WithThumbnailUrl(currentVideoInfo.LowResUrl);
+            }
+            lock (musicQueue)
+            {
+                foreach (VideoInfo song in musicQueue)
+                {
+                    if (song.Equals(currentVideoInfo))
+                    {
+                        dynamicEmbed.AddField($"{(pause ? ":pause_button:" : ":arrow_forward:")}  {(repeat ? "\U0001F502" : "")}" + song.Title, song.Duration.FormatTime());
+                    }
+                    else
+                    {
+                        dynamicEmbed.AddField(song.Title, song.Duration.FormatTime() + $" https://youtu.be/{song.Id}");
+                    }
+
+                }
+                lock (lastStatus)
+                {
+                    dynamicEmbed.AddField("Status:", lastStatus);
+                }
+            }
+            return dynamicEmbed.Build();
+        }
+    }
+
+    public static class TimeSpanExtension
+    {
+        public static string FormatTime(this TimeSpan timeSpan)
+        {
+            return ((timeSpan.Hours > 0) ? timeSpan.ToString("h\\:mm\\:ss") : timeSpan.ToString("mm\\:ss"));
         }
     }
 }
