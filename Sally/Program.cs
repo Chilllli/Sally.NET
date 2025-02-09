@@ -17,6 +17,7 @@ using Sally.NET.Handler;
 using Microsoft.Extensions.DependencyInjection;
 using Sally.NET.Core.Enum;
 using Sally.NET.Module;
+using Microsoft.Extensions.Hosting;
 
 namespace Sally
 {
@@ -24,10 +25,10 @@ namespace Sally
     {
         public static async Task Main(string[] args)
         {
-            await new Program().MainAsync();
+            await new Program().MainAsync(args);
         }
 
-        public async Task MainAsync()
+        public async Task MainAsync(string[] args)
         {
             ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
@@ -65,45 +66,46 @@ namespace Sally
             });
 
 
-            IServiceCollection serviceCollection = new ServiceCollection()
-              .AddSingleton(client)
-              .AddSingleton(botConfiguration)
-              .AddSingleton<CleverbotApiHandler>()
-              .AddSingleton<ColornamesApiHandler>()
-              .AddSingleton<KonachanApiHandler>()
-              .AddSingleton<WeatherApiHandler>()
-              .AddSingleton<WikipediaApiHandler>()
-              .AddSingleton<MusicModule>()
-              .AddSingleton<GeneralModule>()
-              .AddSingleton(CredentialManager)
-              .AddSingleton<Helper>()
-              .AddSingleton(logger)
-              .AddSingleton<GameModule>()
-              .AddSingleton<CommandHandlerService>()
-              .AddSingleton<Bot>()
-              .AddSingleton<VoiceRewardService>()
-              .AddSingleton<OAuthHttpListener>();
-
-            serviceCollection.AddHttpClient<CleverbotApiHandler>(c => c.BaseAddress = new("https://www.cleverbot.com"));
-            serviceCollection.AddHttpClient<ColornamesApiHandler>(c => c.BaseAddress = new("https://colornames.org"));
-            serviceCollection.AddHttpClient<KonachanApiHandler>(c => c.BaseAddress = new("https://konachan.com"));
-            serviceCollection.AddHttpClient<WeatherApiHandler>(c => c.BaseAddress = new("https://api.openweathermap.org"));
-            serviceCollection.AddHttpClient<WikipediaApiHandler>(c => c.BaseAddress = new("https://en.wikipedia.org"));
-
-            switch (botConfiguration.SQLType)
+            IHost host = Host.CreateDefaultBuilder(args).ConfigureServices((_, services) =>
             {
-                case SQLType.Sqlite:
-                    serviceCollection.AddSingleton<IDBAccess>(new SQLiteAccess(botConfiguration.SqliteConnectionString));
-                    break;
-                case SQLType.MySQL:
-                    serviceCollection.AddSingleton<IDBAccess>(new MySQLAccess(botConfiguration.DbUser, botConfiguration.DbPassword, botConfiguration.Db, botConfiguration.DbHost));
-                    break;
-                default:
+                services.AddSingleton(client)
+                .AddSingleton(botConfiguration)
+                .AddSingleton<CleverbotApiHandler>()
+                .AddSingleton<ColornamesApiHandler>()
+                .AddSingleton<KonachanApiHandler>()
+                .AddSingleton<WeatherApiHandler>()
+                .AddSingleton<WikipediaApiHandler>()
+                .AddSingleton<MusicModule>()
+                .AddSingleton<GeneralModule>()
+                .AddSingleton(CredentialManager)
+                .AddSingleton<Helper>()
+                .AddSingleton(logger)
+                .AddSingleton<GameModule>()
+                .AddSingleton<CommandHandlerService>()
+                .AddSingleton<Bot>()
+                .AddSingleton<VoiceRewardService>()
+                .AddSingleton<OAuthHttpListener>();
+                services.AddHttpClient<CleverbotApiHandler>(c => c.BaseAddress = new("https://www.cleverbot.com"));
+                services.AddHttpClient<ColornamesApiHandler>(c => c.BaseAddress = new("https://colornames.org"));
+                services.AddHttpClient<KonachanApiHandler>(c => c.BaseAddress = new("https://konachan.com"));
+                services.AddHttpClient<WeatherApiHandler>(c => c.BaseAddress = new("https://api.openweathermap.org"));
+                services.AddHttpClient<WikipediaApiHandler>(c => c.BaseAddress = new("https://en.wikipedia.org"));
 
-                    break;
-            }
-            IServiceProvider services = serviceCollection.BuildServiceProvider();
-            var bot = services.GetRequiredService<Bot>();
+                switch (botConfiguration.SQLType)
+                {
+                    case SQLType.Sqlite:
+                        services.AddSingleton<IDBAccess>(new SQLiteAccess(botConfiguration.SqliteConnectionString));
+                        break;
+                    case SQLType.MySQL:
+                        services.AddSingleton<IDBAccess>(new MySQLAccess(botConfiguration.DbUser, botConfiguration.DbPassword, botConfiguration.Db, botConfiguration.DbHost));
+                        break;
+                    default:
+
+                        break;
+                }
+            }).Build();
+
+            var bot = host.Services.GetRequiredService<Bot>();
             await bot.RunAsync();
             // Block this task until the program is closed.
             await Task.Delay(-1);
